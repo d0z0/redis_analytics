@@ -48,10 +48,10 @@ module Rack
           end
         end
         # simply update the visit_start_time and visit_end_time
-        env['action_dispatch.cookies'][Rack::RedisAnalytics.visit_cookie_name] = {:value => "#{seq}.#{visit_start_time}.#{t.to_i}", :expires => Rack::RedisAnalytics.visit_ttl.to_i.minutes.from_now}
+        env['action_dispatch.cookies'][Rack::RedisAnalytics.visit_cookie_name] = {:value => "#{seq}.#{visit_start_time}.#{t.to_i}", :expires => Rack::RedisAnalytics.visit_timeout.to_i.minutes.from_now}
 
         # create the permanent cookie
-        env['action_dispatch.cookies'].permanent[Rack::RedisAnalytics.returning_user_cookie_name] = "RedisAnalytics (c)"
+        env['action_dispatch.cookies'].permanent[Rack::RedisAnalytics.returning_user_cookie_name] = "RedisAnalytics - copyright Schubert Cardozo - 2013 - http://www.github.com/saturnine/redis_analytics"
 
         puts "VISIT = #{seq} [#{t}]"
 
