@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency('rack')
   spec.add_dependency('redis')
+  spec.add_dependency('useragent')
   spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec')
   spec.add_development_dependency('mocha')
