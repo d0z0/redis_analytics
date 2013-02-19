@@ -18,7 +18,7 @@ module Rack
 
       # Redis namespace for keys
       def redis_namespace
-        @redis_namespace ||= 'ra:'
+        @redis_namespace ||= 'ra'
       end
 
       # Minutes the visit should timeout after (if no hit is received)
