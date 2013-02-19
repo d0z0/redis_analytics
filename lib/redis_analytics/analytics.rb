@@ -7,23 +7,32 @@ module Rack
       end
       
       def call(env)
-        @status, @headers, @response = @app.call(env)
+        t0 = Time.now
+        @request = Rack::Request.new(env)
+        # call the @app
+        status, headers, body = @app.call(env)
+
+        # create a response
+        @response = Rack::Response.new body, status, headers
+        
         t = Time.now
-        if visit = env['action_dispatch.cookies'][Rack::RedisAnalytics.returning_user_cookie_name]
-          track_recent_visit(env, t)
+        if visit = @request.cookies[Rack::RedisAnalytics.returning_user_cookie_name]
+          track_recent_visit(t)
         else
-          unless track_recent_visit(env, t)
+          unless track_recent_visit(t)
             [t.strftime("%Y"), t.strftime("%Y_%m"), t.strftime("%Y_%m_%d"), t.strftime("%Y_%m_%d_%H")].each do |ts|
               Rack::RedisAnalytics.redis_connection.incr("NEW_VISITS_#{ts}")
             end
           end
         end
-        [@status, @headers, @response]
-      end
 
-      def track_recent_visit(env, t)
+        # write the response
+        @response.finish
+      end
+      
+      def track_recent_visit(t)
         visit_start_time, visit_end_time = t.to_i
-        if recent_visit = env['action_dispatch.cookies'][Rack::RedisAnalytics.visit_cookie_name]
+        if recent_visit = @request.cookies[Rack::RedisAnalytics.visit_cookie_name]
           # recent visit was made
           seq, visit_start_time, visit_end_time = recent_visit.split('.')
           # add to total visit time
@@ -48,10 +57,10 @@ module Rack
           end
         end
         # simply update the visit_start_time and visit_end_time
-        env['action_dispatch.cookies'][Rack::RedisAnalytics.visit_cookie_name] = {:value => "#{seq}.#{visit_start_time}.#{t.to_i}", :expires => Rack::RedisAnalytics.visit_timeout.to_i.minutes.from_now}
+        @response.set_cookie(Rack::RedisAnalytics.visit_cookie_name, {:value => "#{seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (Rack::RedisAnalytics.visit_timeout.to_i * 60 )})
 
-        # create the permanent cookie
-        env['action_dispatch.cookies'].permanent[Rack::RedisAnalytics.returning_user_cookie_name] = "RedisAnalytics - copyright Schubert Cardozo - 2013 - http://www.github.com/saturnine/redis_analytics"
+        # create the permanent cookie (2 years)
+        @response.set_cookie(Rack::RedisAnalytics.returning_user_cookie_name, {:value => "RedisAnalytics - copyright Schubert Cardozo - 2013 - http://www.github.com/saturnine/redis_analytics", :expires => t + (2 * 365 * 24 * 60 * 60)})
 
         puts "VISIT = #{seq} [#{t}]"
 
