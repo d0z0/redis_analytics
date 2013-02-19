@@ -1,5 +1,6 @@
 require 'rack'
 require 'redis'
+require 'useragent'
 
 require 'redis_analytics'
 require 'redis_analytics/version'
