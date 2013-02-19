@@ -28,12 +28,12 @@ module Rack
 
       # Name of the cookie which tracks returning visitors (known visitors)
       def returning_user_cookie_name
-        @returning_user_cookie_name ||= :_rucn
+        @returning_user_cookie_name ||= '_rucn'
       end
 
       # Name of the cookie which tracks visits
       def visit_cookie_name
-        @visit_cookie_name ||= :_vcn
+        @visit_cookie_name ||= '_vcn'
       end
       
       def configure
