@@ -22,7 +22,7 @@ describe Rack::RedisAnalytics::Analytics do
       get '/'
       last_response.original_headers['Set-Cookie'].should =~ /#{Rack::RedisAnalytics.visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}/
       t2 = t1 + (Rack::RedisAnalytics.visit_timeout * 60) - 1
-      # Time.stubs(:now).returns(t2)
+      Time.stubs(:now).returns(t2)
       get '/'
       last_response.original_headers['Set-Cookie'].should =~ /#{Rack::RedisAnalytics.visit_cookie_name}=1.#{t1.to_i}.#{t2.to_i}/
     end
