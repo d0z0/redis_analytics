@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
   #spec.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency('rack')
-  spec.add_dependency('redis')
-  spec.add_dependency('useragent')
+  spec.add_runtime_dependency('rack')
+  spec.add_runtime_dependency('redis')
+  spec.add_runtime_dependency('browser')
   spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec')
   spec.add_development_dependency('mocha')
