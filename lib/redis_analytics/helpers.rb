@@ -18,7 +18,6 @@ module Rack
       end
 
       def data(granularity, type, from_date, to_date = Time.now)
-
         i = from_date
         union = []
         begin
@@ -41,23 +40,6 @@ module Rack
       
       def get_next_seq
         seq = Rack::RedisAnalytics.redis_connection.incr("#{Rack::RedisAnalytics.redis_namespace}:#SEQUENCER")
-      end
-      
-      # helpers for platform/browser
-      def browsers(time = nil)
-        Rack::RedisAnalytics.redis_connection.zrange("#{RedisAnalytics.redis_namespace}:UA_B_#{t.strftimex}", 0, -1, :with_scores => true)
-      end
-      
-      # def browser_versions(time = nil)
-      #   Rack::RedisAnalytics.redis_connection.zrange("#{RedisAnalytics.redis_namespace}:UA_B_V_#{t.strftime}", 0, -1, :with_scores => true)
-      # end
-
-      def os_platforms(time = nil)
-        Rack::RedisAnalytics.redis_connection.zrange("#{RedisAnalytics.redis_namespace}:UA_OS_#{t.strftime}", 0, -1, :with_scores => true)
-      end
-
-      def devices(time = nil)
-        Rack::RedisAnalytics.redis_connection.zrange("#{RedisAnalytics.redis_namespace}:UA_D_#{t.strftime}", 0, -1, :with_scores => true)
       end
 
     end
