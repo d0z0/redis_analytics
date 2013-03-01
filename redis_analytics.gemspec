@@ -14,14 +14,14 @@ Gem::Specification.new do |spec|
 
   spec.rubyforge_project = "redis_analytics"
 
-  spec.files          = Dir.glob("**/*.rb")
+  spec.files          = Dir.glob("**/*")
   #spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   #spec.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   spec.require_paths  = ["lib"]
 
-  spec.add_runtime_dependency('rack', '~> 1.4.5')
-  spec.add_runtime_dependency('redis', '~> 3.0.2')
-  spec.add_runtime_dependency('browser', '~> 0.1.6')
+  spec.add_runtime_dependency('rack', '>= 1.4.5')
+  spec.add_runtime_dependency('redis', '>= 3.0.2')
+  spec.add_runtime_dependency('browser', '>= 0.1.6')
 
   spec.add_development_dependency('rake', '>= 10.0.3')
   spec.add_development_dependency('rspec', '>= 2.11.0')
