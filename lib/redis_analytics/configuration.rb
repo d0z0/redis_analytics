@@ -16,6 +16,9 @@ module Rack
       # Minutes the visit should timeout after (if no hit is received)
       attr_writer :visit_timeout
 
+      # Endpoint for dashboard
+      attr_writer :dashboard_endpoint
+
       # Redis namespace for keys
       def redis_namespace
         @redis_namespace ||= 'ra'
@@ -35,7 +38,11 @@ module Rack
       def visit_cookie_name
         @visit_cookie_name ||= '_vcn'
       end
-      
+ 
+      def dashboard_endpoint
+        @dashboard_endpoint ||= '/dashboard'
+      end
+     
       def configure
         yield self
       end
