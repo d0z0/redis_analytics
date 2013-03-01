@@ -2,7 +2,7 @@
 require 'digest/md5'
 module Rack
   module RedisAnalytics
-
+    
     class Analytics
       
       PAGEVIEWS = [['/health', 'o', 'd', 't'], ['/track', 'o', 'd', 't']]
@@ -32,11 +32,15 @@ module Rack
       end
       
       def call(env)
+        record_visits(env)
+      end
+      
+      def record_visits(env)
         t0 = Time.now
         @request = Rack::Request.new(env)
         # call the @app
         status, headers, body = @app.call(env)
-
+        
         # create a response
         @response = Rack::Response.new(body, status, headers)
         
@@ -52,28 +56,25 @@ module Rack
               RedisAnalytics.redis_connection.hset("#{@redis_key_prefix}page", h, v)
               RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_#{i}_#{page.index(k)}_#{h}:#{ts}")
             end
-            # RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}x:#{i}_#{v}_:#{t.strftime('%Y_%m_%d_%H_%M')}")
-            # RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}x:#{i}_#{v}_:#{t.strftime('%Y_%m_%d_%H_%M')}", 60*60)
           end
-          
         end
-
+        
         # record visits
         if visit = @request.cookies[RedisAnalytics.returning_user_cookie_name]
-          track_recent_visit(t)
+          record_recent_visit(t)
         else
-          unless track_recent_visit(t)
+          unless record_recent_visit(t)
             [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
               RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
             end
           end
         end
-
+        
         # write the response
         @response.finish
       end
       
-      def track_recent_visit(t)
+      def record_recent_visit(t)
         visit_start_time, visit_end_time = t.to_i
         if recent_visit = @request.cookies[RedisAnalytics.visit_cookie_name]
           # recent visit was made
@@ -89,7 +90,7 @@ module Rack
             seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
             # add to total unique visits
             RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", seq)
-
+            
             # add ua info
             ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
