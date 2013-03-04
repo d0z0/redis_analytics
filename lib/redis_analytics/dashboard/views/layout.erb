@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Redis Analytics Dashboard</title>
+
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/dashboard/javascripts/flot/excanvas.min.js"></script><![endif]-->
+  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.js"></script>
+  <script language="javascript" type="text/javascript" src="javascripts/bootstrap.js"></script>
+  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.flot.time.js"></script>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  
+</head>
+<body>
+  <%= erb(:header, :layout => false) %>
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span8">
+	<%= yield %>
+      </div>
+      <div class="span4">
+	<br/>
+      </div>
+    </div>
+    <%= erb(:footer, :layout => false) %>
+</body>
+</html>
