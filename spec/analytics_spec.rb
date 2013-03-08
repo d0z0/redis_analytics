@@ -16,6 +16,8 @@ describe Rack::RedisAnalytics::Analytics do
     # @redis_connection.flushdb
   end
 
+  # Spec for Cookies
+  
   context "when a visit has not timed out" do
     it "should count as the same visit" do
       t1 = Time.now
@@ -45,7 +47,5 @@ describe Rack::RedisAnalytics::Analytics do
     get '/'
     last_response.original_headers['Set-Cookie'].should =~ /#{Rack::RedisAnalytics.returning_user_cookie_name}=/
   end
-  
-  
-  
+
 end
