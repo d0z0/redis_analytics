@@ -26,7 +26,7 @@ module Rack
 
       # Minutes the visit should timeout after (if no hit is received)
       def visit_timeout
-        @visit_timeout ||= 15 # minutes
+        @visit_timeout ||= 1 # minutes
       end
 
       # Name of the cookie which tracks returning visitors (known visitors)
