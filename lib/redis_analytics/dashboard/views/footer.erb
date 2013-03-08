@@ -1,0 +1,103 @@
+<!-- start footer -->
+
+<script type="text/javascript" language="text/javascript">
+visits_area = Morris.Area({
+  element: 'visits_area',
+  xkey: 'date',
+  data: <%=@week_visits_and_new_visits.to_json%>,
+  ykeys: ['new_visits', 'returning_visits'],
+  labels: ['New Visits', 'Returning Visits'],
+  ymax: 'auto 20',
+  pointSize: '2px',
+  hideHover: 'auto',
+  events: ['2013-03-02', '2013-03-03'],
+  eventStrokeWidth: '5px',
+  eventLineColors: ['#ccc', '#eee']
+});
+
+visits_donut = Morris.Donut({
+  element: 'visits_donut',
+  data: <%=@week_visits_and_new_visits_donut.to_json%>
+});
+
+unique_visits_line = Morris.Bar({
+  element: 'unique_visits_line',
+  xkey: 'day_of_week',
+  data: <%=@week_unique_visits.to_json%>,
+  ykeys: ['unique_visits_this', 'unique_visits_last'],
+  labels: ['This Week', 'Last Week'],
+  ymax: 'auto 20',
+  hideHover: 'auto',
+  stacked: true,
+});
+
+traffic_donut = Morris.Donut({
+  element: 'traffic_donut',
+  data: [{"label":"Google","value":6482},{"label":"Bing","value":2136},{"label":"Direct","value":8136},{"label":"Other","value":5136}]
+});
+
+
+function changeTimeFrame(range)
+{
+switch(range)
+{
+case 'day':
+visits_area.setData(<%=@day_visits_and_new_visits.to_json%>);
+visits_donut.setData(<%=@day_visits_and_new_visits_donut.to_json%>);
+case 'week':
+visits_area.setData(<%=@week_visits_and_new_visits.to_json%>);
+visits_donut.setData(<%=@week_visits_and_new_visits_donut.to_json%>);
+case 'month':
+visits_area.setData(<%=@month_visits_and_new_visits.to_json%>);
+visits_donut.setData(<%=@month_visits_and_new_visits_donut.to_json%>);
+break;
+}
+}
+
+
+var geoLocationData = {
+  "IN": 3230,
+  "AE": 235,
+  "KW": 132,
+  "QR": 109
+};
+
+$(function(){
+  $('#world-map-gdp').vectorMap({
+    map: 'world_mill_en',
+    min: 0,
+    backgroundColor: '#fff',
+regionStyle: {
+  initial: {
+    fill: '#ddd',
+    "fill-opacity": 1,
+    stroke: 'none',
+    "stroke-width": 0,
+    "stroke-opacity": 1
+  },
+  hover: {
+    fill: '#bbb',
+    "fill-opacity": 0.8
+  },
+  selected: {
+    fill: 'yellow'
+  },
+  selectedHover: {
+  }
+},
+    series: {
+      regions: [{
+        scale: ['#C8EEFF', '#0071A4'],
+        values: geoLocationData,
+        normalizeFunction: 'polynomial'
+      }]
+    },
+    onLabelShow: function(e, el, code){
+      el.html(el.html()+' (GDP - '+geoLocationData[code]+')');
+    }
+  });
+});
+</script>
+<script language="javascript" type="text/javascript" src="<%=$template_prefix%>/javascripts/bootstrap.min.js"></script>
+
+<!-- end footer -->
