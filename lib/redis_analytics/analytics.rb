@@ -60,36 +60,128 @@ module Rack
         end
         
         # record visits
-        if visit = @request.cookies[RedisAnalytics.returning_user_cookie_name]
-          record_recent_visit(t)
-        else
-          unless record_recent_visit(t)
-            [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
-              RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
-            end
-          end
+        # if returning_visitor = @request.cookies[RedisAnalytics.returning_user_cookie_name]
+        #   # RETURNING VISITOR (NEW OR SAME VISIT)
+        #   rucn_seq, first_visit_time = returning_visitor.split('.')
+        #   record_recent_visitor(t, rucn_seq, first_visit_time)
+        # else
+        #   unless record_recent_visitor(t)
+        #     # FIRST TIME VISITOR
+        #     [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+        #       RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
+        #     end
+        #   end
+        # end
+
+        # new code
+
+        returning_visitor = @request.cookies[RedisAnalytics.returning_user_cookie_name]
+        recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
+
+        vcn_seq, rucn_seq = nil
+
+        visit_start_time =visit_end_time = first_visit_time = t.to_i
+
+        if not returning_visitor and not recent_visitor
+          rucn_seq= RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
+          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
+          new_visit(t)
+          unique_visit(t, rucn_seq)
+          visit(t)
+          visit_time(t, t.to_i)
+          # new visit
+          # rucn_seq ++ and push to unique
+          # visits ++
+          # update visit time
+        elsif returning_visitor and not recent_visitor
+          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
+          rucn_seq, first_visit_time = returning_visitor.split('.')
+          unique_visit(t, rucn_seq)
+          visit(t)
+          # get rucn_seq and push to unique
+          # visits ++
+        elsif returning_visitor and recent_visitor
+          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
+          rucn_seq, first_visit_time = returning_visitor.split('.')
+          visit_time(t, visit_end_time.to_i)
+          # visit_time ++
+        elsif not returning_visitor and recent_visitor
+          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
+          unique_visit(t, rucn_seq)
+          visit_time(t, visit_end_time.to_i)
+          # get rucn_seq from vcn and push to unique
+          # visit_time ++
         end
-        
+
+        # create the recent visit cookie
+        @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
+
+        # create the permanent cookie (2 years)
+        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (2 * 365 * 24 * 60 * 60)})
+
+        puts "TIME = [#{t}]"
+        puts "VISIT = #{vcn_seq}"
+        puts "UNIQUE VISIT = #{rucn_seq}"
+
         # write the response
         @response.finish
       end
       
-      def record_recent_visit(t)
+      def new_visit(t)
+        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
+        end
+      end
+      
+      def unique_visit(t, rucn_seq)
+        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+          RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
+        end
+      end
+
+      def visit(t)
+        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+
+          # increment the total visits
+          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+
+          # add ua info
+          ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
+          RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
+          RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_platforms:#{ts}", 1, ua.platform.to_s)
+          RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_devices:#{ts}", 1, ua.mobile? ? 'M' : 'D')
+
+        end        
+      end
+
+      def visit_time(t, visit_end_time = nil)
+        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+          RedisAnalytics.redis_connection.incrby("#{@redis_key_prefix}visit_time:#{ts}", t.to_i - visit_end_time)
+        end
+      end
+
+      def record_recent_visitor(t, rucn_seq = nil, first_visit_time = nil)
         visit_start_time, visit_end_time = t.to_i
-        if recent_visit = @request.cookies[RedisAnalytics.visit_cookie_name]
-          # recent visit was made
-          seq, visit_start_time, visit_end_time = recent_visit.split('.')
+        first_visit_time ||= t.to_i
+
+        if recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
+          # SAME VISIT
+          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
           # add to total visit time
           [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
             RedisAnalytics.redis_connection.incrby("#{@redis_key_prefix}visit_time:#{ts}", t.to_i - visit_end_time.to_i)
           end
         else
-          # no recent visit
+          # NEW VISIT FROM RETURNING VISITOR
+          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
+          rucn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
+          
           [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
             # increment the total visits
-            seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+            RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+            
             # add to total unique visits
-            RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", seq)
+            RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
             
             # add ua info
             ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
@@ -99,17 +191,22 @@ module Rack
           end
         end
         # simply update the visit_start_time and visit_end_time
-        @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
+
+
+        # create the recent visit cookie
+        @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
 
         # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "RedisAnalytics - copyright Schubert Cardozo - 2013 - http://www.github.com/saturnine/redis_analytics", :expires => t + (2 * 365 * 24 * 60 * 60)})
+        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (24 * 60 * 60)})
 
-        puts "VISIT = #{seq} [#{t}]"
+        puts "TIME = [#{t}]"
+        puts "VISIT = #{vcn_seq}"
+        puts "UNIQUE VISIT = #{rucn_seq}"
 
         # return the sequencer
-        recent_visit
+        recent_visitor
       end
-      
+
     end
   end
 end
