@@ -2,29 +2,29 @@
 <html lang="en">
 <head>
     <title>Redis Analytics Dashboard</title>
+    <!-- morris js -->
+    <link rel="stylesheet" href="//cdn.oesmith.co.uk/morris-0.4.1.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdn.oesmith.co.uk/morris-0.4.1.min.js"></script>  
 
-  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/dashboard/javascripts/flot/excanvas.min.js"></script><![endif]-->
-  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.js"></script>
-  <script language="javascript" type="text/javascript" src="javascripts/bootstrap.js"></script>
-  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.flot.js"></script>
-  <script language="javascript" type="text/javascript" src="javascripts/flot/jquery.flot.time.js"></script>
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  
+    <!-- jvectormap -->
+    <link rel="stylesheet" href="<%=$template_prefix%>/javascripts/jquery-jvectormap-1.2.2.css" type="text/css" media="screen"/>
+    <script src="<%=$template_prefix%>/javascripts/jquery-jvectormap-1.2.2.min.js"></script>    
+    <script src="<%=$template_prefix%>/javascripts/jquery-jvectormap-world-mill-en.js"></script>    
+
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<%=$template_prefix%>/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="<%=$template_prefix%>/css/bootstrap-responsive.css" rel="stylesheet">
+    
 </head>
 <body>
   <%= erb(:header, :layout => false) %>
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span8">
-	<%= yield %>
-      </div>
-      <div class="span4">
-	<br/>
-      </div>
-    </div>
-    <%= erb(:footer, :layout => false) %>
+  <!-- start yield -->
+  <%=yield%>
+  <!-- end yield -->
+  <%= erb(:footer, :layout => false) %>
 </body>
 </html>
