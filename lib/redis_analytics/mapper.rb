@@ -7,9 +7,11 @@ module Rack
           map '/' do
             run Analytics.new(app)
           end
-          
-          map RedisAnalytics.dashboard_endpoint do
-            run Dashboard.new
+
+          if defined? Dashboard
+            map RedisAnalytics.dashboard_endpoint do
+              run Dashboard.new
+            end
           end
         end
       end

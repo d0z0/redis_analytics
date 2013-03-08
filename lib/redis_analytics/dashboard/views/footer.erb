@@ -20,6 +20,17 @@ visits_donut = Morris.Donut({
   data: <%=@week_visits_and_new_visits_donut.to_json%>
 });
 
+traffic_donut = Morris.Donut({
+  element: 'traffic_donut',
+  data: [{"label":"Google","value":6482},{"label":"Bing","value":2136},{"label":"Direct","value":8136},{"label":"Other","value":5136}]
+});
+
+visitor_info_donut = Morris.Donut({
+  element: 'visitor_info_donut',
+  data: [{"label":"Chrome","value":6482},{"label":"Firefox","value":2195},{"label":"Internet Explorer","value":8142}]
+});
+
+
 unique_visits_line = Morris.Bar({
   element: 'unique_visits_line',
   xkey: 'day_of_week',
@@ -28,14 +39,8 @@ unique_visits_line = Morris.Bar({
   labels: ['This Week', 'Last Week'],
   ymax: 'auto 20',
   hideHover: 'auto',
-  stacked: true,
+  stacked: true
 });
-
-traffic_donut = Morris.Donut({
-  element: 'traffic_donut',
-  data: [{"label":"Google","value":6482},{"label":"Bing","value":2136},{"label":"Direct","value":8136},{"label":"Other","value":5136}]
-});
-
 
 function changeTimeFrame(range)
 {

@@ -36,7 +36,7 @@ module Rack
       end
       
       def record_visits(env)
-        t0 = Time.now
+        t0 = Time.now 
         @request = Rack::Request.new(env)
         # call the @app
         status, headers, body = @app.call(env)
@@ -44,7 +44,7 @@ module Rack
         # create a response
         @response = Rack::Response.new(body, status, headers)
         
-        t = Time.now
+        t = Time.now 
         # record pageviews
         path = @request.path
         params = @request.params
