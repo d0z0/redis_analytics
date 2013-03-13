@@ -7,14 +7,18 @@ visits_area = Morris.Area({
   data: <%=@data[:week][:visits_new_visits][:plot].to_json%>,
   ykeys: ['new_visits', 'returning_visits'],
   labels: ['New Visits', 'Returning Visits'],
-  ymax: 'auto 20',
-  events: ['2013-03-02', '2013-03-03'],
+  ymax: 'auto',
+  //events: ['2013-03-02', '2013-03-03'],
+    grid: true,
   eventStrokeWidth: 2,
   eventLineColors: ['#ccc', '#eee'],
   smooth: true,
-  hideHover: true,
+  hideHover: 'auto',
   lineWidth: 2,
-  pointSize: 1,
+  pointSize: 0,
+   //  xLabels: 'day',
+    xLabelFormat: function(x) {return '';},
+
   // hoverCallback: function(index, series)
   //   {
   // 	h = series.data[index];
@@ -41,15 +45,32 @@ visitor_info_donut = Morris.Donut({
 });
 
 
-unique_visits_line = Morris.Bar({
+unique_visits_line = Morris.Line({
   element: 'unique_visits_line',
-  xkey: 'day_of_week',
+  xkey: 'unit',
   data: <%=@data[:week][:unique_visits].to_json%>,
   ykeys: ['unique_visits_this', 'unique_visits_last'],
-  labels: ['This Week', 'Last Week'],
-  ymax: 'auto 20',
+  labels: ['Current', 'Previous'],
+  ymax: 'auto',
   hideHover: 'auto',
-  stacked: true
+  parseTime: false,
+  lineWidth: 2,
+  pointSize: 0,
+  grid: true,
+  pointFillColors: ['#fff'],
+  pointStrokeColors: ['#000'],
+  // hoverCallback: function(index, series)
+  //   {
+  // 	h = series.data[index];
+  // 	this_week_color = series.lineColors[0];
+  // 	last_week_color = series.lineColors[1];
+  // 	html = '';
+  // 	html += '<font style="color:' + this_week_color + '">Current: ' + h.unique_visits_this + '</font>';
+  // 	html += '<br/>';
+  // 	html += '<font style="color:' + last_week_color + '">Previous: ' + h.unique_visits_last + '</font>';
+  // 	return html;
+  //  },
+
 });
 
 function changeTimeFrame(range)
@@ -57,14 +78,16 @@ function changeTimeFrame(range)
 switch(range)
 {
 case 'day':
-    // visits_area.setData(<%=@day_visits_and_new_visits.to_json%>);
-    // visits_donut.setData(<%=@day_visits_and_new_visits_donut.to_json%>);
+    visits_area.setData(<%=@data[:day][:visits_new_visits][:plot].to_json%>);
+    unique_visits_line.setData(<%=@data[:day][:unique_visits].to_json%>);
+    break;
 case 'week':
     visits_area.setData(<%=@data[:week][:visits_new_visits][:plot].to_json%>);
-    visits_donut.setData(<%=@data[:week][:visits_new_visits][:donut].to_json%>);
-case 'month':
-    visits_area.setData(<%=@data[:month][:visits_new_visits][:plot].to_json%>);
-    visits_donut.setData(<%=@data[:month][:visits_new_visits][:donut].to_json%>);
+    unique_visits_line.setData(<%=@data[:week][:unique_visits].to_json%>);
+    break;
+case 'year':
+    visits_area.setData(<%=@data[:year][:visits_new_visits][:plot].to_json%>);
+    unique_visits_line.setData(<%=@data[:year][:unique_visits].to_json%>);
     break;
 }
 }
