@@ -81,7 +81,7 @@ module Rack
         @data[:day][:visits_new_visits][:plot] = @data[:day][:new_visits].inject(Hash[@data[:day][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
         @data[:day][:visits_new_visits][:donut] = [{'label' => 'Returning Visitors', 'value' => @data[:day][:total_visits] - @data[:day][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:day][:total_visits]}]
 
-        day_unique_visits = hourly_unique_visits(Time.now - 2.days).map{|x,y| [x.strftime('%I %p'), y]}
+        day_unique_visits = hourly_unique_visits(Time.now - 2.days).map{|x,y| [x.strftime('%l %P'), y]}
         @data[:day][:unique_visits] = day_unique_visits[0..23].inject(Hash[day_unique_visits[24..47]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
 
         puts @data[:day][:unique_visits].inspect
