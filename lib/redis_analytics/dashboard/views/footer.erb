@@ -4,20 +4,30 @@
 visits_area = Morris.Area({
   element: 'visits_area',
   xkey: 'date',
-  data: <%=@week_visits_and_new_visits.to_json%>,
+  data: <%=@data[:week][:visits_new_visits][:plot].to_json%>,
   ykeys: ['new_visits', 'returning_visits'],
   labels: ['New Visits', 'Returning Visits'],
   ymax: 'auto 20',
-  pointSize: '2px',
-  hideHover: 'auto',
   events: ['2013-03-02', '2013-03-03'],
-  eventStrokeWidth: '5px',
-  eventLineColors: ['#ccc', '#eee']
+  eventStrokeWidth: 2,
+  eventLineColors: ['#ccc', '#eee'],
+  smooth: true,
+  hideHover: true,
+  lineWidth: 2,
+  pointSize: 1,
+  // hoverCallback: function(index, series)
+  //   {
+  // 	h = series.data[index];
+  // 	d = Date(h.x);
+  // 	return(d + '<br>' + h.new_visits);
+  //   },
+  pointFillColors: ['#fff'],
+  pointStrokeColors: ['#000'],
 });
 
 visits_donut = Morris.Donut({
   element: 'visits_donut',
-  data: <%=@week_visits_and_new_visits_donut.to_json%>
+  data: <%=@data[:week][:visits_new_visits][:donut].to_json%>
 });
 
 traffic_donut = Morris.Donut({
@@ -34,7 +44,7 @@ visitor_info_donut = Morris.Donut({
 unique_visits_line = Morris.Bar({
   element: 'unique_visits_line',
   xkey: 'day_of_week',
-  data: <%=@week_unique_visits.to_json%>,
+  data: <%=@data[:week][:unique_visits].to_json%>,
   ykeys: ['unique_visits_this', 'unique_visits_last'],
   labels: ['This Week', 'Last Week'],
   ymax: 'auto 20',
@@ -47,15 +57,15 @@ function changeTimeFrame(range)
 switch(range)
 {
 case 'day':
-visits_area.setData(<%=@day_visits_and_new_visits.to_json%>);
-visits_donut.setData(<%=@day_visits_and_new_visits_donut.to_json%>);
+    // visits_area.setData(<%=@day_visits_and_new_visits.to_json%>);
+    // visits_donut.setData(<%=@day_visits_and_new_visits_donut.to_json%>);
 case 'week':
-visits_area.setData(<%=@week_visits_and_new_visits.to_json%>);
-visits_donut.setData(<%=@week_visits_and_new_visits_donut.to_json%>);
+    visits_area.setData(<%=@data[:week][:visits_new_visits][:plot].to_json%>);
+    visits_donut.setData(<%=@data[:week][:visits_new_visits][:donut].to_json%>);
 case 'month':
-visits_area.setData(<%=@month_visits_and_new_visits.to_json%>);
-visits_donut.setData(<%=@month_visits_and_new_visits_donut.to_json%>);
-break;
+    visits_area.setData(<%=@data[:month][:visits_new_visits][:plot].to_json%>);
+    visits_donut.setData(<%=@data[:month][:visits_new_visits][:donut].to_json%>);
+    break;
 }
 }
 
