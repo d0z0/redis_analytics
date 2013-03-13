@@ -89,35 +89,42 @@ module Rack
           unique_visit(t, rucn_seq)
           visit(t)
           visit_time(t, t.to_i)
+          page_view(t)
           # new visit
           # rucn_seq ++ and push to unique
           # visits ++
-          # update visit time
+          # visit_time ++
+          # page_view ++
         elsif returning_visitor and not recent_visitor
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
           rucn_seq, first_visit_time = returning_visitor.split('.')
           unique_visit(t, rucn_seq)
           visit(t)
+          page_view(t)
           # get rucn_seq and push to unique
           # visits ++
         elsif returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
           rucn_seq, first_visit_time = returning_visitor.split('.')
           visit_time(t, visit_end_time.to_i)
+          page_view(t, visit_start_time.to_i == visit_end_time.to_i)
           # visit_time ++
+          # page_view ++
         elsif not returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
           unique_visit(t, rucn_seq)
           visit_time(t, visit_end_time.to_i)
+          page_view(t, visit_start_time.to_i == visit_end_time.to_i)
           # get rucn_seq from vcn and push to unique
           # visit_time ++
+          # page_view ++
         end
 
         # create the recent visit cookie
         @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
 
         # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (2 * 365 * 24 * 60 * 60)})
+        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (5 * 60)})
 
         puts "TIME = [#{t}]"
         puts "VISIT = #{vcn_seq}"
@@ -160,52 +167,14 @@ module Rack
         end
       end
 
-      def record_recent_visitor(t, rucn_seq = nil, first_visit_time = nil)
-        visit_start_time, visit_end_time = t.to_i
-        first_visit_time ||= t.to_i
-
-        if recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
-          # SAME VISIT
-          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
-          # add to total visit time
-          [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
-            RedisAnalytics.redis_connection.incrby("#{@redis_key_prefix}visit_time:#{ts}", t.to_i - visit_end_time.to_i)
-          end
-        else
-          # NEW VISIT FROM RETURNING VISITOR
-          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
-          rucn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
-          
-          [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
-            # increment the total visits
-            RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
-            
-            # add to total unique visits
-            RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
-            
-            # add ua info
-            ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
-            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
-            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_platforms:#{ts}", 1, ua.platform.to_s)
-            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_devices:#{ts}", 1, ua.mobile? ? 'M' : 'D')
-          end
+      # 2nd pageview in a visit
+      def page_view(t, second_page_view = false)
+        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_views:#{ts}")
+          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}second_page_views:#{ts}") if second_page_view
         end
-        # simply update the visit_start_time and visit_end_time
-
-
-        # create the recent visit cookie
-        @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
-
-        # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (24 * 60 * 60)})
-
-        puts "TIME = [#{t}]"
-        puts "VISIT = #{vcn_seq}"
-        puts "UNIQUE VISIT = #{rucn_seq}"
-
-        # return the sequencer
-        recent_visitor
       end
+
 
     end
   end
