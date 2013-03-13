@@ -39,34 +39,55 @@ module Rack
       end
 
       get '/' do
-        # MONTH
-        month_visits = daily_visits(Time.now - 1.month)
-        month_new_visits = daily_new_visits(Time.now - 1.month)
-        @month_visits_and_new_visits = month_new_visits.inject(Hash[month_visits]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
-
-        @total_month_visits = month_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @total_month_new_visits = month_new_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @month_visits_and_new_visits_donut = [{'label' => 'Returning Visitors', 'value' => @total_month_visits - @total_month_new_visits}, {'label' => 'New Visitors', 'value' => @total_month_new_visits}]
+        @data = {}
+        @data[:year] ||= {}
+        @data[:year][:visits] = monthly_visits(Time.now - 1.year)
+        @data[:year][:total_visits] = @data[:year][:visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:year][:new_visits] = monthly_new_visits(Time.now - 1.year)
+        @data[:year][:total_new_visits] = @data[:year][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:year][:visits_new_visits] ||= {}
+        @data[:year][:visits_new_visits][:plot] = @data[:year][:new_visits].inject(Hash[@data[:year][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+        @data[:year][:visits_new_visits][:donut] = [{'label' => 'Returning Visitors', 'value' => @data[:year][:total_visits] - @data[:year][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:year][:total_visits]}]
+        year_unique_visits = monthly_unique_visits(Time.now - 2.years + 1.month).map{|x,y| [x.strftime('%b'), y]}
+        puts "=====>"
+        puts year_unique_visits.inspect
+        @data[:year][:unique_visits] = year_unique_visits[0..11].inject(Hash[year_unique_visits[12..23]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
+        puts @data[:year][:unique_visits].inspect
+        year_second_page_views = monthly_second_page_views(Time.now - 1.year)
+        @data[:year][:total_second_page_views] = year_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
 
         # WEEK
-        week_visits = daily_visits(Time.now - 1.week)
-        week_new_visits = daily_new_visits(Time.now - 1.week)
-        week_unique_visits = daily_unique_visits(Time.now - 2.weeks + 1.day).map{|x,y| [x.strftime('%a'), y]}
-        @week_unique_visits = week_unique_visits[0..6].inject(Hash[week_unique_visits[7..13]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'day_of_week'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
-        @week_visits_and_new_visits = week_new_visits.inject(Hash[week_visits]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+        @data[:week] ||= {}
+        @data[:week][:visits] = daily_visits(Time.now - 1.week)
+        @data[:week][:total_visits] = @data[:week][:visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:week][:new_visits] = daily_new_visits(Time.now - 1.week)
+        @data[:week][:total_new_visits] = @data[:week][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:week][:visits_new_visits] ||= {}
+        @data[:week][:visits_new_visits][:plot] = @data[:week][:new_visits].inject(Hash[@data[:week][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+        @data[:week][:visits_new_visits][:donut] = [{'label' => 'Returning Visitors', 'value' => @data[:week][:total_visits] - @data[:week][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:week][:total_visits]}]
 
-        @total_week_visits = week_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @total_week_new_visits = week_new_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @week_visits_and_new_visits_donut = [{'label' => 'Returning Visitors', 'value' => @total_week_visits - @total_week_new_visits}, {'label' => 'New Visitors', 'value' => @total_week_new_visits}]
+        week_unique_visits = daily_unique_visits(Time.now - 2.weeks + 1.day).map{|x,y| [x.strftime('%a'), y]}
+        @data[:week][:unique_visits] = week_unique_visits[0..6].inject(Hash[week_unique_visits[7..13]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
+        week_second_page_views = daily_second_page_views(Time.now - 1.week)
+        @data[:week][:total_second_page_views] = week_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
 
         # DAY
-        day_visits = daily_visits(Time.now - 1.day)
-        day_new_visits = daily_new_visits(Time.now - 1.day)
-        @day_visits_and_new_visits = day_new_visits.inject(Hash[day_visits]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+        @data[:day] ||= {}
+        @data[:day][:visits] = hourly_visits(Time.now - 1.day)
+        @data[:day][:total_visits] = @data[:day][:visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:day][:new_visits] = hourly_new_visits(Time.now - 1.day)
+        @data[:day][:total_new_visits] = @data[:day][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
+        @data[:day][:visits_new_visits] ||= {}
+        @data[:day][:visits_new_visits][:plot] = @data[:day][:new_visits].inject(Hash[@data[:day][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k, 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+        @data[:day][:visits_new_visits][:donut] = [{'label' => 'Returning Visitors', 'value' => @data[:day][:total_visits] - @data[:day][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:day][:total_visits]}]
 
-        @total_day_visits = day_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @total_day_new_visits = day_new_visits.inject(0){|s, x| s += x[1].to_i; s}
-        @day_visits_and_new_visits_donut = [{'label' => 'Returning\nVisitors', 'value' => @total_day_visits - @total_day_new_visits}, {'label' => 'New\nVisitors', 'value' => @total_day_new_visits}]
+        day_unique_visits = hourly_unique_visits(Time.now - 2.days).map{|x,y| [x.strftime('%I %p'), y]}
+        @data[:day][:unique_visits] = day_unique_visits[0..23].inject(Hash[day_unique_visits[24..47]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
+
+        puts @data[:day][:unique_visits].inspect
+        day_second_page_views = hourly_second_page_views(Time.now - 1.day)
+        @data[:day][:total_second_page_views] = day_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
+
 
         erb :index
       end
