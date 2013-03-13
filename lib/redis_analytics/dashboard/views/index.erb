@@ -5,13 +5,17 @@
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
-	    <p class="text-center"><b>Visits Area Chart</b><i class="pull-left icon-search"></i><i class="pull-right icon-download-alt"></i></p>
+	    <p class="text-center"><b>Visits Area Chart</b><i class="pull-left icon-search"></i><a href="#"><i class="pull-right icon-download-alt"></i></a></p>
 	    <div id="visits_area" style="width:100%;height:180px;"></div>
 	  </td>
 	</tr>
       </table>
     </div>
     <div class="span2">
+
+
+
+
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
@@ -97,7 +101,7 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4>65.23% <small class="muted">bounce rate</small></h4>
+	    <h4><%=((@data[:week][:total_second_page_views].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small></h4>
 	  </td>
 	  <td>
 	    <h4>00:03:01 <small class="muted">avg time spent</small></h4>
