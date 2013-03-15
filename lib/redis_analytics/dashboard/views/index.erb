@@ -5,8 +5,8 @@
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
-	    <p class="text-center"><b>Visits and New Visits</b><i class="pull-left icon-search"></i><a href="#"><i class="pull-right icon-download-alt"></i></a></p>
-	    <div id="visits_area" style="width:100%;height:180px;"></div>
+	    <p class="text-center"><b>Visits</b><i class="pull-left icon-search"></i><a href="#"><i class="pull-right icon-download-alt"></i></a></p>
+	    <div id="visits_area" style="width:100%;height:150px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -20,7 +20,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Total Visits</b></p>
-	    <div id="visits_donut" style="width:100%;height:180px;"></div>
+	    <div id="visits_donut" style="width:100%;height:150px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -30,7 +30,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Traffic Sources</b></p>
-	    <div id="traffic_donut" style="width:100%;height:180px;"></div>
+	    <div id="traffic_donut" style="width:100%;height:150px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -39,8 +39,8 @@
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
-	    <p class="text-center"><b>Visitor Info</b></p>
-	    <div id="visitor_info_donut" style="width:100%;height:180px;"></div>
+	    <p class="text-center"><b>Browser Info</b></p>
+	    <div id="visitor_info_donut" style="width:100%;height:150px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -53,18 +53,50 @@
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
-	    <p class="text-center"><b>Unique Visits</b></p>
-	    <div id="unique_visits_line" style="width:100%;height:180px;"></div>
+	    <p class="text-center"><b>Unique Visits - Current vs Previous week</b></p>
+	    <div id="unique_visits_line" style="width:100%;height:150px;"></div>
 	  </td>
 	</tr>
       </table>
-    </div>
-    <div class="span6">
+      </div>
+    
+    <div class="span4">
       <table class="table table-bordered">
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Visitor Map</b><i class="pull-left icon-search"></i><i class="pull-right icon-download-alt"></i></p>
-	    <div id="world-map-gdp" style="width: 100%px; height: 180px"></div>
+	    <div id="world-map-gdp" style="width: 100%px; height: 150px"></div>
+	  </td>
+	</tr>
+      </table>
+    </div>
+
+    <div class="span2">
+      <table class="table table-bordered table-hover">
+	<tr>
+	  <td>
+	    <p class="text-center"><b>Visitor Recency</b></p>
+	    <div style="height:150px;">
+	      <div style="margin:5px;">
+		<small class="muted">less than 1 day (80%)</small>
+		<div class="progress" style="height: 5px; margin-bottom:10px;">
+		  <div class="bar" style="width: 80%;"></div>
+		</div>
+		<small class="muted">1-5 days (14%)</small>
+		<div class="progress" style="height: 5px; margin-bottom:10px;">
+		  <div class="bar" style="width: 14%;"></div>
+		</div>
+		<small class="muted">6-10 days (5%)</small>
+		<div class="progress" style="height: 5px; margin-bottom:10px;">
+		  <div class="bar" style="width: 5%;"></div>
+		</div>
+		<small class="muted">more than 10 days (1%)</small>
+		<div class="progress" style="height: 5px; margin-bottom:10px;">
+		  <div class="bar" style="width: 1%;"></div>
+		</div>
+
+	      </div>
+	    </div>
 	  </td>
 	</tr>
       </table>
@@ -73,7 +105,7 @@
 
   <div class="row-fluid">
     <div class="span6">
-      <table class="table table-bordered table-hover">
+      <table class="table table-bordered table-hover table-condensed">
 	<colgroup>
 	  <col style="width: 33%"></col>
 	  <col style="width: 33%"></col>
@@ -81,19 +113,24 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4>2655 <small class="muted">visits</small></h4>
+	    <h4><%=@data[:week][:total_visits]%> <small class="muted">visits</small></h4>
 	  </td>
 	  <td>
-	    <h4>5578 <small class="muted">page views</small></h4>
+	    <h4><%=@data[:week][:total_page_views]%> <small class="muted">page views</small></h4>
 	  </td>
 	  <td>
-	    <h4>2.10 <small class="muted">pages per visit</small></h4>
+	    <h4><%=(@data[:week][:total_page_views].to_f/@data[:week][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small></h4>
 	  </td>
 	</tr>
+	<tr>
+	  <td colspan="3">
+	    <div id="visits_spark" style="width:100%;height:90px;"></div>
+	  </td>
+	  </tr>
       </table>
     </div>
     <div class="span6">
-      <table class="table table-bordered table-hover">
+      <table class="table table-bordered table-hover table-condensed">
 	<colgroup>
 	  <col style="width: 33%"></col>
 	  <col style="width: 33%"></col>
@@ -107,12 +144,28 @@
 	    <h4>00:03:01 <small class="muted">avg time spent</small></h4>
 	  </td>
 	  <td>
-	    <h4>5.23% <small class="muted">new visits</small></h4>
+	    <h4><%=((@data[:week][:total_new_visits].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>
 	  </td>
 	</tr>
       </table>
     </div>
 
   </div>
+
+  <!-- <div class="row-fluid"> -->
+  <!--   <div class="span12"> -->
+  <!--     <table class="table table-bordered table-hover"> -->
+  <!-- 	<colgroup> -->
+  <!-- 	  <col style="width: 100%"></col> -->
+  <!-- 	</colgroup> -->
+  <!-- 	<tr> -->
+  <!-- 	  <td> -->
+  <!-- 	    <div id="generic_hourly_line" style="width:100%;height:50px;"></div> -->
+  <!-- 	  </td> -->
+  <!-- 	</tr> -->
+  <!--     </table> -->
+  <!--   </div> -->
+  <!-- </div> -->
+    
 
 </div>
