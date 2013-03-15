@@ -1,9 +1,21 @@
 <!-- start header -->
   <div class="navbar">
     <div class="navbar-inner">
-      <a class="brand" href="#">Dashboard</a>
+      <a class="brand" href="#">Redis Analytics<small><small><small> Dashboard <%=@t.round(2)%> sec</small></small></small></a>
+      
+
       <ul class="nav nav-pills pull-right">
 	<li>
+	  <div class="btn-group">
+            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i> Settings</button>
+            <ul class="dropdown-menu">
+              <li><a href="#">Theme</a></li>
+              <li><a href="#">Preferences</a></li>
+              <li class="divider"></li>
+              <li><a href="#">About</a></li>
+            </ul>
+          </div>
+
 	  <div class="btn-group" data-toggle="buttons-radio">
 	    <button type="button" class="btn btn-small active" onclick='changeTimeFrame("month")'>Visits</button>
 	    <button type="button" class="btn btn-small" onclick='javascript:visits_area.grid=true'>Transactions</button>
@@ -12,8 +24,10 @@
 	    <button type="button" class="btn btn-small" onclick='changeTimeFrame("year")'>Year</button>
 	    <button type="button" class="btn btn-small active" onclick='changeTimeFrame("week")'>Week</button>
 	    <button type="button" class="btn btn-small" onclick='changeTimeFrame("day")'>Day</button>
-	    <button type="button" class="btn btn-small" onclick=''>Live</button>
+	    <button type="button" class="btn btn-small" onclick=''>All</button>
+
 	  </div>
+	  
 	</li>
       </ul>
     </div>
