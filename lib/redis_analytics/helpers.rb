@@ -22,7 +22,7 @@ module Rack
       # all methods are private unless explicitly declared public
       private
       def method_missing(meth, *args, &block)
-        if meth.to_s =~ /^(minute|hour|dai|month|year)ly_(new_visits|visits|unique_visits|visit_time|ratio_browsers|ratio_platforms|ratio_devices)$/
+        if meth.to_s =~ /^(minute|hour|dai|month|year)ly_(new_visits|visits|page_views|second_page_views|unique_visits|visit_time|ratio_recency|ratio_browsers|ratio_platforms|ratio_devices)$/
           granularity = $1 + 'ly'
           type = $2
           data(granularity, type, *args)
