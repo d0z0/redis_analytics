@@ -58,9 +58,9 @@ module Rack
             union_key = "#{Rack::RedisAnalytics.redis_namespace}:#{seq}"
             Rack::RedisAnalytics.redis_connection.zunionstore(union_key, union)
             Rack::RedisAnalytics.redis_connection.expire(union_key, 100)
-            return Rack::RedisAnalytics.redis_connection.zcard(union_key)
+            return Rack::RedisAnalytics.redis_connection.zrange(union_key, 0, -1, :with_scores => true)
           else
-            return time.zip(union.map{|x| Rack::RedisAnalytics.redis_connection.zcard(x)})
+            return time.zip(union.map{|x| Rack::RedisAnalytics.redis_connection.zrange(x,0,-1, :with_scores => true)})
           end
         else
           time.zip(Rack::RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
