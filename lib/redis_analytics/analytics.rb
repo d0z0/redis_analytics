@@ -97,9 +97,9 @@ module Rack
           # page_view ++
         elsif returning_visitor and not recent_visitor
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
-          rucn_seq, first_visit_time = returning_visitor.split('.')
+          rucn_seq, first_visit_time, last_visit_time = returning_visitor.split('.')
           unique_visit(t, rucn_seq)
-          visit(t)
+          visit(t, last_visit_time.to_i)
           page_view(t)
           # get rucn_seq and push to unique
           # visits ++
@@ -146,11 +146,17 @@ module Rack
         end
       end
 
-      def visit(t)
+      def visit(t, last_visit_time = nil)
         [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
 
           # increment the total visits
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+          
+          # tracking for visitor recency
+          if last_visit_time
+            days_since_last_visit = ((t.to_i - last_visit_time)/(24*3600)).round
+            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}visit_recency:#{ts}", 1, days_since_last_visit)
+          end
 
           # add ua info
           ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
