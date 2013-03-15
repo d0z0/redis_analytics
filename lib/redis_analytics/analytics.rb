@@ -155,7 +155,7 @@ module Rack
           # tracking for visitor recency
           if last_visit_time
             days_since_last_visit = ((t.to_i - last_visit_time)/(24*3600)).round
-            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}visit_recency:#{ts}", 1, days_since_last_visit)
+            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_recency:#{ts}", 1, days_since_last_visit)
           end
 
           # add ua info
