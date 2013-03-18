@@ -42,6 +42,14 @@ module Rack
       def dashboard_endpoint
         @dashboard_endpoint ||= '/dashboard'
       end
+
+      def visitor_recency_slices
+        @visitor_recency_slices ||= [1, 7, 30]
+      end
+
+      def default_range
+        @default_range = :day
+      end
      
       def configure
         yield self
