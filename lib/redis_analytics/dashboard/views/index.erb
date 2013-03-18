@@ -1,12 +1,11 @@
 <div class="container-fluid">
-
   <div class="row-fluid">
     <div class="span6">
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Visits</b><a href="#"><i class="pull-right icon-download-alt"></i></a></p>
-	    <div id="visits_area" style="width:100%;height:150px;"></div>
+	    <div id="visits_area" style="width:100%;height:160px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -16,7 +15,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Total Visits</b></p>
-	    <div id="visits_donut" style="width:100%;height:150px;"></div>
+	    <div id="visits_donut" style="width:100%;height:160px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -26,7 +25,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Traffic Sources</b></p>
-	    <div id="traffic_donut" style="width:100%;height:150px;"></div>
+	    <div id="traffic_donut" style="width:100%;height:160px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -36,7 +35,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Browser Info</b></p>
-	    <div id="visitor_info_donut" style="width:100%;height:150px;"></div>
+	    <div id="browsers_donut" style="width:100%;height:160px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -49,8 +48,8 @@
       <table class="table table-bordered table-hover">
 	<tr>
 	  <td>
-	    <p class="text-center"><b>Unique Visits - Current vs Previous week</b><i class="pull-right icon-download-alt"></i></p>
-	    <div id="unique_visits_line" style="width:100%;height:150px;"></div>
+	    <p class="text-center"><b>Unique Visits - Current vs Previous <span id="compare_unit">week</span></b><i class="pull-right icon-download-alt"></i></p>
+	    <div id="unique_visits_line" style="width:100%;height:160px;"></div>
 	  </td>
 	</tr>
       </table>
@@ -61,7 +60,7 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Visitor Map</b><i class="pull-right icon-download-alt"></i></p>
-	    <div id="world-map-gdp" style="width: 100%px; height: 150px"></div>
+	    <div id="world-map-gdp" class="info" style="width: 100%px; height: 160px"></div>
 	  </td>
 	</tr>
       </table>
@@ -72,25 +71,15 @@
 	<tr>
 	  <td>
 	    <p class="text-center"><b>Visit Recency</b><i class="pull-left icon-search"></i><i class="pull-right icon-download-alt"></i></p>
-	    <div style="height:150px;">
+	    <div style="height:160px;">
 	      <div style="margin:5px;">
-		<small class="muted">less than 1 day (80%)</small>
+	      <% @data[:week][:visitor_recency_slices].each do |(k, v), i| %>
+	      <% p = ((i.to_f/@data[:week][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round %>
+		<small class="muted"><%=(k == 0 ? 'Less than' : "#{k}")%> <%=('-' unless k == 0 or v == '*')%> <%=(v == '*' ? ' or more' : "#{v}")%> days (<%=p%>%)</small>
 		<div class="progress" style="height: 5px; margin-bottom:10px;">
-		  <div class="bar" style="width: 80%;"></div>
+		  <div class="bar" style="width: <%=p%>%;"></div>
 		</div>
-		<small class="muted">2-5 days (14%)</small>
-		<div class="progress" style="height: 5px; margin-bottom:10px;">
-		  <div class="bar" style="width: 14%;"></div>
-		</div>
-		<small class="muted">6-30 days (5%)</small>
-		<div class="progress" style="height: 5px; margin-bottom:10px;">
-		  <div class="bar" style="width: 5%;"></div>
-		</div>
-		<small class="muted">more than 30 days (1%)</small>
-		<div class="progress" style="height: 5px; margin-bottom:10px;">
-		  <div class="bar" style="width: 1%;"></div>
-		</div>
-
+	      <% end %>
 	      </div>
 	    </div>
 	  </td>
@@ -101,7 +90,7 @@
 
   <div class="row-fluid">
     <div class="span6">
-      <table class="table table-bordered table-hover table-condensed">
+      <table class="table table-bordered table-hover">
 	<colgroup>
 	  <col style="width: 33%"></col>
 	  <col style="width: 33%"></col>
@@ -109,24 +98,24 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4><%=@data[:week][:total_visits]%> <small class="muted">visits</small></h4>
+	    <h4 id="total_visits"><%=@data[:week][:total_visits]%> <small class="muted">visits</small></h4>
 	  </td>
 	  <td>
-	    <h4><%=@data[:week][:total_page_views]%> <small class="muted">page views</small></h4>
+	    <h4 id="total_page_views"><%=@data[:week][:total_page_views]%> <small class="muted">page views</small></h4>
 	  </td>
 	  <td>
-	    <h4><%=(@data[:week][:total_page_views].to_f/@data[:week][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small></h4>
+	    <h4 id="page_depth"><%=(@data[:week][:total_page_views].to_f/@data[:week][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small></h4>
 	  </td>
 	</tr>
-	<tr>
-	  <td colspan="3">
-	    <div id="visits_spark" style="width:100%;height:90px;"></div>
-	  </td>
-	  </tr>
+	<!-- <tr> -->
+	<!--   <td colspan="3"> -->
+	<!--     <div id="visits_spark" style="width:100%;height:90px;"></div> -->
+	<!--   </td> -->
+	<!--   </tr> -->
       </table>
     </div>
     <div class="span6">
-      <table class="table table-bordered table-hover table-condensed">
+      <table class="table table-bordered table-hover">
 	<colgroup>
 	  <col style="width: 33%"></col>
 	  <col style="width: 33%"></col>
@@ -134,21 +123,33 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4><%=((@data[:week][:total_second_page_views].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small></h4>
+	    <h4 id="bounce_rate"><%=(((@data[:week][:total_visits].to_f-@data[:week][:total_second_page_views].to_f)/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small></h4>
 	  </td>
 	  <td>
-	    <h4>00:03:01 <small class="muted">avg time spent</small></h4>
+	    <h4 id="visit_duration"><%=Time.at(@data[:week][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small></h4>
 	  </td>
 	  <td>
-	    <h4><%=((@data[:week][:total_new_visits].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>
+	    <h4 id="new_visits"><%=((@data[:week][:total_new_visits].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>
 	  </td>
 	</tr>
-	<tr>
-	  <td colspan="3">
-	    <div style="height: 90px">
-	    </div>
-	  </td>
-	</tr>
+	<!-- <tr> -->
+	<!--   <td> -->
+	<!--     <div style="height: 90px"> -->
+	<!--       <div id="bounce_rate_spark" style="width:100%;height:90px;"></div> -->
+	<!--     </div> -->
+	<!--   </td> -->
+	<!--   <td> -->
+	<!--     <div style="height: 90px"> -->
+	<!--       <div id="time_spent_spark" style="width:100%;height:90px;"></div> -->
+	<!--     </div> -->
+	<!--   </td> -->
+	<!--   <td> -->
+	<!--     <div style="height: 90px"> -->
+	<!--       <div id="loyalty_spark" style="width:100%;height:90px;"></div> -->
+	<!--     </div> -->
+	<!--   </td> -->
+
+	<!-- </tr> -->
       </table>
     </div>
 
