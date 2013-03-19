@@ -20,6 +20,9 @@ module Rack
       attr_writer :dashboard_endpoint
 
       # Redis namespace for keys
+      attr_writer :geo_ip_data_path
+
+      # Redis namespace for keys
       def redis_namespace
         @redis_namespace ||= 'ra'
       end
@@ -41,6 +44,10 @@ module Rack
  
       def dashboard_endpoint
         @dashboard_endpoint ||= '/dashboard'
+      end
+
+      def geo_ip_data_path
+        @geo_ip_data_path = ::File.expand_path(::File.join(::File.dirname(__FILE__),'..','..'))
       end
 
       def visitor_recency_slices
