@@ -101,6 +101,7 @@ function setSessionCookie(name,value) {
 
 function changeTimeFrame(range)
 {
+var mapObject = $('#world-map-gdp').vectorMap('get', 'mapObject');
 switch(range)
 {
 case 'day':
@@ -115,11 +116,12 @@ case 'day':
     $("#bounce_rate")[0].innerHTML = '<%=(((@data[:day][:total_visits].to_f-@data[:day][:total_second_page_views].to_f)/@data[:day][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small>';
     $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[:day][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
     $("#new_visits")[0].innerHTML = '<%=((@data[:day][:total_new_visits].to_f/@data[:day][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>';
-    $("#compare_unit")[0].innerHTML = 'day';
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:day][:visits_new_visits_donut].to_json%>});
     browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:day][:browsers_donut].to_json%>});
+    mapObject.series.regions[0].setValues(<%=@data[:day][:country_map].to_json%>);
 
+    $("#compare_unit")[0].innerHTML = 'day';
     break;
 case 'week':
     setSessionCookie("_rarng", "week");
@@ -136,8 +138,9 @@ case 'week':
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:week][:visits_new_visits_donut].to_json%>});
     browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:week][:browsers_donut].to_json%>});
-    $("#compare_unit")[0].innerHTML = 'week';
+    mapObject.series.regions[0].setValues(<%=@data[:week][:country_map].to_json%>);
 
+    $("#compare_unit")[0].innerHTML = 'week';
     break;
 case 'year':
     setSessionCookie("_rarng", "year");
@@ -154,6 +157,8 @@ case 'year':
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:year][:visits_new_visits_donut].to_json%>});
     browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:year][:browsers_donut].to_json%>});
+    mapObject.series.regions[0].setValues(<%=@data[:year][:country_map].to_json%>);
+
     $("#compare_unit")[0].innerHTML = 'year';
     break;
 }
@@ -198,6 +203,8 @@ regionStyle: {
     }
   });
 });
+
+
 </script>
 <script language="javascript" type="text/javascript" src="<%=$template_prefix%>/javascripts/bootstrap.min.js"></script>
 <!-- end footer -->
