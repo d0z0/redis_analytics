@@ -103,6 +103,7 @@ module Rack
         @data[:week][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
           h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
         end
+        @data[:week][:country_map] = Hash[daily_ratio_country(week_range, :aggregate => true)]
 
         # DAY
         day_range = t0 - 1.day + 1.hour
@@ -135,6 +136,7 @@ module Rack
         @data[:day][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
           h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
         end
+        @data[:day][:country_map] = Hash[hourly_ratio_country(day_range, :aggregate => true)]
 
         t1 = Time.now
         @t = t1 - t0
