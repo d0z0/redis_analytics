@@ -2,6 +2,7 @@ require 'rack'
 require 'redis'
 require 'browser'
 require 'sinatra'
+require 'geoip' 
 
 require 'redis_analytics'
 require 'redis_analytics/version'
@@ -9,6 +10,7 @@ require 'redis_analytics/configuration'
 require 'redis_analytics/analytics'
 require 'redis_analytics/helpers'
 # require 'redis_analytics/dashboard' # to be enabled once development on dashboard is complete
+
 require 'redis_analytics/mapper'
 require 'redis_analytics/railtie' if defined? Rails::Railtie
 
