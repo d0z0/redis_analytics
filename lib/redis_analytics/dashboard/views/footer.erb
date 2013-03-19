@@ -159,13 +159,9 @@ case 'year':
 }
 }
 
+// Map Overlay
 
-var geoLocationData = {
-  "IN": 3230,
-  "AE": 235,
-  "KW": 132,
-  "QR": 109
-};
+var geoLocationData = <%=@data[@range][:country_map].to_json%>;
 
 $(function(){
   $('#world-map-gdp').vectorMap({
