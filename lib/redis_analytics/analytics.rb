@@ -83,11 +83,10 @@ module Rack
         visit_start_time =visit_end_time = first_visit_time = t.to_i
 
         if not returning_visitor and not recent_visitor
-          rucn_seq= RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
+          rucn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
           new_visit(t)
-          unique_visit(t, rucn_seq)
-          visit(t)
+          visit(t, :rucn_seq => rucn_seq)
           visit_time(t, t.to_i)
           page_view(t)
           # new visit
@@ -98,8 +97,7 @@ module Rack
         elsif returning_visitor and not recent_visitor
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
           rucn_seq, first_visit_time, last_visit_time = returning_visitor.split('.')
-          unique_visit(t, rucn_seq)
-          visit(t, last_visit_time.to_i)
+          visit(t, :last_visit_time => last_visit_time.to_i, :rucn_seq => rucn_seq)
           page_view(t)
           # get rucn_seq and push to unique
           # visits ++
@@ -112,7 +110,6 @@ module Rack
           # page_view ++
         elsif not returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
-          unique_visit(t, rucn_seq)
           visit_time(t, visit_end_time.to_i)
           page_view(t, visit_start_time.to_i == visit_end_time.to_i)
           # get rucn_seq from vcn and push to unique
@@ -124,7 +121,7 @@ module Rack
         @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
 
         # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (60 * 60 * 24)})
+        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (60 * 60 * 5)}) # 5 hours temp
 
         puts "TIME = [#{t}]"
         puts "VISIT = #{vcn_seq}"
@@ -140,17 +137,28 @@ module Rack
         end
       end
       
-      def unique_visit(t, rucn_seq)
-        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
-          RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
-        end
-      end
-
-      def visit(t, last_visit_time = nil)
+      def visit(t, options = {})
+        last_visit_time = options[:last_visit_time] || nil
+        rucn_seq = options[:rucn_seq] || nil
+        
         [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
 
           # increment the total visits
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+
+          if rucn_seq
+            unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
+            puts "UNIQUE => #{unique}" 
+            if unique and defined?(GeoIP)
+              begin
+                g = GeoIP.new("#{RedisAnalytics.geo_ip_data_path}/GeoIP.dat")
+                geo_country_code = g.country("115.111.79.34").to_hash[:country_code2]
+                RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
+              rescue
+                puts "Warning: Unable to fetch country info"
+              end
+            end
+          end
           
           # tracking for visitor recency
           if last_visit_time
