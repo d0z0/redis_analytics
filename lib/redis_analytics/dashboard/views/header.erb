@@ -15,7 +15,6 @@
 		<a tabindex="-1" href="#">Theme</a>
 		<ul class="dropdown-menu">
 		  <li><a href="?template=journal">Journal</a></li>
-		  <li><a href="?template=readable">Readable</a></li>
 		  <li><a href="?template=spacelab">Spacelab</a></li>
 		  <li><a href="?template=united">United</a></li>
 		  <li class="divider"></li>
@@ -29,7 +28,10 @@
           </div>
 
 	  <div class="btn-group" data-toggle="buttons-radio">
-	    <button type="button" class="btn btn-small active">Visits</button>
+	    <a href="/visits" class="btn btn-small active">Visits</a>
+	    <a href="/transactions" class="btn btn-small disabled">Transactions</a>
+	    <a href="/activity" class="btn btn-small">Activity</a>
+
 	    <!-- <button type="button" class="btn btn-small" onclick='javascript:visits_area.grid=true'>Transactions</button> -->
 	  </div>
 	  <div class="btn-group" data-toggle="buttons-radio">
