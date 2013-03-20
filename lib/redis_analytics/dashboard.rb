@@ -38,111 +38,66 @@ module Rack
         super
       end
 
-      get '/visits' do
-        t0 = Time.now
-        @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
-        @data = {}
-
-        # YEAR
-        year_range = t0 - 1.year + 1.month
-        @data[:year] ||= {}
-        @data[:year][:visits] = monthly_visits(year_range)
-        @data[:year][:total_visits] = @data[:year][:visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:year][:new_visits] = monthly_new_visits(year_range)
-        @data[:year][:total_new_visits] = @data[:year][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:year][:page_views] = monthly_page_views(year_range)
-        @data[:year][:total_page_views] = @data[:year][:page_views].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:year][:visit_time] = monthly_visit_time(year_range)
-        @data[:year][:avg_visit_time] = Hash[@data[:year][:visit_time]].values.sum.to_f/@data[:year][:visit_time].length.to_f
-
-        @data[:year][:visits_new_visits_plot] = @data[:year][:new_visits].inject(Hash[@data[:year][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime('%b'), 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
-        @data[:year][:visits_new_visits_donut] = [{'label' => 'Returning Visitors', 'value' => @data[:year][:total_visits] - @data[:year][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:year][:total_visits]}]
-
-        @data[:year][:browsers_donut] = monthly_ratio_browsers(year_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-        @data[:year][:platforms_donut] = monthly_ratio_platforms(year_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-        @data[:year][:devices_donut] = monthly_ratio_platforms(year_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-
-        year_unique_visits = monthly_unique_visits(year_range - 1.year).map{|x,y| [x.strftime('%b'), y]}
-        @data[:year][:unique_visits] = year_unique_visits[0..11].inject(Hash[year_unique_visits[12..23]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
-        year_second_page_views = monthly_second_page_views(year_range)
-        @data[:year][:total_second_page_views] = year_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
-
-        visitor_recency = hourly_ratio_recency(year_range, :aggregate => true)
-        @data[:year][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
-          h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
-        end
-        @data[:year][:country_map] = Hash[monthly_ratio_country(year_range, :aggregate => true)]
-
-        # WEEK
-        week_range = t0 - 1.week + 1.day
-        @data[:week] ||= {}
-        @data[:week][:visits] = daily_visits(week_range)
-        @data[:week][:visits_plot] = @data[:week][:visits].map{|x| {'date' => x[0].strftime('%a'), 'visits' => x[1].to_i}}
-        @data[:week][:total_visits] = @data[:week][:visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:week][:new_visits] = daily_new_visits(week_range)
-        @data[:week][:total_new_visits] = @data[:week][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:week][:page_views] = daily_page_views(week_range)
-        @data[:week][:page_views_plot] = @data[:week][:page_views].map{|x| {'date' => x[0].strftime('%a'), 'page_views' => x[1].to_i}}
-        @data[:week][:total_page_views] = @data[:week][:page_views].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:week][:visit_time] = daily_visit_time(week_range)
-        @data[:week][:avg_visit_time] = Hash[@data[:week][:visit_time]].values.sum.to_f/@data[:week][:visit_time].length.to_f
-
-        @data[:week][:visits_page_views_plot] = @data[:week][:page_views].inject(Hash[@data[:week][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime('%a'), 'page_views' => v[0].to_i, 'visits' => v[1].to_i}}
-
-        @data[:week][:visits_new_visits_plot] = @data[:week][:new_visits].inject(Hash[@data[:week][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime('%a'), 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
-        @data[:week][:visits_new_visits_donut] = [{'label' => 'Returning Visitors', 'value' => @data[:week][:total_visits] - @data[:week][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:week][:total_new_visits]}]
-
-        @data[:week][:browsers_donut] = daily_ratio_browsers(week_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-
-        week_unique_visits = daily_unique_visits(week_range - 1.week).map{|x,y| [x.strftime('%a'), y]}
-        @data[:week][:unique_visits] = week_unique_visits[0..6].inject(Hash[week_unique_visits[7..13]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
-        week_second_page_views = daily_second_page_views(week_range)
-        @data[:week][:total_second_page_views] = week_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
-
-        visitor_recency = daily_ratio_recency(week_range, :aggregate => true)
-        @data[:week][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
-          h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
-        end
-        @data[:week][:country_map] = Hash[daily_ratio_country(week_range, :aggregate => true)]
-
-        # DAY
-        day_range = t0 - 1.day + 1.hour
-        @data[:day] ||= {}
-        @data[:day][:visits] = hourly_visits(day_range)
-        @data[:day][:visits_plot] = @data[:day][:visits].map{|x| {'date' => x[0].strftime('%l %P'), 'visits' => x[1].to_i}}
-        @data[:day][:total_visits] = @data[:day][:visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:day][:new_visits] = hourly_new_visits(day_range)
-        @data[:day][:total_new_visits] = @data[:day][:new_visits].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:day][:page_views] = hourly_page_views(day_range)
-        @data[:day][:page_views_plot] = @data[:day][:page_views].map{|x| {'date' => x[0].strftime('%l %P'), 'page_views' => x[1].to_i}}
-        @data[:day][:total_page_views] = @data[:day][:page_views].inject(0){|s, x| s += x[1].to_i; s}
-        @data[:day][:visit_time] = hourly_visit_time(day_range)
-        @data[:day][:avg_visit_time] = Hash[@data[:day][:visit_time]].values.sum.to_f/@data[:day][:visit_time].length.to_f
-
-        @data[:day][:visits_page_views_plot] = @data[:day][:page_views].inject(Hash[@data[:day][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime('%l %P'), 'page_views' => v[0].to_i, 'visits' => v[1].to_i}}
-
-        @data[:day][:visits_new_visits_plot] = @data[:day][:new_visits].inject(Hash[@data[:day][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime('%l %P'), 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
-        @data[:day][:visits_new_visits_donut] = [{'label' => 'Returning Visitors', 'value' => @data[:day][:total_visits] - @data[:day][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[:day][:total_new_visits]}]
-
-        @data[:day][:browsers_donut] = hourly_ratio_browsers(day_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-
-        day_unique_visits = hourly_unique_visits(day_range - 1.day).map{|x,y| [x.strftime('%l %P'), y]}
-        @data[:day][:unique_visits] = day_unique_visits[0..23].inject(Hash[day_unique_visits[24..47]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
-
-        day_second_page_views = hourly_second_page_views(day_range)
-        @data[:day][:total_second_page_views] = day_second_page_views.inject(0){|s, x| s += x[1].to_i; s}
-
-        visitor_recency = hourly_ratio_recency(day_range, :aggregate => true)
-        @data[:day][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
-          h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
-        end
-        @data[:day][:country_map] = Hash[hourly_ratio_country(day_range, :aggregate => true)]
-
-        t1 = Time.now
-        @t = t1 - t0
-        erb :index
+      get '/' do
+        status, headers, body = call env.merge("PATH_INFO" => '/visits')
+        [status, headers, body]
       end
 
+      get '/activity' do
+        erb :activity
+      end
+
+      helpers do 
+        def with_benchmarking
+          @t0 = Time.now
+          yield
+          @t1 = Time.now
+          @t = @t1 - @t0
+        end
+      end
+
+      get '/visits' do
+        with_benchmarking do
+          @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
+          @data = {}
+          
+          [[:year, :month, "%b", 12], [:week, :day, "%a", 7], [:day, :hour, "%l %P", 24]].each do |range, unit, time_format, multiple|
+            time_range = @t0 - 1.send(range) + 1.send(unit)
+            @data[range] ||= {}
+            @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
+            @data[range][:total_visits] = @data[range][:visits].inject(0){|s, x| s += x[1].to_i; s}
+            @data[range][:new_visits] = self.send("#{unit}ly_new_visits", time_range)
+            @data[range][:total_new_visits] = @data[range][:new_visits].inject(0){|s, x| s += x[1].to_i; s}            
+            @data[range][:page_views] = self.send("#{unit}ly_page_views", time_range)
+
+            @data[range][:total_page_views] = @data[range][:page_views].inject(0){|s, x| s += x[1].to_i; s}
+            @data[range][:visit_time] = self.send("#{unit}ly_visit_time", time_range)
+            @data[range][:avg_visit_time] = Hash[@data[range][:visit_time]].values.sum.to_f/@data[range][:visit_time].length.to_f
+
+            @data[range][:visits_new_visits_plot] = @data[range][:new_visits].inject(Hash[@data[range][:visits]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'date'=> k.strftime(time_format), 'new_visits' => v[0].to_i, 'returning_visits' => v[1].to_i - v[0].to_i}}
+            @data[range][:visits_new_visits_donut] = [{'label' => 'Returning Visitors', 'value' => @data[range][:total_visits] - @data[range][:total_new_visits]}, {'label' => 'New Visitors', 'value' => @data[range][:total_new_visits]}]
+
+            @data[range][:browsers_donut] = self.send("#{unit}ly_ratio_browsers", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
+            @data[range][:platforms_donut] = self.send("#{unit}ly_ratio_platforms", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
+            @data[range][:devices_donut] = self.send("#{unit}ly_ratio_platforms", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
+            puts '*' * 50
+            unique_visits = self.send("#{unit}ly_unique_visits", time_range - 1.send(range)).map{|x,y| [x.strftime(time_format), y]}
+
+            @data[range][:unique_visits] = unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
+            second_page_views = self.send("#{unit}ly_second_page_views", time_range)
+            @data[range][:total_second_page_views] = second_page_views.inject(0){|s, x| s += x[1].to_i; s}
+          
+            visitor_recency = self.send("#{unit}ly_ratio_recency", time_range, :aggregate => true)
+            @data[range][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
+              h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
+            end
+            @data[range][:country_map] = Hash[self.send("#{unit}ly_ratio_country", time_range, :aggregate => true)]
+            
+          end
+          
+        end
+        erb :visits
+      end
     end
   end
 end
