@@ -17,25 +17,6 @@ module Rack
         "products" => ["/products/:id/review", :user_id]
       }
 
-
-      # METRIC KEYS (constructed exactly in reports)
-      # format -> [prefix|domain-index|metric|timestamp]
-      # 
-      # available metrics:
-      # 
-      # visits
-      # new_visits
-      # unique_visits
-      # visit_time
-      # ratio_browsers
-      # ratio_platforms
-      # ratio_devices
-      # page_A_B_MD5 (A => url-index, B => parameter-index, MD5 => value-key)
-
-      # PAGEVIEWS (used in reports for labeling transactions)
-      # format -> [prefix|domain-index|page][md5(value)] = value
-      #
-
       def initialize(app)
         @app = app
         @redis_key_prefix = "#{RedisAnalytics.redis_namespace}:"
@@ -69,22 +50,6 @@ module Rack
           end
         end
         
-        # record visits
-        # if returning_visitor = @request.cookies[RedisAnalytics.returning_user_cookie_name]
-        #   # RETURNING VISITOR (NEW OR SAME VISIT)
-        #   rucn_seq, first_visit_time = returning_visitor.split('.')
-        #   record_recent_visitor(t, rucn_seq, first_visit_time)
-        # else
-        #   unless record_recent_visitor(t)
-        #     # FIRST TIME VISITOR
-        #     [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
-        #       RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
-        #     end
-        #   end
-        # end
-
-        # new code
-
         returning_visitor = @request.cookies[RedisAnalytics.returning_user_cookie_name]
         recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
 
