@@ -29,6 +29,14 @@ module Rack
       
       helpers do
         include Rack::RedisAnalytics::Helpers
+
+        def with_benchmarking
+          @t0 = Time.now
+          yield
+          @t1 = Time.now
+          @t = @t1 - @t0
+        end
+
       end
       
       set :static, true
@@ -44,16 +52,13 @@ module Rack
       end
 
       get '/activity' do
+        with_benchmarking do 
+          # code
+        end
         erb :activity
       end
 
       helpers do 
-        def with_benchmarking
-          @t0 = Time.now
-          yield
-          @t1 = Time.now
-          @t = @t1 - @t0
-        end
       end
 
       get '/visits' do
@@ -92,12 +97,11 @@ module Rack
               h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
             end
             @data[range][:country_map] = Hash[self.send("#{unit}ly_ratio_country", time_range, :aggregate => true)]
-            
           end
-          
         end
         erb :visits
       end
+      
     end
   end
 end
