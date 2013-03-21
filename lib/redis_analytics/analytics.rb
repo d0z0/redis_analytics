@@ -7,6 +7,16 @@ module Rack
       
       PAGEVIEWS = [['/health', 'o', 'd', 't'], ['/track', 'o', 'd', 't']]
 
+      TRANSACTIONS = {
+        "flights_search" => ["/flights/search", :o, :d],
+        "flights_results" => ["/flights/results", :o, :d],
+        "flights_book_step_1" => ["/flights/itinerary/:itinerary_id/info"],
+        "flights_book_step_2" => ["/flights/itinerary/:itinerary_id/traveller"],
+        "flights_book_step_3" => ["/flights/itinerary/:itinerary_id/pay"],
+        "flights_book_done" => ["/flights/itinerary/:itinerary_id/confirmation"],
+        "products" => ["/products/:id/review", :user_id]
+      }
+
 
       # METRIC KEYS (constructed exactly in reports)
       # format -> [prefix|domain-index|metric|timestamp]
@@ -121,7 +131,7 @@ module Rack
         @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
 
         # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (60 * 60 * 5)}) # 5 hours temp
+        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (60 * 60 * 24 * 5)}) # 5 hours temp
 
         puts "TIME = [#{t}]"
         puts "VISIT = #{vcn_seq}"
