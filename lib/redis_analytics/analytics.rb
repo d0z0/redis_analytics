@@ -22,19 +22,20 @@ module Rack
         @redis_key_prefix = "#{RedisAnalytics.redis_namespace}:"
       end
       
+      # def call(env)
+      #   dup.call!(env)
+      # end
+
       def call(env)
-        record_visits(env)
+        @env = env
+        @request  = Request.new(env)
+        status, headers, body = @app.call(env)
+        @response = Rack::Response.new(body, status, headers)
+        record # reads request, modifies response
+        @response.finish
       end
       
-      def record_visits(env)
-        t0 = Time.now 
-        @request = Rack::Request.new(env)
-        # call the @app
-        status, headers, body = @app.call(env)
-        
-        # create a response
-        @response = Rack::Response.new(body, status, headers)
-        
+      def record
         t = Time.now 
         # record pageviews
         path = @request.path
@@ -102,8 +103,8 @@ module Rack
         puts "VISIT = #{vcn_seq}"
         puts "UNIQUE VISIT = #{rucn_seq}"
 
-        # write the response
-        @response.finish
+        # # write the response
+        # @response.finish
       end
       
       def new_visit(t)
