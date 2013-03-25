@@ -1,0 +1,227 @@
+<script type="text/javascript" language="text/javascript">
+
+visits_area = Morris.Area({
+  element: 'visits_area',
+  xkey: 'date',
+  data: <%=@data[@range][:visits_new_visits_plot].to_json%>,
+  ykeys: ['new_visits', 'returning_visits'],
+  labels: ['New Visits', 'Returning Visits'],
+  ymax: 'auto',
+  //events: ['2013-03-02', '2013-03-03'],
+    grid: true,
+  eventStrokeWidth: 2,
+  eventLineColors: ['#ccc', '#eee'],
+  smooth: true,
+  hideHover: 'auto',
+  parseTime: false,
+  lineWidth: 2,
+  pointSize: 0,
+   //  xLabels: 'day',
+    xLabelFormat: function(x) {return '';},
+
+  // hoverCallback: function(index, series)
+  //   {
+  // 	h = series.data[index];
+  // 	d = Date(h.x);
+  // 	return(d + '<br>' + h.new_visits);
+  //   },
+  pointFillColors: ['#fff'],
+  pointStrokeColors: ['#000'],
+});
+
+visits_donut = Morris.Donut({
+  element: 'visits_donut',
+  data: <%=@data[@range][:visits_new_visits_donut].to_json%>
+});
+
+traffic_donut = Morris.Donut({
+  element: 'traffic_donut',
+  data: [{"label":"Google","value":6482},{"label":"Bing","value":2136},{"label":"Direct","value":8136},{"label":"Other","value":5136}]
+});
+
+browsers_donut = Morris.Donut({
+  element: 'browsers_donut',
+  data: <%=@data[@range][:browsers_donut].to_json%>
+});
+
+unique_visits_line = Morris.Line({
+  element: 'unique_visits_line',
+  xkey: 'unit',
+  data: <%=@data[@range][:unique_visits].to_json%>,
+  ykeys: ['unique_visits_this', 'unique_visits_last'],
+    labels: ['Current', 'Previous'],
+  ymax: 'auto',
+  hideHover: 'auto',
+  parseTime: false,
+  lineWidth: 2,
+  pointSize: 0,
+  grid: true,
+  pointFillColors: ['#fff'],
+  pointStrokeColors: ['#000'],
+  // hoverCallback: function(index, series)
+  //   {
+  // 	h = series.data[index];
+  // 	this_week_color = series.lineColors[0];
+  // 	last_week_color = series.lineColors[1];
+  // 	html = '';
+  // 	html += '<font style="color:' + this_week_color + '">This ' + h.unit + ': ' + h.unique_visits_this + '</font>';
+  // 	html += '<br/>';
+  // 	html += '<font style="color:' + last_week_color + '">Last ' + h.unit + ': ' + h.unique_visits_last + '</font>';
+  // 	return html;
+  //  },
+
+});
+
+// visits_spark = Morris.Line({
+//   element: 'visits_spark',
+//   xkey: 'date',
+//   data: <%=@data[@range][:visits_page_views_plot].to_json%>,
+//   ykeys: ['visits', 'page_views'],
+//   labels: ['Visits', 'Page Views'],
+//   xLabelFormat: function(x){return '';},
+//   yLabelFormat: function(x){return '';},
+//   hoverCallback: function(i,x){return x.data[i].date + '<br/>' + 'Page Views: ' + x.data[i].page_views + '<br/>Visits: ' + x.data[i].visits;},
+//   ymax: 'auto',
+//   ymin: 0,
+//   smooth: true,
+//   hideHover: 'auto',
+//   parseTime: false,
+//   lineWidth: 2,
+//   pointSize: 0,
+//   grid: false,
+//   pointFillColors: ['#fff'],
+//   pointStrokeColors: ['#000']
+// });
+
+function setSessionCookie(name,value) {
+    document.cookie = name+"="+value+"; path=/";
+}
+
+function changeTimeFrame(range)
+{
+var mapObject = $('#world-map').vectorMap('get', 'mapObject');
+switch(range)
+{
+case 'day':
+    setSessionCookie("_rarng", "day");
+    visits_area.setData(<%=@data[:day][:visits_new_visits_plot].to_json%>);
+    unique_visits_line.setData(<%=@data[:day][:unique_visits].to_json%>);
+
+    $("#total_visits")[0].innerHTML = '<%=@data[:day][:total_visits]%> <small class="muted">visits</small>';
+    $("#total_page_views")[0].innerHTML = '<%=@data[:day][:total_page_views]%> <small class="muted">page views</small>';
+    $("#page_depth")[0].innerHTML = '<%=(@data[:day][:total_page_views].to_f/@data[:day][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small>';
+
+    $("#bounce_rate")[0].innerHTML = '<%=(((@data[:day][:total_visits].to_f-@data[:day][:total_second_page_views].to_f)/@data[:day][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small>';
+    $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[:day][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
+    $("#new_visits")[0].innerHTML = '<%=((@data[:day][:total_new_visits].to_f/@data[:day][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>';
+
+    visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:day][:visits_new_visits_donut].to_json%>});
+    browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:day][:browsers_donut].to_json%>});
+    mapObject.series.regions[0].setValues(<%=@data[:day][:country_map].to_json%>);
+
+    $("#compare_unit")[0].innerHTML = 'day'; 
+
+    <% @data[:day][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+    <% p = ((i.to_f/@data[:day][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
+    <%= "$('#recency_#{c}_num')[0].innerHTML = '#{p}';" %>
+    <% end %>
+
+    break;
+case 'week':
+    setSessionCookie("_rarng", "week");
+    visits_area.setData(<%=@data[:week][:visits_new_visits_plot].to_json%>);
+    unique_visits_line.setData(<%=@data[:week][:unique_visits].to_json%>);
+
+    $("#total_visits")[0].innerHTML = '<%=@data[:week][:total_visits]%> <small class="muted">visits</small>';
+    $("#total_page_views")[0].innerHTML = '<%=@data[:week][:total_page_views]%> <small class="muted">page views</small>';
+    $("#page_depth")[0].innerHTML = '<%=(@data[:week][:total_page_views].to_f/@data[:week][:total_visits].to_f).round(2)%> <small class="muted">page per visit</small>';
+
+    $("#bounce_rate")[0].innerHTML = '<%=(((@data[:week][:total_visits].to_f-@data[:week][:total_second_page_views].to_f)/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small>';
+    $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[:week][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
+    $("#new_visits")[0].innerHTML = '<%=((@data[:week][:total_new_visits].to_f/@data[:week][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>';
+
+    visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:week][:visits_new_visits_donut].to_json%>});
+    browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:week][:browsers_donut].to_json%>});
+    mapObject.series.regions[0].setValues(<%=@data[:week][:country_map].to_json%>);
+
+    $("#compare_unit")[0].innerHTML = 'week';
+
+    <% @data[:week][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+    <% p = ((i.to_f/@data[:week][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
+    <%= "$('#recency_#{c}_num')[0].innerHTML = '#{p}';" %>
+    <% end %>
+
+    break;
+case 'year':
+    setSessionCookie("_rarng", "year");
+    visits_area.setData(<%=@data[:year][:visits_new_visits_plot].to_json%>);
+    unique_visits_line.setData(<%=@data[:year][:unique_visits].to_json%>);
+
+    $("#total_visits")[0].innerHTML = '<%=@data[:year][:total_visits]%> <small class="muted">visits</small>';
+    $("#total_page_views")[0].innerHTML = '<%=@data[:year][:total_page_views]%> <small class="muted">page views</small>';
+    $("#page_depth")[0].innerHTML = '<%=(@data[:year][:total_page_views].to_f/@data[:year][:total_visits].to_f).round(2)%> <small class="muted">page per visit</small>';
+
+    $("#bounce_rate")[0].innerHTML = '<%=(((@data[:year][:total_visits].to_f-@data[:year][:total_second_page_views].to_f)/@data[:year][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small>';
+    $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[:year][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
+    $("#new_visits")[0].innerHTML = '<%=((@data[:year][:total_new_visits].to_f/@data[:year][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>';
+
+    visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[:year][:visits_new_visits_donut].to_json%>});
+    browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[:year][:browsers_donut].to_json%>});
+    mapObject.series.regions[0].setValues(<%=@data[:year][:country_map].to_json%>);
+
+    $("#compare_unit")[0].innerHTML = 'year';
+
+    <% @data[:year][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+    <% p = ((i.to_f/@data[:year][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
+    <%= "$('#recency_#{c}_num')[0].innerHTML = '#{p}';" %>
+    <% end %>
+
+    break;
+}
+}
+
+// Map Overlay
+
+var geoLocationData = <%=@data[@range][:country_map].to_json%>;
+
+$(function(){
+  $('#world-map').vectorMap({
+    map: 'world_mill_en',
+    min: 0,
+    backgroundColor: '#fff',
+regionStyle: {
+  initial: {
+    fill: '#ddd',
+    "fill-opacity": 1,
+    stroke: 'none',
+    "stroke-width": 0,
+    "stroke-opacity": 1
+  },
+  hover: {
+    fill: '#bbb',
+    "fill-opacity": 0.8
+  },
+  selected: {
+    fill: 'yellow'
+  },
+  selectedHover: {
+  }
+},
+    series: {
+      regions: [{
+        scale: ['#C8EEFF', '#0071A4'],
+        values: geoLocationData,
+        normalizeFunction: 'polynomial'
+      }]
+    },
+    onLabelShow: function(e, el, code){
+      el.html(el.html()+' (GDP - '+geoLocationData[code]+')');
+    }
+  });
+});
+
+
+</script>
