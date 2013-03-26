@@ -57,6 +57,14 @@ module Rack
       def default_range
         @default_range = :day
       end
+
+      def redis_key_timestamps # [format, expire in seconds or nil]
+        ['%Y', '%Y_%m', '%Y_%m_%d', '%Y_%m_%d_%H', ['%Y_%m_%d_%H_%M', 1.day + 1.minute]]
+      end
+
+      def time_range_formats
+        [[:year, :month, "%b"], [:week, :day, "%a"], [:day, :hour, "%l%P"]]
+      end
      
       def configure
         yield self
