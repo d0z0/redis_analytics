@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'active_support'
+require 'active_support/core_ext'
 
 module TimeExtensions
   %w[ round floor ceil ].each do |_method|
