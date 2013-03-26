@@ -34,19 +34,54 @@ module Rack
         record # reads request, modifies response
         @response.finish
       end
-      
+
+      def parse_path(path)
+        keys = []
+        spc = %w{. + ( )}
+        pattern =
+          path.to_str.gsub(/((:\w+)|[\*#{spc.join}])/) do |match|
+          case match
+          # when "*"
+          #   keys << 'splat'
+          #   "(.*?)"
+          when *spc
+            Regexp.escape(match)
+          else
+            keys << $2[1..-1]
+            "([^/?&#]+)"
+          end
+        end
+        [/^#{pattern}$/, keys]
+      end
+
+      def for_each_time_range(t)
+        RedisAnalytics.redis_key_timestamps.map{|x, y| [t.strftime(x), y]}.each do |ts, expire|
+          yield(ts, expire) # returns an array of the redis methods to call 
+          # r.each do |method, args|
+          #   RedisAnalytics.redis_connection.send(method, *args)
+          #   RedisAnalytics.redis_connection.expire(args[1]) if expire # assuming args[1] is always the key that is being operated on.. will this always work?
+          # end
+        end
+      end
+
       def record
         t = Time.now 
+
         # record pageviews
         path = @request.path
         params = @request.params
         if i = PAGEVIEWS.index{|x| x[0] == path}
           page = PAGEVIEWS[i]
           params.select{|x, y| page[1..-1].include?(x)}.each do |k, v|
-            [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+            for_each_time_range(t) do |ts, expire|
+
+              puts "#{ts} -> #{expire}"
               h = Digest::MD5.hexdigest(v)
               RedisAnalytics.redis_connection.hset("#{@redis_key_prefix}page", h, v)
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page", expire) if expire
+
               RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_#{i}_#{page.index(k)}_#{h}:#{ts}")
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page_#{i}_#{page.index(k)}_#{h}:#{ts}", expire) if expire
             end
           end
         end
@@ -55,7 +90,6 @@ module Rack
         recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
 
         vcn_seq, rucn_seq = nil
-
         visit_start_time =visit_end_time = first_visit_time = t.to_i
 
         if not returning_visitor and not recent_visitor
@@ -65,32 +99,20 @@ module Rack
           visit(t, :rucn_seq => rucn_seq)
           visit_time(t, t.to_i)
           page_view(t)
-          # new visit
-          # rucn_seq ++ and push to unique
-          # visits ++
-          # visit_time ++
-          # page_view ++
         elsif returning_visitor and not recent_visitor
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
           rucn_seq, first_visit_time, last_visit_time = returning_visitor.split('.')
           visit(t, :last_visit_time => last_visit_time.to_i, :rucn_seq => rucn_seq)
           page_view(t)
-          # get rucn_seq and push to unique
-          # visits ++
         elsif returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
           rucn_seq, first_visit_time = returning_visitor.split('.')
           visit_time(t, visit_end_time.to_i)
           page_view(t, visit_start_time.to_i == visit_end_time.to_i)
-          # visit_time ++
-          # page_view ++
         elsif not returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
           visit_time(t, visit_end_time.to_i)
           page_view(t, visit_start_time.to_i == visit_end_time.to_i)
-          # get rucn_seq from vcn and push to unique
-          # visit_time ++
-          # page_view ++
         end
 
         # create the recent visit cookie
@@ -102,34 +124,35 @@ module Rack
         puts "TIME = [#{t}]"
         puts "VISIT = #{vcn_seq}"
         puts "UNIQUE VISIT = #{rucn_seq}"
-
-        # # write the response
-        # @response.finish
       end
       
       def new_visit(t)
-        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+        for_each_time_range(t) do |ts, expire|
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}new_visits:#{ts}",expire) if expire
         end
       end
-      
+
       def visit(t, options = {})
         last_visit_time = options[:last_visit_time] || nil
         rucn_seq = options[:rucn_seq] || nil
         
-        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+        for_each_time_range(t) do |ts, expire|
 
           # increment the total visits
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits:#{ts}")
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}visits:#{ts}", expire) if expire
 
           if rucn_seq
             unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
+            RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
             puts "UNIQUE => #{unique}" 
             if unique and defined?(GeoIP)
               begin
                 g = GeoIP.new("#{RedisAnalytics.geo_ip_data_path}/GeoIP.dat")
                 geo_country_code = g.country("115.111.79.34").to_hash[:country_code2]
                 RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
+                RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
               rescue
                 puts "Warning: Unable to fetch country info"
               end
@@ -140,28 +163,39 @@ module Rack
           if last_visit_time
             days_since_last_visit = ((t.to_i - last_visit_time)/(24*3600)).round
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_recency:#{ts}", 1, days_since_last_visit)
+            RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_recency:#{ts}", expire) if expire
           end
 
           # add ua info
           ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
+          
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_browsers:#{ts}", expire) if expire
+
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_platforms:#{ts}", 1, ua.platform.to_s)
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_platforms:#{ts}", expire) if expire
+          
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_devices:#{ts}", 1, ua.mobile? ? 'M' : 'D')
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_devices:#{ts}", expire) if expire
 
         end        
       end
 
       def visit_time(t, visit_end_time = nil)
-        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+        for_each_time_range(t) do |ts, expire|
           RedisAnalytics.redis_connection.incrby("#{@redis_key_prefix}visit_time:#{ts}", t.to_i - visit_end_time)
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}visit_time:#{ts}", expire) if expire
         end
       end
 
       # 2nd pageview in a visit
       def page_view(t, second_page_view = false)
-        [t.strftime('%Y'), t.strftime('%Y_%m'), t.strftime('%Y_%m_%d'), t.strftime('%Y_%m_%d_%H')].each do |ts|
+        for_each_time_range(t) do |ts, expire|
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_views:#{ts}")
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page_views:#{ts}", expire) if expire
+
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}second_page_views:#{ts}") if second_page_view
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}second_page_views:#{ts}", expire) if second_page_view and expire
         end
       end
 
