@@ -63,7 +63,8 @@ module Rack
           @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
           @data = {}
           
-          [[:year, :month, "%b", 12], [:week, :day, "%a", 7], [:day, :hour, "%l %P", 24]].each do |range, unit, time_format, multiple|
+          RedisAnalytics.time_range_formats.each do |range, unit, time_format|
+            multiple = (1.send(range)/1.send(unit)).round
             time_range = @t0 - 1.send(range) + 1.send(unit)
             @data[range] ||= {}
             @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
@@ -95,6 +96,7 @@ module Rack
             end
             @data[range][:country_map] = Hash[self.send("#{unit}ly_ratio_country", time_range, :aggregate => true)]
           end
+          @range = @data.keys[0] unless @data[@range]
         end
         erb :visits
       end
