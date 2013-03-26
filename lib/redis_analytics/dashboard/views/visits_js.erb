@@ -102,7 +102,7 @@ function changeTimeFrame(range)
 var mapObject = $('#world-map').vectorMap('get', 'mapObject');
 switch(range)
 {
-<%['day', 'week', 'year'].each do |range|%>
+<% Rack::RedisAnalytics.time_range_formats.map{|x| x[0].to_s}.each do |range| %>
 case '<%=range%>':
     setSessionCookie("_rarng", "<%=range%>");
     visits_area.setData(<%=@data[range.to_sym][:visits_new_visits_plot].to_json%>);
@@ -124,7 +124,8 @@ case '<%=range%>':
     <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
     <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
     <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
-    <%= "$('#recency_#{c}_num')[0].innerHTML = '#{p}';" %>
+    <%= "$('#recency_#{c}_num')[0].title = '#{i.to_i} visits';" %>
+    <%= "$('#recency_#{c}_cent')[0].innerHTML = '#{p}';" %>
     <% end %>
 
     break;
@@ -171,6 +172,5 @@ regionStyle: {
     }
   });
 });
-
 
 </script>
