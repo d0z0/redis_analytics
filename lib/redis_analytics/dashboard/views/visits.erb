@@ -73,12 +73,15 @@
 	    <p class="text-center"><b>Visit Recency</b><i class="pull-left icon-search"></i><i class="pull-right icon-download-alt"></i></p>
 	    <div style="height:160px;">
 	      <div style="margin:5px;">
-	      <% @data[@range][:visitor_recency_slices].each do |(k, v), i| %>
-	      <% p = ((i.to_f/@data[@range][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round %>
-		<small title="<%=i.to_i%> visits" class="muted"><%=(k == 0 ? 'Less than' : "#{k}")%> <%=('-' unless k == 0 or v == '*')%> <%=(v == '*' ? ' or more' : "#{v}")%> days (<%=p%>%)</small>
-		<div title="<%=i.to_i%> visits" class="progress" style="height: 5px; margin-bottom:10px;">
-		  <div class="bar" style="width: <%=p%>%;"></div>
+	      <%p @data[@range][:visitor_recency_slices].inspect %>
+	      <% @data[@range][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+	      <% p = ((i.to_f/@data[@range][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+	      <div id="recency_<%=c%>_num" title="<%=i.to_i%> visits">
+		<small class="muted"><%=(k == 0 ? 'Less than' : "#{k}")%> <%=('-' unless k == 0 or v == '*')%> <%=(v == '*' ? ' or more' : "#{v}")%> days (<span id="recency_<%=c%>_cent"><%=p%></span>%)</small>
+		<div class="progress" style="height: 8px; margin-bottom:10px;">
+		  <div id="recency_<%=c%>" class="bar" style="width: <%=p%>%;"></div>
 		</div>
+	      </div>
 	      <% end %>
 	      </div>
 	    </div>
@@ -98,13 +101,13 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4 id="total_visits"><%=@data[@range][:total_visits]%> <small class="muted">visits</small></h4>
+	    <h4 id="total_visits"><%=@data[@range][:total_visits]%><br/><small class="muted">visits</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="total_page_views"><%=@data[@range][:total_page_views]%> <small class="muted">page views</small></h4>
+	    <h4 id="total_page_views"><%=@data[@range][:total_page_views]%><br/><small class="muted">page views</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="page_depth"><%=(@data[@range][:total_page_views].to_f/@data[@range][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small></h4>
+	    <h4 id="page_depth"><%=(@data[@range][:total_page_views].to_f/@data[@range][:total_visits].to_f).round(2)%><br/><small class="muted">pages per visit</small></h4>
 	  </td>
 	</tr>
 	<!-- <tr> -->
@@ -123,13 +126,13 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4 id="bounce_rate"><%=(((@data[@range][:total_visits].to_f-@data[@range][:total_second_page_views].to_f)/@data[@range][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small></h4>
+	    <h4 id="bounce_rate"><%=(((@data[@range][:total_visits].to_f-@data[@range][:total_second_page_views].to_f)/@data[@range][:total_visits].to_f)*100).round(2)%>%<br/><small class="muted">bounce rate</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="visit_duration"><%=Time.at(@data[@range][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small></h4>
+	    <h4 id="visit_duration"><%=Time.at(@data[@range][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%><br/><small class="muted">avg time spent</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="new_visits"><%=((@data[@range][:total_new_visits].to_f/@data[@range][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>
+	    <h4 id="new_visits"><%=((@data[@range][:total_new_visits].to_f/@data[@range][:total_visits].to_f)*100).round(2)%>%<br/><small class="muted">new visits</small></h4>
 	  </td>
 	</tr>
       </table>
@@ -156,3 +159,5 @@
     <!-- <button class="btn btn-primary">Save changes</button> -->
   </div>
 </div>
+
+<%=erb(:visits_js)%>
