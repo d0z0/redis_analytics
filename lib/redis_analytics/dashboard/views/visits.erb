@@ -107,7 +107,7 @@
 	    <h4 id="total_page_views"><%=@data[@range][:total_page_views]%><br/><small class="muted">page views</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="page_depth"><%=(@data[@range][:total_page_views].to_f/@data[@range][:total_visits].to_f).round(2)%><br/><small class="muted">pages per visit</small></h4>
+	    <h4 id="page_depth"><%=parse_float((@data[@range][:total_page_views].to_f/@data[@range][:total_visits].to_f).round(2))%><br/><small class="muted">pages per visit</small></h4>
 	  </td>
 	</tr>
 	<!-- <tr> -->
@@ -126,13 +126,13 @@
 	</colgroup>
 	<tr>
 	  <td>
-	    <h4 id="bounce_rate"><%=(((@data[@range][:total_visits].to_f-@data[@range][:total_second_page_views].to_f)/@data[@range][:total_visits].to_f)*100).round(2)%>%<br/><small class="muted">bounce rate</small></h4>
+	    <h4 id="bounce_rate"><%=parse_float((((@data[@range][:total_visits].to_f-@data[@range][:total_second_page_views].to_f)/@data[@range][:total_visits].to_f)*100).round(2))%>%<br/><small class="muted">bounce rate</small></h4>
 	  </td>
 	  <td>
 	    <h4 id="visit_duration"><%=Time.at(@data[@range][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%><br/><small class="muted">avg time spent</small></h4>
 	  </td>
 	  <td>
-	    <h4 id="new_visits"><%=((@data[@range][:total_new_visits].to_f/@data[@range][:total_visits].to_f)*100).round(2)%>%<br/><small class="muted">new visits</small></h4>
+	    <h4 id="new_visits"><%=parse_float(((@data[@range][:total_new_visits].to_f/@data[@range][:total_visits].to_f)*100).round(2))%>%<br/><small class="muted">new visits</small></h4>
 	  </td>
 	</tr>
       </table>
