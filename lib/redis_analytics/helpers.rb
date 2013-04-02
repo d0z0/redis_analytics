@@ -31,7 +31,7 @@ module Rack
       private
 
       def method_missing(meth, *args, &block)
-        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_(new_visits|visits|page_views|second_page_views|unique_visits|visit_time|ratio_recency|ratio_browsers|ratio_platforms|ratio_devices|ratio_country)$/
+        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_(new_visits|visits|page_views|second_page_views|unique_visits|visit_time|ratio_recency|ratio_browsers|ratio_platforms|ratio_devices|ratio_country|ratio_referrers)$/
           granularity = ($1 == 'dai' ? 'day' : $1) + 'ly'
           type = $2
           data(granularity, type, *args)
