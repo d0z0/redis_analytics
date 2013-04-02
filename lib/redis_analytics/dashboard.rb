@@ -6,7 +6,7 @@ require 'active_support/core_ext'
 require 'redis_analytics'
 
 Rack::RedisAnalytics.configure do |c|
-  c.redis_connection = Redis.new
+  c.redis_connection = Redis.new(:db => 2)
 end
 
 if defined? Encoding
@@ -29,7 +29,11 @@ module Rack
       
       helpers do
         include Rack::RedisAnalytics::Helpers
-
+        
+        def parse_float(float)
+          float.nan? ? '0.0' : float
+        end
+        
         def with_benchmarking
           @t0 = Time.now
           yield
@@ -86,6 +90,7 @@ module Rack
             puts '*' * 50
             unique_visits = self.send("#{unit}ly_unique_visits", time_range - 1.send(range)).map{|x,y| [x.strftime(time_format), y]}
 
+            puts unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.inspect
             @data[range][:unique_visits] = unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
             second_page_views = self.send("#{unit}ly_second_page_views", time_range)
             @data[range][:total_second_page_views] = second_page_views.inject(0){|s, x| s += x[1].to_i; s}
