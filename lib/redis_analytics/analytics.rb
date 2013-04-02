@@ -32,6 +32,7 @@ module Rack
         status, headers, body = @app.call(env)
         @response = Rack::Response.new(body, status, headers)
         record # reads request, modifies response
+        
         @response.finish
       end
 
