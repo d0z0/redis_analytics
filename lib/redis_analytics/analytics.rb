@@ -150,28 +150,27 @@ module Rack
             unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
             puts "UNIQUE => #{unique}" 
-            if unique 
-              
-              # geo ip tracking (requires data file to be updated)
-              if defined?(GeoIP)
-                begin
-                  g = GeoIP.new("#{RedisAnalytics.geo_ip_data_path}/GeoIP.dat")
-                  geo_country_code = g.country("115.111.79.34").to_hash[:country_code2]
-                  RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
-                  RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
-                rescue
-                  puts "Warning: Unable to fetch country info"
-                end
+            
+            # geo ip tracking (requires data file to be updated)
+            if defined?(GeoIP)
+              begin
+                g = GeoIP.new("#{RedisAnalytics.geo_ip_data_path}/GeoIP.dat")
+                geo_country_code = g.country("115.111.79.34").to_hash[:country_code2]
+                RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
+                RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
+              rescue
+                puts "Warning: Unable to fetch country info"
               end
-              
-              # track referrer (this will track x.google.mysite.com as google so its buggy, fix the regex)
-              if @request.referrer
-                puts "REFERRER => #{@request.referrer}"
-                REFERRERS.each do |referrer|
-                  if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
-                    RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrer:#{ts}", 1, m.to_a[3])
+              end
+            
+            # track referrer (this will track x.google.mysite.com as google so its buggy, fix the regex)
+            if @request.referrer
+              puts "REFERRER => #{@request.referrer}"
+              REFERRERS.each do |referrer|
+                if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
+                  puts "MATCH => #{m.to_a[3]}"
+                  RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, m.to_a[3])
                   end
-                end
               end
             end
           end
