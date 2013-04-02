@@ -81,7 +81,8 @@ module Rack
             @data[range][:browsers_donut] = self.send("#{unit}ly_ratio_browsers", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
             @data[range][:platforms_donut] = self.send("#{unit}ly_ratio_platforms", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
             @data[range][:devices_donut] = self.send("#{unit}ly_ratio_platforms", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
-            puts '*' * 50
+            @data[range][:referrers_donut] = self.send("#{unit}ly_ratio_referrers", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
+
             unique_visits = self.send("#{unit}ly_unique_visits", time_range - 1.send(range)).map{|x,y| [x.strftime(time_format), y]}
 
             puts unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.inspect
