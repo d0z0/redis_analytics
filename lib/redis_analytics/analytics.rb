@@ -98,8 +98,8 @@ module Rack
         if not returning_visitor and not recent_visitor
           rucn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
-          new_visit(t)
           visit(t, :rucn_seq => rucn_seq)
+          new_visit(t)
           visit_time(t, t.to_i)
           page_view(t)
         elsif returning_visitor and not recent_visitor
