@@ -34,9 +34,9 @@ visits_donut = Morris.Donut({
   data: <%=@data[@range][:visits_new_visits_donut].to_json%>
 });
 
-traffic_donut = Morris.Donut({
-  element: 'traffic_donut',
-  data: [{"label":"Google","value":6482},{"label":"Bing","value":2136},{"label":"Direct","value":8136},{"label":"Other","value":5136}]
+referrers_donut = Morris.Donut({
+  element: 'referrers_donut',
+  data: <%=@data[@range][:referrers_donut].to_json%>
 });
 
 browsers_donut = Morris.Donut({
@@ -117,6 +117,7 @@ case '<%=range%>':
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[range.to_sym][:visits_new_visits_donut].to_json%>});
     browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[range.to_sym][:browsers_donut].to_json%>});
+    referrers_donut = Morris.Donut({element: 'referrers_donut', data: <%=@data[range.to_sym][:referrers_donut].to_json%>});
     mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
 
     $("#compare_unit")[0].innerHTML = '<%=range%>'; 
