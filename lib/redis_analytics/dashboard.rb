@@ -1,13 +1,7 @@
 require 'sinatra/base'
-require 'date'
 require 'json'
-require 'erb'
 require 'active_support/core_ext'
 require 'redis_analytics'
-
-Rack::RedisAnalytics.configure do |c|
-  c.redis_connection = Redis.new(:db => 2)
-end
 
 if defined? Encoding
   Encoding.default_external = Encoding::UTF_8
