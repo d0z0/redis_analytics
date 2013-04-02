@@ -166,7 +166,7 @@ module Rack
               
               # track referrer (this will track x.google.mysite.com as google so its buggy, fix the regex)
               REFERRERS.each do |referrer|
-                if @request.referrer and m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(\/.*)?$/)
+                if @request.referrer and m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
                   RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrer:#{ts}", 1, m.to_a[3])
                 end 
               end
