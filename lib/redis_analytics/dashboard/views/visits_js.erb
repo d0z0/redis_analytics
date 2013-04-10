@@ -110,10 +110,10 @@ case '<%=range%>':
 
     $("#total_visits")[0].innerHTML = '<%=@data[range.to_sym][:total_visits]%> <small class="muted">visits</small>';
     $("#total_page_views")[0].innerHTML = '<%=@data[range.to_sym][:total_page_views]%> <small class="muted">page views</small>';
-    $("#page_depth")[0].innerHTML = '<%=(@data[range.to_sym][:total_page_views].to_f/@data[range.to_sym][:total_visits].to_f).round(2)%> <small class="muted">pages per visit</small>';
-    $("#bounce_rate")[0].innerHTML = '<%=(((@data[range.to_sym][:total_visits].to_f-@data[range.to_sym][:total_second_page_views].to_f)/@data[range.to_sym][:total_visits].to_f)*100).round(2)%>% <small class="muted">bounce rate</small>';
+    $("#page_depth")[0].innerHTML = '<%=parse_float((@data[range.to_sym][:total_page_views].to_f/@data[range.to_sym][:total_visits].to_f).round(2))%> <small class="muted">pages per visit</small>';
+    $("#bounce_rate")[0].innerHTML = '<%=parse_float((((@data[range.to_sym][:total_visits].to_f-@data[range.to_sym][:total_second_page_views].to_f)/@data[range.to_sym][:total_visits].to_f)*100).round(2))%>% <small class="muted">bounce rate</small>';
     $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[range.to_sym][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
-    $("#new_visits")[0].innerHTML = '<%=((@data[range.to_sym][:total_new_visits].to_f/@data[range.to_sym][:total_visits].to_f)*100).round(2)%>% <small class="muted">new visits</small></h4>';
+    $("#new_visits")[0].innerHTML = '<%=parse_float(((@data[range.to_sym][:total_new_visits].to_f/@data[range.to_sym][:total_visits].to_f)*100).round(2))%>% <small class="muted">new visits</small></h4>';
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[range.to_sym][:visits_new_visits_donut].to_json%>});
     browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[range.to_sym][:browsers_donut].to_json%>});
@@ -174,4 +174,58 @@ regionStyle: {
   });
 });
 
+function onDownload() {
+    document.location = 'data:Application/octet-stream,' +
+                         encodeURIComponent(convertToCSV(<%=@data[@range][:visits_new_visits_plot].to_json%>));
+}
+
+function convertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str;
+        };
+
+$('#visits_modal').on('show', function () {
+    
+    colors = Highcharts.getOptions().colors;
+    
+    // create the chart when all data is loaded
+    $(function(){
+	
+	$('#visits_detail').highcharts('StockChart', {
+	    chart: {
+	    },
+	    
+	    // tooltip: {
+	    // 	pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+	    // 	valueDecimals: 2
+	    // },
+	    yAxis: {
+		allowDecimals: false
+	    },
+	    xAxis: {
+		allowDecimals: false
+	    },
+	    
+	    series: [{
+		name: 'Visits',
+		data: <%=@data[:all_visits].to_json%>
+	    }]
+	});
+    });
+});
+
 </script>
+
