@@ -41,7 +41,7 @@ module Rack
       def visit_cookie_name
         @visit_cookie_name ||= '_vcn'
       end
- 
+      
       def dashboard_endpoint
         @dashboard_endpoint ||= '/dashboard'
       end
@@ -65,11 +65,11 @@ module Rack
       def time_range_formats
         [[:year, :month, "%b"], [:week, :day, "%a"], [:day, :hour, "%l%P"]]
       end
-     
+      
       def configure
         yield self
       end
-
+      
     end
   end
 end

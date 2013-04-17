@@ -23,7 +23,12 @@ module Rack
       
       helpers do
         include Rack::RedisAnalytics::Helpers
-        
+
+        def realistic(n, r = 1000)
+          return n
+          n + r + rand(r)
+        end
+
         def parse_float(float)
           float.nan? ? '0.0' : float
         end
@@ -33,6 +38,7 @@ module Rack
           yield
           @t1 = Time.now
           @t = @t1 - @t0
+          puts "Time Taken: #{@t} seconds"
         end
 
       end
@@ -98,6 +104,8 @@ module Rack
           end
           @range = @data.keys[0] unless @data[@range]
         end
+        @data[:all_visits] = daily_visits(Time.now - 1.year).map{|x,y| [x.to_i * 1000, realistic(y)]}
+        @data[:all_unique_visits] = daily_unique_visits(Time.now - 1.year).map{|x,y| [x.to_i * 1000, realistic(y)]}
         erb :visits
       end
       

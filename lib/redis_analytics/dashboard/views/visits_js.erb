@@ -227,5 +227,39 @@ $('#visits_modal').on('show', function () {
     });
 });
 
+
+$('#unique_visits_modal').on('show', function () {
+    
+    colors = Highcharts.getOptions().colors;
+    
+    // create the chart when all data is loaded
+    $(function(){
+	
+	$('#unique_visits_detail').highcharts('StockChart', {
+	    chart: {
+	    },
+	    
+	    // tooltip: {
+	    // 	pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+	    // 	valueDecimals: 2
+	    // },
+	    yAxis: {
+		allowDecimals: false
+	    },
+	    xAxis: {
+		allowDecimals: false
+	    },
+	    
+	    series: [{
+		name: 'Unique Visits',
+		data: <%=@data[:all_unique_visits].to_json%>
+	    }]
+	});
+    });
+});
+
 </script>
 
+<style>
+.modal {width:940px;left:36%;}
+</style>
