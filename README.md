@@ -65,7 +65,7 @@ and navigate to [http://localhost:4567](http://localhost:4567)
 
 ## What if I have multiple rails apps that I want to track as one?
 
-Just keep the redis_namespace the same for all of them and you're good to go
+In the configuration, keep the value of redis_namespace the same across all your rails apps
 
 ## Copyright
 
