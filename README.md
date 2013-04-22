@@ -67,6 +67,13 @@ and navigate to [http://localhost:4567](http://localhost:4567)
 
 In the configuration, keep the value of redis_namespace the same across all your rails apps
 
+```ruby
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_namespace = 'mywebsite.org'
+
+end
+```
 ## Copyright
 
 Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.
