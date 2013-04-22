@@ -27,13 +27,13 @@ require 'redis_analytics'
 
 # configure your redis connection (this is mandatory) and namespace (this is optional)
 Rack::RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => '127.0.0.1')
+  configuration.redis_connection = Redis.new(:host => 'localhost'
   configuration.redis_namespace = 'mysite.org_analytics'
   
 end
 ```
 
-## Hey! Where do I view the dashboard?
+## Where do I view the dashboard?
 
 ### Option 1: If you are riding on rails, you can mount it
 
@@ -44,9 +44,17 @@ ExampleApp::Application.routes.draw do
 end
 ```
 
+and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rails app is hosted at [http://127.0.0.1:3000](http://localhost:3000)
+
 ### Option 2: Simply run the binary executable file
 
 `redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace mysite.org_analytics`
+
+and navigate to [http://localhost:4567](http://localhost:4567)
+
+## What if I have multiple rails apps that I want to track as one?
+
+Just keep the redis_namespace the same for all of them and you're good to go
 
 ## Copyright
 
