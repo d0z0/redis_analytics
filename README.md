@@ -6,6 +6,10 @@ A gem that provides a Redis based web analytics solution for your rack compliant
 
 It gives you detailed analytics about visitors, unique visitors, browsers, OS, visitor recency, traffic sources and more
 
+## Does it have a cool dashboard?
+
+![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
+
 ## OK, so how do I install it?
 
 `gem install redis_analytics`
