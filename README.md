@@ -25,6 +25,8 @@ check out the [Redis documentation](http://redis.io/documentation).
 
 ## How do I enable tracking in my rack-compliant app?
 
+### Step 1: Load the redis_analytics library and configure it
+
 ```ruby
 # this is not required unless you use :require => false in your Gemfile
 require 'redis_analytics'
@@ -35,6 +37,11 @@ Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_namespace = 'ra'
   
 end
+```
+### Step 2: Use the Mapper rack middleware (NOT REQUIRED FOR RAILS)
+
+```ruby
+use Rack::RedisAnalytics::Mapper
 ```
 
 ## Where do I view the dashboard?
