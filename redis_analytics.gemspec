@@ -15,8 +15,9 @@ Gem::Specification.new do |spec|
   spec.rubyforge_project = "redis_analytics"
 
   spec.files          = Dir.glob("**/*")
-  #spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  #spec.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+
+  spec.executables = ['redis_analytics_dashboard']
+  spec.default_executable = 'redis_analytics_dashboard'
   spec.require_paths  = ["lib"]
 
   spec.add_runtime_dependency('rack', '>= 1.4.0')
