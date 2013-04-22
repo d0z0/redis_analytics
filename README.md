@@ -31,8 +31,8 @@ require 'redis_analytics'
 
 # configure your redis connection (this is mandatory) and namespace (this is optional)
 Rack::RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost'
-  configuration.redis_namespace = 'mysite.org_analytics'
+  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_namespace = 'ra'
   
 end
 ```
@@ -52,7 +52,7 @@ and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboar
 
 ### Option 2: Simply run the binary executable file
 
-`redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace mysite.org_analytics`
+`redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
 
 and navigate to [http://localhost:4567](http://localhost:4567)
 
