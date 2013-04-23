@@ -158,8 +158,12 @@ module Rack
             if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
               "REFERRER => #{m.to_a[3]}"
               referrer = m.to_a[3]
+            else
+              referrer = 'other'
             end
           end
+        else
+          referrer = 'organic'
         end
 
         # User agent
@@ -176,7 +180,7 @@ module Rack
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
             
             # geo ip tracking
-            if geo_country_code
+            if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
               RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
             end
