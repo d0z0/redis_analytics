@@ -41,6 +41,7 @@ end
 ### Step 2: Use the Tracker rack middleware (NOT REQUIRED FOR RAILS)
 
 ```ruby
+# In Sinatra you would do...
 use Rack::RedisAnalytics::Tracker
 ```
 
