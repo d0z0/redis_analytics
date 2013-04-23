@@ -8,6 +8,8 @@ It gives you detailed analytics about visitors, unique visitors, browsers, OS, v
 
 ## Does it have a cool dashboard?
 
+Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for the main dashboard and [Highcharts](http://www.highcharts.com) for drawing the various detailed graphs
+
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
 
 ## OK, so how do I install it?
@@ -89,7 +91,6 @@ Rack::RedisAnalytics.configure do |configuration|
   configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
 end
 ```
-
 
 ## Copyright
 
