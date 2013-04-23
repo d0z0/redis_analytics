@@ -44,6 +44,8 @@ end
 use Rack::RedisAnalytics::Tracker
 ```
 
+For rails the middleware is added automatically, so you should not need to add it manually using `config.middleware.use`
+
 ## Where do I view the dashboard?
 
 ### Option 1: If you are riding on rails, you can mount it
