@@ -35,12 +35,12 @@ require 'redis_analytics'
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'ra'
-  
 end
 ```
 ### Step 2: Use the Tracker rack middleware (NOT REQUIRED FOR RAILS)
 
 ```ruby
+# in Sinatra you would do...
 use Rack::RedisAnalytics::Tracker
 ```
 
@@ -57,7 +57,7 @@ ExampleApp::Application.routes.draw do
 end
 ```
 
-and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rails app is hosted at [http://127.0.0.1:3000](http://localhost:3000)
+and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rails app is hosted at [http://localhost:3000](http://localhost:3000)
 
 ### Option 2: Simply run the binary executable file
 
@@ -73,7 +73,6 @@ In the configuration, keep the value of redis_namespace the same across all your
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'mywebsite.org'
-
 end
 ```
 ## Copyright
