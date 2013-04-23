@@ -58,9 +58,9 @@ Rack::RedisAnalytics.configure do |configuration|
 end
 ```
 
-and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rails app is hosted at [http://localhost:3000](http://localhost:3000)
+and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rack-compliant app is hosted at [http://localhost:3000](http://localhost:3000)
 
-### Option 2: Simply run the binary executable file
+### Option 2: Simply run the bundled Sinatra application binary
 
 `redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
 
