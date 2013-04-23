@@ -47,7 +47,7 @@ module Rack
       end
 
       def geo_ip_data_path
-        @geo_ip_data_path = ::File.expand_path(::File.join(::File.dirname(__FILE__),'..','..')) + "GeoIP.dat"
+        @geo_ip_data_path = ::File.expand_path(::File.join(::File.dirname(__FILE__),'..','..')) + "/bin/GeoIP.dat"
       end
 
       def visitor_recency_slices
