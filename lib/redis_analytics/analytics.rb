@@ -77,8 +77,6 @@ module Rack
           page = PAGEVIEWS[i]
           params.select{|x, y| page[1..-1].include?(x)}.each do |k, v|
             for_each_time_range(t) do |ts, expire|
-
-              puts "#{ts} -> #{expire}"
               h = Digest::MD5.hexdigest(v)
               RedisAnalytics.redis_connection.hset("#{@redis_key_prefix}page", h, v)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page", expire) if expire
@@ -149,7 +147,6 @@ module Rack
           if rucn_seq
             unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
-            puts "UNIQUE => #{unique}" 
             
             # geo ip tracking (requires data file to be updated)
             if defined?(GeoIP)
@@ -159,17 +156,16 @@ module Rack
                 puts "Tracking IP #{@request.ip} using #{g.inspect} => GOT #{geo_country_code}"
                 RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
                 RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
-              rescue
-                puts "Warning: Unable to fetch country info"
+              rescue Exception => e
+                puts "Warning: Unable to fetch country info #{e}"
               end
               end
             
             # track referrer (this will track x.google.mysite.com as google so its buggy, fix the regex)
             if @request.referrer
-              puts "REFERRER => #{@request.referrer}"
               REFERRERS.each do |referrer|
                 if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
-                  puts "MATCH => #{m.to_a[3]}"
+                  puts "REFERRER => #{m.to_a[3]}"
                   RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, m.to_a[3])
                   end
               end
@@ -208,6 +204,7 @@ module Rack
       # 2nd pageview in a visit
       def page_view(t, second_page_view = false)
         for_each_time_range(t) do |ts, expire|
+          puts "PAGEVIEW ++ @ #{ts}"
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_views:#{ts}")
           RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page_views:#{ts}", expire) if expire
 
