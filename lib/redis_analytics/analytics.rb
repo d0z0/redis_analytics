@@ -154,7 +154,7 @@ module Rack
             # geo ip tracking (requires data file to be updated)
             if defined?(GeoIP)
               begin
-                g = GeoIP.new("#{RedisAnalytics.geo_ip_data_path}/GeoIP.dat")
+                g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
                 geo_country_code = g.country("115.111.79.34").to_hash[:country_code2]
                 RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
                 RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
