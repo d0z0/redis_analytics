@@ -10,7 +10,6 @@ if args.key?('--redis-host') and args.key?('--redis-port')
     c.redis_connection = Redis.new(:host => args['--redis-host'], :port => args['--redis-port'], :db => args['--redis-db'])
     c.redis_namespace = args['--redis-namespace'] if args['--redis-namespace']
   end
-  # Rack::RedisAnalytics::Dashboard.set(:bind, '127.0.0.1')
   Rack::RedisAnalytics::Dashboard.set(:port, args['-p']) if args['-p']
   Rack::RedisAnalytics::Dashboard.run!
 else

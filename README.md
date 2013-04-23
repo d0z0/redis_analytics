@@ -1,12 +1,14 @@
 ## What is redis_analytics?
 
-A gem that provides a Redis based web analytics solution for your rack compliant apps
+A gem that provides a Redis based web analytics solution for your rack-compliant apps
 
 ## Why should I use it?
 
 It gives you detailed analytics about visitors, unique visitors, browsers, OS, visitor recency, traffic sources and more
 
 ## Does it have a cool dashboard?
+
+Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for the main dashboard and [Highcharts](http://www.highcharts.com) for drawing the various detailed graphs
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
 
@@ -35,32 +37,30 @@ require 'redis_analytics'
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'ra'
-  
 end
 ```
 ### Step 2: Use the Tracker rack middleware (NOT REQUIRED FOR RAILS)
 
 ```ruby
-# In Sinatra you would do...
+# in Sinatra you would do...
 use Rack::RedisAnalytics::Tracker
 ```
 
-For rails the middleware is added automatically, so you should not need to add it manually using `config.middleware.use`
+For rails the middleware is added automatically, so you do not need to add it manually using `config.middleware.use`
 
 ## Where do I view the dashboard?
 
-### Option 1: If you are riding on rails, you can mount it
+### Option 1: Set a dashboard endpoint in your configuration
 
 ```ruby
-# in your config/routes.rb
-ExampleApp::Application.routes.draw do
-  mount Rack::RedisAnalytics::Dashboard, :at => '/dashboard'
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.dashboard_endpoint = '/dashboard'
 end
 ```
 
-and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rails app is hosted at [http://localhost:3000](http://localhost:3000)
+and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rack-compliant app is hosted at [http://localhost:3000](http://localhost:3000)
 
-### Option 2: Simply run the binary executable file
+### Option 2: Simply run the bundled Sinatra application binary
 
 `redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
 
@@ -74,9 +74,23 @@ In the configuration, keep the value of redis_namespace the same across all your
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'mywebsite.org'
-
 end
 ```
+
+## Why is the Geolocation tracking giving me wrong results?
+
+IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
+Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
+You will then need to point to the GeoIP.dat file in your configuration.
+
+```ruby
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_namespace = 'mywebsite.org'
+  configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
+end
+```
+
 ## Copyright
 
 Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.

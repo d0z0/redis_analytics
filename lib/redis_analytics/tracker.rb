@@ -8,7 +8,7 @@ module Rack
             run Analytics.new(app)
           end
 
-          if defined? Dashboard
+          if defined? Dashboard and RedisAnalytics.dashboard_endpoint
             map RedisAnalytics.dashboard_endpoint do
               run Dashboard.new
             end

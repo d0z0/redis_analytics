@@ -43,11 +43,11 @@ module Rack
       def data(granularity, type, from_date, options = {})
         aggregate = options[:aggregate] || false
         x = granularity[0..-3]
-        puts "DATA: #{x} (#{type})"
+        # puts "DATA: #{x} (#{type})"
         to_date = (options[:to_date] || Time.now).send("end_of_#{x}")
         i = from_date.send("beginning_of_#{x}") #unless x == 'minute'
 
-        puts "FROM: #{i} to #{to_date}"
+        # puts "FROM: #{i} to #{to_date}"
         union = []
         time = []
         begin

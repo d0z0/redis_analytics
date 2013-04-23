@@ -17,7 +17,7 @@ module Rack
       attr_writer :visit_timeout
 
       # Endpoint for dashboard
-      attr_writer :dashboard_endpoint
+      attr_accessor :dashboard_endpoint
 
       # Redis namespace for keys
       attr_writer :geo_ip_data_path
@@ -42,10 +42,6 @@ module Rack
         @visit_cookie_name ||= '_vcn'
       end
       
-      def dashboard_endpoint
-        @dashboard_endpoint ||= '/dashboard'
-      end
-
       def geo_ip_data_path
         @geo_ip_data_path = ::File.expand_path(::File.join(::File.dirname(__FILE__),'..','..')) + "/bin/GeoIP.dat"
       end

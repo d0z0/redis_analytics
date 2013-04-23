@@ -12,7 +12,7 @@ module Rack
     class Dashboard < Sinatra::Base
       
       dir = ::File.expand_path(::File.dirname(__FILE__))
-      
+
       set :views,  "#{dir}/dashboard/views"
       
       if respond_to? :public_folder
@@ -46,7 +46,7 @@ module Rack
       set :static, true
 
       def initialize
-        $template_prefix = '/dashboard' if defined? Rails
+        $template_prefix = Rack::RedisAnalytics.dashboard_endpoint
         super
       end
 
@@ -91,7 +91,7 @@ module Rack
 
             unique_visits = self.send("#{unit}ly_unique_visits", time_range - 1.send(range)).map{|x,y| [x.strftime(time_format), y]}
 
-            puts unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.inspect
+            # puts unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.inspect
             @data[range][:unique_visits] = unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
             second_page_views = self.send("#{unit}ly_second_page_views", time_range)
             @data[range][:total_second_page_views] = second_page_views.inject(0){|s, x| s += x[1].to_i; s}
