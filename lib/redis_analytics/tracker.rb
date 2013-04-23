@@ -1,6 +1,6 @@
 module Rack
   module RedisAnalytics
-    class Mapper
+    class Tracker
 
       def initialize(app)
         @app = Rack::Builder.new do
