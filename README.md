@@ -50,12 +50,11 @@ For rails the middleware is added automatically, so you do not need to add it ma
 
 ## Where do I view the dashboard?
 
-### Option 1: If you are riding on rails, you can mount it
+### Option 1: Set a dashboard endpoint in your configuration
 
 ```ruby
-# in your config/routes.rb
-ExampleApp::Application.routes.draw do
-  mount Rack::RedisAnalytics::Dashboard, :at => '/dashboard'
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.dashboard_endpoint = '/dashboard'
 end
 ```
 
