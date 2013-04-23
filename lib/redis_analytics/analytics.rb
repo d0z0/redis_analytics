@@ -33,8 +33,7 @@ module Rack
         @request  = Request.new(env)
         status, headers, body = @app.call(env)
         @response = Rack::Response.new(body, status, headers)
-        record # reads request, modifies response
-        
+        record if @response.ok? and @response.content_type =~ /^text\/html/
         @response.finish
       end
 
@@ -137,6 +136,34 @@ module Rack
       def visit(t, options = {})
         last_visit_time = options[:last_visit_time] || nil
         rucn_seq = options[:rucn_seq] || nil
+        geo_country_code = nil
+        referrer = nil
+        ua = nil
+        
+        # Geo IP Country code fetch
+        if defined?(GeoIP)
+          begin
+            g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
+            geo_country_code = g.country(@request.ip).to_hash[:country_code2]
+            puts "Tracking IP #{@request.ip} using #{g.inspect} => GOT #{geo_country_code}"
+          rescue Exception => e
+            puts "Warning: Unable to fetch country info #{e}"
+          end
+        end
+
+        # Referrer regex decode
+        if @request.referrer
+          REFERRERS.each do |referrer|
+            # this will track x.google.mysite.com as google so its buggy, fix the regex
+            if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
+              "REFERRER => #{m.to_a[3]}"
+              referrer = m.to_a[3]
+            end
+          end
+        end
+
+        # User agent
+        ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
         
         for_each_time_range(t) do |ts, expire|
 
@@ -148,28 +175,14 @@ module Rack
             unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
             
-            # geo ip tracking (requires data file to be updated)
-            if defined?(GeoIP)
-              begin
-                g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
-                geo_country_code = g.country(@request.ip).to_hash[:country_code2]
-                puts "Tracking IP #{@request.ip} using #{g.inspect} => GOT #{geo_country_code}"
-                RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
-                RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
-              rescue Exception => e
-                puts "Warning: Unable to fetch country info #{e}"
-              end
-              end
-            
-            # track referrer (this will track x.google.mysite.com as google so its buggy, fix the regex)
-            if @request.referrer
-              REFERRERS.each do |referrer|
-                if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
-                  puts "REFERRER => #{m.to_a[3]}"
-                  RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, m.to_a[3])
-                  end
-              end
+            # geo ip tracking
+            if geo_country_code
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
             end
+            
+            # referrer tracking 
+            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, referrer)
           end
           
           # tracking for visitor recency
@@ -178,9 +191,6 @@ module Rack
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_recency:#{ts}", 1, days_since_last_visit)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_recency:#{ts}", expire) if expire
           end
-
-          # add ua info
-          ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
           
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
           RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_browsers:#{ts}", expire) if expire
@@ -190,7 +200,6 @@ module Rack
           
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_devices:#{ts}", 1, ua.mobile? ? 'M' : 'D')
           RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_devices:#{ts}", expire) if expire
-
         end        
       end
 
