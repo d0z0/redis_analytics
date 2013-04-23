@@ -1,6 +1,6 @@
 ## What is redis_analytics?
 
-A gem that provides a Redis based web analytics solution for your rack compliant apps
+A gem that provides a Redis based web analytics solution for your rack-compliant apps
 
 ## Why should I use it?
 
@@ -44,7 +44,7 @@ end
 use Rack::RedisAnalytics::Tracker
 ```
 
-For rails the middleware is added automatically, so you should not need to add it manually using `config.middleware.use`
+For rails the middleware is added automatically, so you do not need to add it manually using `config.middleware.use`
 
 ## Where do I view the dashboard?
 
@@ -75,6 +75,22 @@ Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_namespace = 'mywebsite.org'
 end
 ```
+
+## Why is the Geolocation tracking giving me wrong results?
+
+IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
+Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
+You will then need to point to the GeoIP.dat file in your configuration.
+
+```ruby
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_namespace = 'mywebsite.org'
+  configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
+end
+```
+
+
 ## Copyright
 
 Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.
