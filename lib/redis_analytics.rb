@@ -11,7 +11,7 @@ require 'redis_analytics/analytics'
 require 'redis_analytics/helpers'
 require 'redis_analytics/dashboard'
 
-require 'redis_analytics/mapper'
+require 'redis_analytics/tracker'
 require 'redis_analytics/railtie' if defined? Rails::Railtie
 
 module Rack
