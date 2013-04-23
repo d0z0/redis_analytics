@@ -156,6 +156,7 @@ module Rack
               begin
                 g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
                 geo_country_code = g.country(@request.ip).to_hash[:country_code2]
+                puts "Tracking IP #{@request.ip} using #{g.inspect} => GOT #{geo_country_code}"
                 RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
                 RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
               rescue
