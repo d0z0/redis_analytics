@@ -17,7 +17,7 @@ module Rack
         "products" => ["/products/:id/review", :user_id]
       }
 
-      REFERRERS = ['google', 'bing', 'yahoo', 'cleartrip']
+      REFERRERS = ['google', 'bing', 'yahoo', 'cleartrip', 'github']
 
       def initialize(app)
         @app = app
