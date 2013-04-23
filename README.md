@@ -38,10 +38,10 @@ Rack::RedisAnalytics.configure do |configuration|
   
 end
 ```
-### Step 2: Use the Mapper rack middleware (NOT REQUIRED FOR RAILS)
+### Step 2: Use the Tracker rack middleware (NOT REQUIRED FOR RAILS)
 
 ```ruby
-use Rack::RedisAnalytics::Mapper
+use Rack::RedisAnalytics::Tracker
 ```
 
 ## Where do I view the dashboard?
