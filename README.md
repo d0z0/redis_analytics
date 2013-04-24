@@ -1,3 +1,5 @@
+# Redis Analytics
+
 ## What is redis_analytics?
 
 A gem that provides a Redis based web analytics solution for your rack-compliant apps
