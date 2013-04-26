@@ -1,4 +1,9 @@
-pec.name        = "redis_analytics"
+# -*- encoding: utf-8 -*-
+$:.push File.expand_path("../lib", __FILE__)
+require 'redis_analytics/version'
+
+Gem::Specification.new do |spec|
+  spec.name        = "redis_analytics"
   spec.version     = Rack::RedisAnalytics::VERSION
   spec.date        = '2013-02-15'
   spec.authors     = ["Schubert Cardozo"]
