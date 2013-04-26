@@ -1,9 +1,4 @@
-# -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
-require 'redis_analytics/version'
-
-Gem::Specification.new do |spec|
-  spec.name        = "redis_analytics"
+pec.name        = "redis_analytics"
   spec.version     = Rack::RedisAnalytics::VERSION
   spec.date        = '2013-02-15'
   spec.authors     = ["Schubert Cardozo"]
@@ -28,10 +23,10 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('json', '>= 1.7.7')
   spec.add_runtime_dependency('activesupport', '>= 3.2.0')
 
-
   spec.add_development_dependency('rake', '>= 10.0.3')
   spec.add_development_dependency('rspec', '>= 2.11.0')
   spec.add_development_dependency('mocha', '>= 0.12.7')
+  spec.add_development_dependency('rack-test', '>= 0.6.2')
 
   spec.required_ruby_version = '>= 1.9.2'
 end
