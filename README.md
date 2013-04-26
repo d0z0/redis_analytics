@@ -1,4 +1,4 @@
-# Redis Analytics
+# redis_analytics  [![Build Status](https://travis-ci.org/saturnine/redis_analytics.png?branch=master)](https://travis-ci.org/saturnine/redis_analytics)
 
 ## What is redis_analytics?
 
