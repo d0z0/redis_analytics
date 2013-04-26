@@ -21,6 +21,7 @@ describe Rack::RedisAnalytics::Analytics do
   context "when a user makes 2 visits and the visit cookie and returning user cookie are not expired" do
     it "it should count as the same visit" do
       t1 = Time.now
+      Time.stubs(:now).returns(t1)
       get '/'
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.visit_cookie_name}=1\.1\.#{t1.to_i}\.#{t1.to_i}")
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.returning_user_cookie_name}=1\.#{t1.to_i}\.#{t1.to_i}")
@@ -35,13 +36,16 @@ describe Rack::RedisAnalytics::Analytics do
   context "when a user makes 2 visits, but visit cookie and returning user cookie are both non-existent" do
     it "should count as a separate and new visit" do
       t1 = Time.now
+      Time.stubs(:now).returns(t1)
       get '/'
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.visit_cookie_name}=1\.1\.#{t1.to_i}\.#{t1.to_i}")
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.returning_user_cookie_name}=1\.#{t1.to_i}.#{t1.to_i}")
       clear_cookies
-      t2 = Time.now
+
+      t2 = t1 + 5 # just adding 5 seconds
+      Time.stubs(:now).returns(t2)
       get '/'
-      last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.visit_cookie_name}=2\.2\.#{t1.to_i}\.#{t1.to_i}")
+      last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.visit_cookie_name}=2\.2\.#{t2.to_i}\.#{t2.to_i}")
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.returning_user_cookie_name}=2\.#{t2.to_i}\.#{t2.to_i}")
     end
   end
