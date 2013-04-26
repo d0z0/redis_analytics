@@ -19,7 +19,7 @@ describe Rack::RedisAnalytics::Analytics do
   # Spec for Cookies
   
   context "when a user makes 2 visits and the visit cookie and returning user cookie are not expired" do
-    it "it should count as the same visit" do
+    it "it should count as the same visit in the cookie" do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
@@ -34,7 +34,7 @@ describe Rack::RedisAnalytics::Analytics do
   end
   
   context "when a user makes 2 visits, but visit cookie and returning user cookie are both non-existent" do
-    it "should count as a separate and new visit" do
+    it "should count as a separate and new visit in the cookie" do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
@@ -49,6 +49,7 @@ describe Rack::RedisAnalytics::Analytics do
       last_response.original_headers['Set-Cookie'].should =~ Regexp.new("#{Rack::RedisAnalytics.returning_user_cookie_name}=2\.#{t2.to_i}\.#{t2.to_i}")
     end
   end
+
   context "when a user makes 2 visits, and visit cookie is expired but the returning user cookie exists" do
     it "should count as a separate visit but not a new visit"
   end
