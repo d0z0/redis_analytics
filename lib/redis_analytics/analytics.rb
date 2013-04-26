@@ -217,7 +217,6 @@ module Rack
       # 2nd pageview in a visit
       def page_view(t, second_page_view = false)
         for_each_time_range(t) do |ts, expire|
-          puts "PAGEVIEW ++ @ #{ts}"
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_views:#{ts}")
           RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page_views:#{ts}", expire) if expire
 
