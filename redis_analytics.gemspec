@@ -5,7 +5,7 @@ require 'redis_analytics/version'
 Gem::Specification.new do |spec|
   spec.name        = "redis_analytics"
   spec.version     = Rack::RedisAnalytics::VERSION
-  spec.date        = '2013-02-15'
+  spec.date        = Time.now.strftime('%Y-%m-%d')
   spec.authors     = ["Schubert Cardozo"]
   spec.email       = ["cardozoschubert@gmail.com"]
   spec.homepage    = "https://github.com/saturnine/redis_analytics"
@@ -32,6 +32,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rspec', '>= 2.11.0')
   spec.add_development_dependency('mocha', '>= 0.12.7')
   spec.add_development_dependency('rack-test', '>= 0.6.2')
+  spec.add_development_dependency('simplecov', '>= 0.7.1')
+  spec.add_development_dependency('coveralls', '>= 0.6.7')
 
   spec.required_ruby_version = '>= 1.9.2'
 end
