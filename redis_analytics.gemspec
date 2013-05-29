@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Schubert Cardozo"]
   spec.email       = ["cardozoschubert@gmail.com"]
   spec.homepage    = "https://github.com/saturnine/redis_analytics"
-  spec.summary     = %q{A gem that provides a Redis based web analytics solution for your rack-compliant apps}
+  spec.summary     = %q{Fast and efficient web analytics for Rack apps}
   spec.description = %q{A gem that provides a Redis based web analytics solution for your rack-compliant apps. It gives you detailed analytics about visitors, unique visitors, browsers, OS, visitor recency, traffic sources and more}
 
   spec.rubyforge_project = "redis_analytics"
