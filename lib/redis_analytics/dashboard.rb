@@ -17,27 +17,7 @@ module Rack
       set :public, "#{dir}/dashboard/public" unless respond_to? :public_folder
       set :static, true
       
-      helpers do
-        include Rack::RedisAnalytics::Helpers
-
-        def realistic(n, r = 1000)
-          return n
-          n + r + rand(r)
-        end
-
-        def parse_float(float)
-          float.nan? ? '0.0' : float
-        end
-        
-        def with_benchmarking
-          @t0 = Time.now
-          yield
-          @t1 = Time.now
-          @t = @t1 - @t0
-          puts "Time Taken: #{@t} seconds"
-        end
-
-      end
+      helpers Rack::RedisAnalytics::Helpers
 
       def initialize
         $template_prefix = Rack::RedisAnalytics.dashboard_endpoint

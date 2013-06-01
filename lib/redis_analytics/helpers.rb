@@ -64,6 +64,23 @@ module Rack
         seq = Rack::RedisAnalytics.redis_connection.incr("#{Rack::RedisAnalytics.redis_namespace}:#SEQUENCER")
       end
 
+      def realistic(n, r = 1000)
+        return n
+        n + r + rand(r)
+      end
+
+      def parse_float(float)
+        float.nan? ? '0.0' : float
+      end
+      
+      def with_benchmarking
+        @t0 = Time.now
+        yield
+        @t1 = Time.now
+        @t = @t1 - @t0
+        puts "Time Taken: #{@t} seconds"
+      end
+
     end
   end
 end
