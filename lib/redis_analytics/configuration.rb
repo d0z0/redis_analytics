@@ -17,7 +17,7 @@ module Rack
       attr_writer :visit_timeout
 
       # Endpoint for dashboard
-      attr_accessor :dashboard_endpoint
+      attr_writer :dashboard_endpoint
 
       # Redis namespace for keys
       attr_writer :geo_ip_data_path
@@ -32,6 +32,10 @@ module Rack
         @visit_timeout ||= 1 # minutes
       end
 
+      def dashboard_endpoint
+        @dashboard_endpoint ||= '/dashboard'
+      end
+      
       # Name of the cookie which tracks returning visitors (known visitors)
       def returning_user_cookie_name
         @returning_user_cookie_name ||= '_rucn'
