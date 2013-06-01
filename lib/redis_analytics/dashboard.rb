@@ -14,7 +14,7 @@ module Rack
       set :dir, ::File.expand_path(::File.dirname(__FILE__))
       set :views,  "#{settings.dir}/dashboard/views"
       set :public_folder, "#{settings.dir}/dashboard/public" if respond_to? :public_folder
-      set :public, "#{dir}/dashboard/public" unless respond_to? :public_folder
+      set :public, "#{settings.dir}/dashboard/public" unless respond_to? :public_folder
       set :static, true
       
       helpers Rack::RedisAnalytics::Helpers
