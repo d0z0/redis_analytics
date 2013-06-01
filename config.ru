@@ -3,7 +3,6 @@ $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "lib")))
 require 'redis_analytics'
 Rack::RedisAnalytics.configure do |c|
   c.redis_connection = Redis.new
-  c.dashboard_endpoint = '/dashboard'
 end
 
 app = Rack::Builder.app do
