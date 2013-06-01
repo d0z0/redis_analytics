@@ -11,15 +11,11 @@ module Rack
   module RedisAnalytics
     class Dashboard < Sinatra::Base
       
-      dir = ::File.expand_path(::File.dirname(__FILE__))
-
-      set :views,  "#{dir}/dashboard/views"
-      
-      if respond_to? :public_folder
-        set :public_folder, "#{dir}/dashboard/public"
-      else
-        set :public, "#{dir}/dashboard/public"
-      end
+      set :dir, ::File.expand_path(::File.dirname(__FILE__))
+      set :views,  "#{settings.dir}/dashboard/views"
+      set :public_folder, "#{settings.dir}/dashboard/public" if respond_to? :public_folder
+      set :public, "#{dir}/dashboard/public" unless respond_to? :public_folder
+      set :static, true
       
       helpers do
         include Rack::RedisAnalytics::Helpers
@@ -42,8 +38,6 @@ module Rack
         end
 
       end
-      
-      set :static, true
 
       def initialize
         $template_prefix = Rack::RedisAnalytics.dashboard_endpoint
