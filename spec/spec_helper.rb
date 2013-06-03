@@ -1,9 +1,7 @@
 require 'rubygems'
 require 'redis_analytics'
 
-# This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'rspec/autorun'
-require 'test/unit'
 require 'rack/test'
 require 'mocha/setup'
 
