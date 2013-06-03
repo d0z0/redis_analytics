@@ -5,7 +5,7 @@ require 'redis_analytics'
 require 'rspec/autorun'
 require 'test/unit'
 require 'rack/test'
-require 'mocha'
+require 'mocha/setup'
 
 require 'simplecov'
 SimpleCov.start do
