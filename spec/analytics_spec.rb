@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Rack::RedisAnalytics::Analytics do
-  include Rack::Test::Methods
-  
+
   def app 
     Rack::Builder.app do
       use Rack::RedisAnalytics::Analytics
@@ -11,9 +10,7 @@ describe Rack::RedisAnalytics::Analytics do
   end
 
   before(:each) do
-    @redis_connection = Rack::RedisAnalytics.redis_connection
     clear_cookies
-    # @redis_connection.flushdb
   end
 
   # Spec for Cookies
