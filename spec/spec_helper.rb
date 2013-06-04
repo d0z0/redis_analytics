@@ -25,7 +25,7 @@ RSpec.configure do |config|
   config.before(:all) do
     Rack::RedisAnalytics.configure do |configuration|
       configuration.redis_connection = Redis.new(:db => 15, :host => '127.0.0.1')
-      configuration.redis_namespace = '_ra_test_namspace'
+      configuration.redis_namespace = '_ra_test_namespace'
     end
   end
 
