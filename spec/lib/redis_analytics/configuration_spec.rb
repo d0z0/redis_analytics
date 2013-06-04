@@ -26,4 +26,17 @@ describe Rack::RedisAnalytics::Configuration do
     end
   end
 
+  context 'property returning_user_cookie_name' do 
+    subject(:return_cookie) { Rack::RedisAnalytics.returning_user_cookie_name }
+    it 'should not be nil' do
+      return_cookie.should_not be_nil
+    end
+    it 'should have an default value' do 
+      return_cookie.should be == "_rucn"
+    end
+    it 'has an setter method' do 
+      return_cookie = "rucn"
+      return_cookie.should be == "rucn"
+    end
+  end
 end
