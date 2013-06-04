@@ -1,19 +1,17 @@
-require 'rubygems'
-require 'redis_analytics'
-
-require 'rspec/autorun'
-require 'rack/test'
-require 'mocha/api'
-
 require 'simplecov'
+require 'coveralls'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
 SimpleCov.start do
   add_filter '/spec/'
 end
 
-SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
-
-require 'coveralls'
-Coveralls.wear!
+require 'redis_analytics'
+require 'rspec/autorun'
+require 'rack/test'
+require 'mocha/api'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
