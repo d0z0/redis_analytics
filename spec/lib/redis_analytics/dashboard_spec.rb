@@ -2,9 +2,7 @@ require 'spec_helper'
 
 describe Rack::RedisAnalytics::Dashboard do
 
-  def app
-    Rack::RedisAnalytics::Dashboard
-  end
+  subject(:app) { Rack::RedisAnalytics::Dashboard }
 
   context 'the pretty dashboard' do
 

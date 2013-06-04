@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe Rack::RedisAnalytics::Analytics do
 
-  def app 
+  subject(:app) {
     Rack::Builder.app do
       use Rack::RedisAnalytics::Analytics
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, "Hello!"] }
     end
-  end
+  }
 
   before(:each) do
     clear_cookies
