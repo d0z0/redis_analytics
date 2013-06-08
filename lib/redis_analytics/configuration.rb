@@ -19,7 +19,7 @@ module Rack
       # Endpoint for dashboard
       attr_writer :dashboard_endpoint
 
-      # Redis namespace for keys
+      # Path to the Geo IP Database file
       attr_writer :geo_ip_data_path
 
       # Redis namespace for keys
