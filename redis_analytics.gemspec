@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency('rake', '~> 10.0.3')
   spec.add_development_dependency('rspec', '~> 2.13.0')
+  spec.add_development_dependency('guard-rspec', '~> 3.0.1')
   spec.add_development_dependency('mocha', '~> 0.14.0')
   spec.add_development_dependency('rack-test', '~> 0.6.2')
   spec.add_development_dependency('simplecov', '~> 0.7.1')
