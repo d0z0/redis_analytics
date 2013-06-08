@@ -93,9 +93,9 @@ describe Rack::RedisAnalytics::Configuration do
         value.instance_of? Fixnum
       end
     end
-    it 'can not be set to another value' do 
-      visitor_recency_slices = 'nothing'
-      visitor_recency_slices.should_not == 'nothing'
+    it 'can be set to another value' do 
+      visitor_recency_slices = [3, 7, 9]
+      expect(visitor_recency_slices).to eq([3, 7, 9])
     end
   end
 
@@ -104,18 +104,30 @@ describe Rack::RedisAnalytics::Configuration do
     it 'should not be nil' do
       default_range.should_not be_nil
     end
-    it 'should have an value'
-    it 'should be an symbol'
-    it 'cannot be set to another value'
+    it 'should be an symbol' do
+      default_range.instance_of? Symbol
+    end
+    it 'should have an value' do
+      default_range.should be == :day
+    end
+    it 'can be set to another value' do
+      default_range = :month
+      default_range.should be :month
+    end
   end
 
   context 'property redis_key_timestamps' do
     subject(:redis_key_timestamps) { Rack::RedisAnalytics.redis_key_timestamps }
     it 'should not be nil' do
-      default_range.should_not be_nil
+      redis_key_timestamps.should_not be_nil
     end
-    it 'should have an value'
-    it 'cannot be set to another value'
+    it 'should be an instance of Array' do
+      redis_key_timestamps.instance_of? Array
+    end
+    it 'can be set to another value' do
+      redis_key_timestamps = ['one', 'two']
+      expect(redis_key_timestamps).to eq(['one','two'])
+    end
   end
 
   context 'property time_range_formats' do
@@ -123,9 +135,16 @@ describe Rack::RedisAnalytics::Configuration do
     it 'should not be nil' do
       time_range_formats.should_not be_nil
     end
-    it 'should have an value'
-    it 'should be an array'
-    it 'cannot be set to another value'
+    it 'should be an Array of Array' do
+      time_range_formats.instance_of? Array
+      time_range_formats.each do |range|
+        range.instance_of? Array
+      end
+    end
+    it 'can be set to another value' do
+      time_range_formats = "nothing"
+      expect(time_range_formats).to eq("nothing")
+    end
   end
 
 end
