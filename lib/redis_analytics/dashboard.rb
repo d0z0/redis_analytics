@@ -19,11 +19,6 @@ module Rack
       
       helpers Rack::RedisAnalytics::Helpers
 
-      def initialize
-        $template_prefix = Rack::RedisAnalytics.dashboard_endpoint
-        super
-      end
-
       get '/' do
         redirect url('visits')
       end
