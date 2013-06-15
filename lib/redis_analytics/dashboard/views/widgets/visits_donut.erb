@@ -1,0 +1,15 @@
+<table class="table table-bordered table-hover">
+  <tr>
+    <td>
+      <p class="text-center"><b>Total Visits</b></p>
+      <div id="visits_donut" style="width:100%;height:160px;"></div>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  visits_donut = Morris.Donut({
+    element: 'visits_donut',
+    data: <%=@data[@range][:visits_new_visits_donut].to_json%>
+  });
+</script>

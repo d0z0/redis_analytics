@@ -1,0 +1,21 @@
+<table class="table table-bordered table-hover">
+  <tr>
+    <td>
+      <p class="text-center"><b>Visit Recency</b></p>
+      <div style="height:160px;">
+        <div style="margin:5px;">
+        <%p @data[@range][:visitor_recency_slices].inspect %>
+        <% @data[@range][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+        <% p = ((i.to_f/@data[@range][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+        <div id="recency_<%=c%>_num" title="<%=i.to_i%> visits">
+          <small class="muted"><%=(k == 0 ? 'Less than' : "#{k}")%> <%=('-' unless k == 0 or v == '*')%> <%=(v == '*' ? ' or more' : "#{v}")%> days (<span id="recency_<%=c%>_cent"><%=p%></span>%)</small>
+          <div class="progress" style="height: 8px; margin-bottom:10px;">
+            <div id="recency_<%=c%>" class="bar" style="width: <%=p%>%;"></div>
+          </div>
+        </div>
+        <% end %>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>

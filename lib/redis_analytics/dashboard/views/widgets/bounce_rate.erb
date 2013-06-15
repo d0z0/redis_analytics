@@ -1,0 +1,4 @@
+<h4 id="bounce_rate">
+  <%=parse_float((((@data[@range][:total_visits].to_f-@data[@range][:total_second_page_views].to_f)/@data[@range][:total_visits].to_f)*100).round(2))%>%<br/>
+  <small class="muted">bounce rate</small>
+</h4>
