@@ -25,8 +25,7 @@ module Rack
       end
 
       get '/' do
-        status, headers, body = call env.merge("PATH_INFO" => '/visits')
-        [status, headers, body]
+        redirect url('visits')
       end
 
       get '/visits' do
