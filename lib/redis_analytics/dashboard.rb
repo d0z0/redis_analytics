@@ -1,7 +1,5 @@
 require 'sinatra/base'
-require 'json'
-require 'active_support/core_ext'
-require 'redis_analytics'
+require 'sinatra/assetpack'
 
 if defined? Encoding
   Encoding.default_external = Encoding::UTF_8
@@ -10,14 +8,28 @@ end
 module Rack
   module RedisAnalytics
     class Dashboard < Sinatra::Base
-      
-      set :dir, ::File.expand_path(::File.dirname(__FILE__))
-      set :views,  "#{settings.dir}/dashboard/views"
-      set :public_folder, "#{settings.dir}/dashboard/public" if respond_to? :public_folder
-      set :public, "#{settings.dir}/dashboard/public" unless respond_to? :public_folder
+      register Sinatra::AssetPack
+
+      set :root, ::File.expand_path(::File.dirname(__FILE__))
+      set :views,  "#{settings.root}/dashboard/views"
       set :static, true
-      
+
       helpers Rack::RedisAnalytics::Helpers
+
+      assets do
+        serve '/css', from: "dashboard/public/css"
+        serve '/javascripts', from: "dashboard/public/javascripts"
+        serve '/img', from: "dashboard/public/img"
+        js :app, [
+          '/javascripts/*.js'
+          '/javascripts/vendor/**/*.js'
+        ]
+        css :application, [
+          '/css/*.css'
+        ]
+        js_compression  :jsmin    # :jsmin | :yui | :closure | :uglify
+        css_compression :simple   # :simple | :sass | :yui | :sqwish
+      end
 
       get '/' do
         redirect url('visits')
@@ -31,6 +43,8 @@ module Rack
           RedisAnalytics.time_range_formats.each do |range, unit, time_format|
             multiple = (1.send(range)/1.send(unit)).round
             time_range = @t0 - 1.send(range) + 1.send(unit)
+            
+            # @data[range] = DataStore.fetch_data_for_range(time_range)
             @data[range] ||= {}
             @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
             @data[range][:total_visits] = @data[range][:visits].inject(0){|s, x| s += x[1].to_i; s}

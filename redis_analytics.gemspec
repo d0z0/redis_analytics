@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('redis', '~> 3.0.2')
   spec.add_runtime_dependency('browser', '~> 0.1.6')
   spec.add_runtime_dependency('sinatra', '~> 1.4.2')
+  spec.add_runtime_dependency('sinatra-assetpack', '~> 0.2.5')
   spec.add_runtime_dependency('geoip', '~> 1.2.1')
   spec.add_runtime_dependency('json', '~> 1.8.0')
   spec.add_runtime_dependency('activesupport', '~> 3.2.0')
