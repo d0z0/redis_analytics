@@ -1,44 +1,44 @@
 <!-- start header -->
-  <div class="navbar">
-    <div class="navbar-inner">
-      <a class="brand" href="http://www.github.com/saturnine/redis_analytics">Redis Analytics</a>
-      <ul class="nav nav-pills pull-right">
-      <!-- <li><a><small><%#@t.round(2)%> sec</small></a></li> -->
-	<li>
-	  <div class="btn-group">
-            <!-- <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Settings</button> -->
-            <ul class="dropdown-menu">
-
-	      <li class="dropdown-submenu">
-		<a tabindex="-1" href="#">Theme</a>
-		<ul class="dropdown-menu">
-		  <li><a href="?template=journal">Journal</a></li>
-		  <li><a href="?template=spacelab">Spacelab</a></li>
-		  <li><a href="?template=united">United</a></li>
-		  <li class="divider"></li>
-		  <li><a href="?">Default</a></li>
-		</ul>
-	      </li>
-              <li><a href="#">Preferences</a></li>
-              <li class="divider"></li>
-              <li><a href="#">About</a></li>
-            </ul>
-          </div>
-
-	  <div class="btn-group" data-toggle="buttons-radio">
-	    <!-- <a href="/visits" class="btn btn-small<%#' active' if request.path == '/visits'%>">Visits</a> -->
-	    <!-- <a href="/activity" class="btn btn-small<%=' active' if request.path == '/activity'%>">Activity</a> -->
-
-	    <!-- <button type="button" class="btn btn-small" onclick='javascript:visits_area.grid=true'>Transactions</button> -->
-	  </div>
-	  <div class="btn-group" data-toggle="buttons-radio">
-	  <% Rack::RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
-	    <button type="button" class="btn btn-small <%="active" if @range == range%>" onclick='changeTimeFrame("<%=range.to_s%>")'><%=range.to_s%></button>
-	    <% end %>
-	  </div>
-
-	</li>
-      </ul>
-    </div>
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="http://www.github.com/saturnine/redis_analytics">Redis Analytics</a>
+    <ul class="nav nav-pills pull-right">
+      <!--
+      <li><a><small><% @t.round(2) %> sec</small></a></li>
+      -->
+      <li>
+        <!--
+        <div class="btn-group">
+          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Settings</button>
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a tabindex="-1" href="#">Theme</a>
+              <ul class="dropdown-menu">
+                <li><a href="?template=journal">Journal</a></li>
+                <li><a href="?template=spacelab">Spacelab</a></li>
+                <li><a href="?template=united">United</a></li>
+                <li class="divider"></li>
+                <li><a href="?">Default</a></li>
+              /ul>
+            </li>
+            <li><a href="#">Preferences</a></li>
+            <li class="divider"></li>
+            <li><a href="#">About</a></li>
+          </ul>
+        </div>
+        <div class="btn-group" data-toggle="buttons-radio">
+          <a href="visits" class="btn btn-small<%#' active' if request.path == '/visits'%>">Visits</a>
+          <a href="activity" class="btn btn-small<%=' active' if request.path == '/activity'%>">Activity</a>
+          <button type="button" class="btn btn-small" onclick='javascript:visits_area.grid=true'>Transactions</button>
+        </div>
+        -->
+        <div class="btn-group" data-toggle="buttons-radio">
+        <% Rack::RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
+          <button type="button" class="btn btn-small <%="active" if @range == range%>" onclick='changeTimeFrame("<%=range.to_s%>")'><%=range.to_s%></button>
+          <% end %>
+        </div>
+      </li>
+    </ul>
   </div>
-  <!-- end header -->
+</div>
+<!-- end header -->
