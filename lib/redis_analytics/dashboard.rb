@@ -25,7 +25,7 @@ module Rack
           '/javascripts/*.js'
         ]
         js :bootstrap, [
-          '/javascripts/vendor/bootstrap*.js'
+          '/javascripts/vendor/bootstrap/*.js'
         ]
         css :application, [
           '/css/*.css'
