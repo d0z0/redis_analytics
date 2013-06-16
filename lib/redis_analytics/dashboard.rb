@@ -22,7 +22,9 @@ module Rack
         serve '/img', from: "dashboard/public/img"
         js :app, [
           '/javascripts/*.js'
-          '/javascripts/vendor/**/*.js'
+        ]
+        js :bootstrap, [
+          '/javascripts/bootstrap*.js'
         ]
         css :application, [
           '/css/*.css'
