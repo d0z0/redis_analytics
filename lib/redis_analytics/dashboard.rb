@@ -21,10 +21,11 @@ module Rack
         serve '/javascripts', from: "dashboard/public/javascripts"
         serve '/img', from: "dashboard/public/img"
         js :app, [
+          '/javascripts/vendor/*.js',
           '/javascripts/*.js'
         ]
         js :bootstrap, [
-          '/javascripts/bootstrap*.js'
+          '/javascripts/vendor/bootstrap*.js'
         ]
         css :application, [
           '/css/*.css'
