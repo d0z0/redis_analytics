@@ -38,6 +38,13 @@ module Rack
         redirect url('visits')
       end
 
+      get '/activity' do
+        with_benchmarking do
+          @data = {}
+        end
+        erb :activity
+      end
+
       get '/visits' do
         with_benchmarking do
           @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
