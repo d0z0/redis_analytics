@@ -81,6 +81,10 @@ module Rack
         puts "Time Taken: #{@t} seconds"
       end
 
+      def time_range
+        # should first try to fetch from cookie what the default range is
+        (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym
+      end
     end
   end
 end

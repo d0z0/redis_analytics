@@ -47,14 +47,13 @@ module Rack
 
       get '/visits' do
         with_benchmarking do
-          @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
+          @range = time_range
           @data = {}
           
           RedisAnalytics.time_range_formats.each do |range, unit, time_format|
             multiple = (1.send(range)/1.send(unit)).round
             time_range = @t0 - 1.send(range) + 1.send(unit)
             
-            # @data[range] = DataStore.fetch_data_for_range(time_range)
             @data[range] ||= {}
             @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
             @data[range][:total_visits] = @data[range][:visits].inject(0){|s, x| s += x[1].to_i; s}
