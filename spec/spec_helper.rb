@@ -1,32 +1,31 @@
-require 'rubygems'
-require 'redis_analytics'
-
-# This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'rspec/autorun'
-require 'test/unit'
-require 'rack/test'
-require 'mocha'
-
 require 'simplecov'
+require 'coveralls'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
 SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'coveralls'
-Coveralls.wear!
+require 'redis_analytics'
+require 'rspec/autorun'
+require 'rack/test'
+require 'mocha/api'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
+  config.include Rack::Test::Methods
   config.mock_with :mocha
   config.color_enabled = true
 
   config.before(:all) do
     Rack::RedisAnalytics.configure do |configuration|
       configuration.redis_connection = Redis.new(:db => 15, :host => '127.0.0.1')
-      configuration.redis_namespace = '_ra_test_namspace'
+      configuration.redis_namespace = '_ra_test_namespace'
     end
   end
 

@@ -1,27 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Redis Analytics - Dashboard</title>
-    <!-- morris js -->
-    <link rel="stylesheet" href="<%=$template_prefix%>/css/morris.css">
-    <script src="<%=$template_prefix%>/javascripts/jquery-1.9.1.min.js"></script>    
-    <script src="<%=$template_prefix%>/javascripts/raphael-min.js"></script>
-    <script src="<%=$template_prefix%>/javascripts/morris.min.js"></script>  
-
-    <script src="http://code.highcharts.com/stock/highstock.js"></script>  
-    <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>  
-
-    <!-- jvectormap -->
-    <link rel="stylesheet" href="<%=$template_prefix%>/css/jquery-jvectormap-1.2.2.css" type="text/css" media="screen"/>
-    <script src="<%=$template_prefix%>/javascripts/jquery-jvectormap-1.2.2.min.js"></script>    
-    <script src="<%=$template_prefix%>/javascripts/jquery-jvectormap-world-mill-en.js"></script>    
-
-
-    <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="<%=$template_prefix%>/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="<%=$template_prefix%>/css/bootstrap-responsive.min.css" rel="stylesheet">
-    
+  <title>Redis Analytics - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%= css :application, :media => 'screen' %>
+  <%= js  :app %>
+  <script src="http://code.highcharts.com/stock/highstock.js"></script>  
+  <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 </head>
 <body>
   <%= erb(:header, :layout => false) %>

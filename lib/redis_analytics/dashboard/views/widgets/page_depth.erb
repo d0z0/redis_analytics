@@ -1,0 +1,4 @@
+<h4 id="page_depth">
+  <%=parse_float((@data[@range][:total_page_views].to_f/@data[@range][:total_visits].to_f).round(2))%><br/>
+  <small class="muted">pages per visit</small>
+</h4>

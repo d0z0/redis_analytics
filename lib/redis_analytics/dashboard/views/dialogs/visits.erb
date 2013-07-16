@@ -1,0 +1,40 @@
+<!-- Visits Modal -->
+<div id="visits_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Daily Visits</h3>
+  </div>
+  <div class="modal-body">
+    <div id="visits_detail" style="width:900px;height:400px;"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <!-- <button class="btn btn-primary">Save changes</button> -->
+  </div>
+</div>
+
+<script type="text/javascript">
+  $('#visits_modal').on('show', function () {
+    colors = Highcharts.getOptions().colors;
+    // create the chart when all data is loaded
+    $(function(){  
+      $('#visits_detail').highcharts('StockChart', {
+        chart: {},
+        // tooltip: {
+        //   pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+        //   valueDecimals: 2
+        // },
+        yAxis: {
+          allowDecimals: false
+        },
+        xAxis: {
+          allowDecimals: false
+        },
+        series: [{
+          name: 'Visits',
+          data: <%=@data[:all_visits].to_json%>
+        }]
+      });
+    });
+  });
+</script>

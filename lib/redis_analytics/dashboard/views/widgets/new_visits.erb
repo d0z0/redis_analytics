@@ -1,0 +1,4 @@
+<h4 id="new_visits">
+  <%=parse_float(((@data[@range][:total_new_visits].to_f/@data[@range][:total_visits].to_f)*100).round(2))%>%<br/>
+  <small class="muted">new visits</small>
+</h4>

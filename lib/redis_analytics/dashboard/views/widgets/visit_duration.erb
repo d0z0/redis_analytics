@@ -1,0 +1,4 @@
+<h4 id="visit_duration">
+  <%=Time.at(@data[@range][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%><br/>
+  <small class="muted">avg time spent</small>
+</h4>

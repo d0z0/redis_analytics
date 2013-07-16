@@ -1,7 +1,5 @@
 require 'sinatra/base'
-require 'json'
-require 'active_support/core_ext'
-require 'redis_analytics'
+require 'sinatra/assetpack'
 
 if defined? Encoding
   Encoding.default_external = Encoding::UTF_8
@@ -10,66 +8,52 @@ end
 module Rack
   module RedisAnalytics
     class Dashboard < Sinatra::Base
-      
-      dir = ::File.expand_path(::File.dirname(__FILE__))
+      register Sinatra::AssetPack
 
-      set :views,  "#{dir}/dashboard/views"
-      
-      if respond_to? :public_folder
-        set :public_folder, "#{dir}/dashboard/public"
-      else
-        set :public, "#{dir}/dashboard/public"
-      end
-      
-      helpers do
-        include Rack::RedisAnalytics::Helpers
-
-        def realistic(n, r = 1000)
-          return n
-          n + r + rand(r)
-        end
-
-        def parse_float(float)
-          float.nan? ? '0.0' : float
-        end
-        
-        def with_benchmarking
-          @t0 = Time.now
-          yield
-          @t1 = Time.now
-          @t = @t1 - @t0
-          puts "Time Taken: #{@t} seconds"
-        end
-
-      end
-      
+      set :root, ::File.expand_path(::File.dirname(__FILE__))
+      set :views,  "#{settings.root}/dashboard/views"
       set :static, true
 
-      def initialize
-        $template_prefix = Rack::RedisAnalytics.dashboard_endpoint
-        super
+      helpers Rack::RedisAnalytics::Helpers
+
+      assets do
+        serve '/css', from: "dashboard/public/css"
+        serve '/javascripts', from: "dashboard/public/javascripts"
+        serve '/img', from: "dashboard/public/img"
+        js :app, [
+          '/javascripts/vendor/*.js',
+          '/javascripts/*.js'
+        ]
+        js :bootstrap, [
+          '/javascripts/vendor/bootstrap/*.js'
+        ]
+        css :application, [
+          '/css/*.css'
+        ]
+        js_compression  :jsmin    # :jsmin | :yui | :closure | :uglify
+        css_compression :simple   # :simple | :sass | :yui | :sqwish
       end
 
       get '/' do
-        status, headers, body = call env.merge("PATH_INFO" => '/visits')
-        [status, headers, body]
+        redirect url('visits')
       end
 
       get '/activity' do
-        with_benchmarking do 
-          # code
+        with_benchmarking do
+          @data = {}
         end
         erb :activity
       end
 
       get '/visits' do
         with_benchmarking do
-          @range = (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym # should first try to fetch from cookie what the default range is
+          @range = time_range
           @data = {}
           
           RedisAnalytics.time_range_formats.each do |range, unit, time_format|
             multiple = (1.send(range)/1.send(unit)).round
             time_range = @t0 - 1.send(range) + 1.send(unit)
+            
             @data[range] ||= {}
             @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
             @data[range][:total_visits] = @data[range][:visits].inject(0){|s, x| s += x[1].to_i; s}

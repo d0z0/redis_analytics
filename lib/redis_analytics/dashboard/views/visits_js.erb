@@ -1,102 +1,5 @@
 <script type="text/javascript" language="text/javascript">
 
-visits_area = Morris.Area({
-  element: 'visits_area',
-  xkey: 'date',
-  data: <%=@data[@range][:visits_new_visits_plot].to_json%>,
-  ykeys: ['new_visits', 'returning_visits'],
-  labels: ['New Visits', 'Returning Visits'],
-  ymax: 'auto',
-  //events: ['2013-03-02', '2013-03-03'],
-    grid: true,
-  eventStrokeWidth: 2,
-  eventLineColors: ['#ccc', '#eee'],
-  smooth: true,
-  hideHover: 'auto',
-  parseTime: false,
-  lineWidth: 1,
-  pointSize: 0,
-   //  xLabels: 'day',
-    xLabelFormat: function(x) {return '';},
-
-  // hoverCallback: function(index, series)
-  //   {
-  // 	h = series.data[index];
-  // 	d = Date(h.x);
-  // 	return(d + '<br>' + h.new_visits);
-  //   },
-  pointFillColors: ['#fff'],
-  pointStrokeColors: ['#000'],
-});
-
-visits_donut = Morris.Donut({
-  element: 'visits_donut',
-  data: <%=@data[@range][:visits_new_visits_donut].to_json%>
-});
-
-referrers_donut = Morris.Donut({
-  element: 'referrers_donut',
-  data: <%=@data[@range][:referrers_donut].to_json%>
-});
-
-browsers_donut = Morris.Donut({
-  element: 'browsers_donut',
-  data: <%=@data[@range][:browsers_donut].to_json%>
-});
-
-unique_visits_line = Morris.Line({
-  element: 'unique_visits_line',
-  xkey: 'unit',
-  data: <%=@data[@range][:unique_visits].to_json%>,
-  ykeys: ['unique_visits_this', 'unique_visits_last'],
-    labels: ['Current', 'Previous'],
-  ymax: 'auto',
-  hideHover: 'auto',
-  parseTime: false,
-  lineWidth: 1,
-  pointSize: 0,
-  grid: true,
-  pointFillColors: ['#fff'],
-  pointStrokeColors: ['#000'],
-  // hoverCallback: function(index, series)
-  //   {
-  // 	h = series.data[index];
-  // 	this_week_color = series.lineColors[0];
-  // 	last_week_color = series.lineColors[1];
-  // 	html = '';
-  // 	html += '<font style="color:' + this_week_color + '">This ' + h.unit + ': ' + h.unique_visits_this + '</font>';
-  // 	html += '<br/>';
-  // 	html += '<font style="color:' + last_week_color + '">Last ' + h.unit + ': ' + h.unique_visits_last + '</font>';
-  // 	return html;
-  //  },
-
-});
-
-// visits_spark = Morris.Line({
-//   element: 'visits_spark',
-//   xkey: 'date',
-//   data: <%=@data[@range][:visits_page_views_plot].to_json%>,
-//   ykeys: ['visits', 'page_views'],
-//   labels: ['Visits', 'Page Views'],
-//   xLabelFormat: function(x){return '';},
-//   yLabelFormat: function(x){return '';},
-//   hoverCallback: function(i,x){return x.data[i].date + '<br/>' + 'Page Views: ' + x.data[i].page_views + '<br/>Visits: ' + x.data[i].visits;},
-//   ymax: 'auto',
-//   ymin: 0,
-//   smooth: true,
-//   hideHover: 'auto',
-//   parseTime: false,
-//   lineWidth: 2,
-//   pointSize: 0,
-//   grid: false,
-//   pointFillColors: ['#fff'],
-//   pointStrokeColors: ['#000']
-// });
-
-function setSessionCookie(name,value) {
-    document.cookie = name+"="+value+"; path=/";
-}
-
 function changeTimeFrame(range)
 {
 var mapObject = $('#world-map').vectorMap('get', 'mapObject');
@@ -134,129 +37,28 @@ case '<%=range%>':
 }
 }
 
-// Map Overlay
-
-var geoLocationData = <%=@data[@range][:country_map].to_json%>;
-
-$(function(){
-  $('#world-map').vectorMap({
-    map: 'world_mill_en',
-    min: 0,
-    backgroundColor: '#fff',
-regionStyle: {
-  initial: {
-    fill: '#ddd',
-    "fill-opacity": 1,
-    stroke: 'none',
-    "stroke-width": 0,
-    "stroke-opacity": 1
-  },
-  hover: {
-    fill: '#bbb',
-    "fill-opacity": 0.8
-  },
-  selected: {
-    fill: 'yellow'
-  },
-  selectedHover: {
-  }
-},
-    series: {
-      regions: [{
-        scale: ['#C8EEFF', '#0071A4'],
-        values: geoLocationData,
-        normalizeFunction: 'polynomial'
-      }]
-    },
-    onLabelShow: function(e, el, code){
-      el.html(el.html()+' (GDP - '+geoLocationData[code]+')');
-    }
-  });
-});
+function setSessionCookie(name,value) {
+    document.cookie = name+"="+value+"; path=/";
+}
 
 function onDownload() {
-    document.location = 'data:Application/octet-stream,' +
-                         encodeURIComponent(convertToCSV(<%=@data[@range][:visits_new_visits_plot].to_json%>));
+  data =   encodeURIComponent(convertToCSV(<%=@data[@range][:visits_new_visits_plot].to_json%>));
+  document.location = 'data:Application/octet-stream,' + data
 }
 
 function convertToCSV(objArray) {
-            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-            var str = '';
-
-            for (var i = 0; i < array.length; i++) {
-                var line = '';
-                for (var index in array[i]) {
-                    if (line != '') line += ','
-
-                    line += array[i][index];
-                }
-
-                str += line + '\r\n';
-            }
-
-            return str;
-        };
-
-$('#visits_modal').on('show', function () {
-    
-    colors = Highcharts.getOptions().colors;
-    
-    // create the chart when all data is loaded
-    $(function(){
-	
-	$('#visits_detail').highcharts('StockChart', {
-	    chart: {
-	    },
-	    
-	    // tooltip: {
-	    // 	pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-	    // 	valueDecimals: 2
-	    // },
-	    yAxis: {
-		allowDecimals: false
-	    },
-	    xAxis: {
-		allowDecimals: false
-	    },
-	    
-	    series: [{
-		name: 'Visits',
-		data: <%=@data[:all_visits].to_json%>
-	    }]
-	});
-    });
-});
-
-
-$('#unique_visits_modal').on('show', function () {
-    
-    colors = Highcharts.getOptions().colors;
-    
-    // create the chart when all data is loaded
-    $(function(){
-	
-	$('#unique_visits_detail').highcharts('StockChart', {
-	    chart: {
-	    },
-	    
-	    // tooltip: {
-	    // 	pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-	    // 	valueDecimals: 2
-	    // },
-	    yAxis: {
-		allowDecimals: false
-	    },
-	    xAxis: {
-		allowDecimals: false
-	    },
-	    
-	    series: [{
-		name: 'Unique Visits',
-		data: <%=@data[:all_unique_visits].to_json%>
-	    }]
-	});
-    });
-});
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+  var str = '';
+  for (var i = 0; i < array.length; i++) {
+    var line = '';
+    for (var index in array[i]) {
+      if (line != '') line += ','
+      line += array[i][index];
+    }
+    str += line + '\r\n';
+  }
+  return str;
+};
 
 </script>
 
