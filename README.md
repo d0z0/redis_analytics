@@ -96,7 +96,7 @@ end
 
 ## How does it work?
 
-![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
+![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/wsd.png)
 
 ## Copyright
 
