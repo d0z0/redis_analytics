@@ -94,6 +94,10 @@ Rack::RedisAnalytics.configure do |configuration|
 end
 ```
 
+## How does it work?
+
+![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
+
 ## Copyright
 
 Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.
