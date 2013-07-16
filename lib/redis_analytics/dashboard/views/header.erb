@@ -34,7 +34,7 @@
         </div>
         <div class="btn-group" data-toggle="buttons-radio" id="timeRange">
         <% Rack::RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
-          <button type="button" class="btn btn-small <%= "active" if @range == range %>" data-range="<%= range.to_s %>"><%= range.to_s %></button> 
+	  <button type="button" class="btn btn-small <%="active" if @range == range%>" onclick='changeTimeFrame("<%=range.to_s%>")'><%=range.to_s%></button>
         <% end %>
         </div>
       </li>
