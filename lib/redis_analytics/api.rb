@@ -1,9 +1,4 @@
 require 'sinatra/base'
-require 'sinatra/assetpack'
-
-if defined? Encoding
-  Encoding.default_external = Encoding::UTF_8
-end
 
 module Rack
   module RedisAnalytics
