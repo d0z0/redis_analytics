@@ -19,6 +19,9 @@ module Rack
       # Endpoint for dashboard
       attr_writer :dashboard_endpoint
 
+      # Endpoint for api
+      attr_writer :api_endpoint
+
       # Path to the Geo IP Database file
       attr_writer :geo_ip_data_path
 
@@ -34,6 +37,10 @@ module Rack
 
       def dashboard_endpoint
         @dashboard_endpoint ||= '/dashboard'
+      end
+
+      def api_endpoint
+        @api_endpoint ||= '/api'
       end
       
       # Name of the cookie which tracks returning visitors (known visitors)

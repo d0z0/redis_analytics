@@ -31,8 +31,9 @@ module Rack
         union = []
         time = []
         begin
-          union << "#{Rack::RedisAnalytics.redis_namespace}:#{type}:#{i.strftime(FORMAT_SPECIFIER[0..GRANULARITY.index(granularity)].map{|x| x[0]}.join('_'))}"
-          time << i
+          slice_key = i.strftime(FORMAT_SPECIFIER[0..GRANULARITY.index(granularity)].map{|x| x[0]}.join('_'))
+          union << "#{Rack::RedisAnalytics.redis_namespace}:#{type}:#{slice_key}"
+          time << slice_key.split('_')
           i += 1.send(x) # FORMAT_SPECIFIER[GRANULARITY.index(granularity)..-1].map{|x| x[1]}.inject{|p,x| p*=x; p}
         end while i <= to_date
         # puts "UNION #{union.inspect}"

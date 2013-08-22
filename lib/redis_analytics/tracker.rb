@@ -13,6 +13,12 @@ module Rack
               run Dashboard.new
             end
           end
+          if defined? Api and RedisAnalytics.api_endpoint
+            map RedisAnalytics.api_endpoint do
+              run Api.new
+            end
+          end
+
         end
       end
 

@@ -10,6 +10,7 @@ require 'redis_analytics/configuration'
 require 'redis_analytics/analytics'
 require 'redis_analytics/time_ext'
 require 'redis_analytics/helpers'
+require 'redis_analytics/api'
 require 'redis_analytics/dashboard'
 
 require 'redis_analytics/tracker'
