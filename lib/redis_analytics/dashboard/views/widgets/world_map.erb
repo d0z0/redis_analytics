@@ -40,8 +40,10 @@
           normalizeFunction: 'polynomial'
         }]
       },
-      onLabelShow: function(e, el, code){
-        el.html(el.html()+' (GDP - '+geoLocationData[code]+')');
+      onRegionLabelShow: function(e, el, code){
+	  c = geoLocationData[code];
+	  if(c != undefined)
+	  el.html(el.html()+' ('+c+')');
       }
     });
   });
