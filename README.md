@@ -98,6 +98,13 @@ end
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/wsd.png)
 
+## TODO
+
+* Drive the graphs using the JSON API
+* Move to Bootstrap 3
+* Realtime data using JQuery
+* Pixel Tracker to track custom parameters
+
 ## Copyright
 
 Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.
