@@ -32,7 +32,7 @@ module Rack
         time = []
         begin
           slice_key = i.strftime(FORMAT_SPECIFIER[0..GRANULARITY.index(granularity)].map{|x| x[0]}.join('_'))
-          union << "#{Rack::RedisAnalytics.redis_namespace}:#{type}:#{slice_key}"
+          union << "#{RedisAnalytics.redis_namespace}:#{type}:#{slice_key}"
           time << slice_key.split('_')
           i += 1.send(x) # FORMAT_SPECIFIER[GRANULARITY.index(granularity)..-1].map{|x| x[1]}.inject{|p,x| p*=x; p}
         end while i <= to_date
@@ -40,29 +40,29 @@ module Rack
         seq = get_next_seq
         if type =~ /unique/
           if aggregate
-            union_key = "#{Rack::RedisAnalytics.redis_namespace}:#{seq}"
-            Rack::RedisAnalytics.redis_connection.sunionstore(union_key, union)
-            Rack::RedisAnalytics.redis_connection.expire(union_key, 100)
-            return Rack::RedisAnalytics.redis_connection.scard(union_key)
+            union_key = "#{RedisAnalytics.redis_namespace}:#{seq}"
+            RedisAnalytics.redis_connection.sunionstore(union_key, union)
+            RedisAnalytics.redis_connection.expire(union_key, 100)
+            return RedisAnalytics.redis_connection.scard(union_key)
           else
-            return time.zip(union.map{|x| Rack::RedisAnalytics.redis_connection.scard(x)})
+            return time.zip(union.map{|x| RedisAnalytics.redis_connection.scard(x)})
           end
         elsif type =~ /ratio/
           if aggregate
-            union_key = "#{Rack::RedisAnalytics.redis_namespace}:#{seq}"
-            Rack::RedisAnalytics.redis_connection.zunionstore(union_key, union)
-            Rack::RedisAnalytics.redis_connection.expire(union_key, 100)
-            return Rack::RedisAnalytics.redis_connection.zrange(union_key, 0, -1, :with_scores => true)
+            union_key = "#{RedisAnalytics.redis_namespace}:#{seq}"
+            RedisAnalytics.redis_connection.zunionstore(union_key, union)
+            RedisAnalytics.redis_connection.expire(union_key, 100)
+            return RedisAnalytics.redis_connection.zrange(union_key, 0, -1, :with_scores => true)
           else
-            return time.zip(union.map{|x| Rack::RedisAnalytics.redis_connection.zrange(x,0,-1, :with_scores => true)})
+            return time.zip(union.map{|x| RedisAnalytics.redis_connection.zrange(x,0,-1, :with_scores => true)})
           end
         else
-          time.zip(Rack::RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
+          time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
         end
       end
       
       def get_next_seq
-        seq = Rack::RedisAnalytics.redis_connection.incr("#{Rack::RedisAnalytics.redis_namespace}:#SEQUENCER")
+        seq = RedisAnalytics.redis_connection.incr("#{RedisAnalytics.redis_namespace}:#SEQUENCER")
       end
 
       def realistic(n, r = 1000)
