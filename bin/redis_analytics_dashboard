@@ -3,7 +3,7 @@
 require 'rubygems'
 path = File.expand_path '../../lib', __FILE__
 $:.unshift(path) if File.directory?(path) && !$:.include?(path)
-require 'redis_analytics/dashboard'
+require 'redis_analytics'
 args = Hash[*ARGV] rescue {}
 if args.key?('--redis-host') and args.key?('--redis-port')
   Rack::RedisAnalytics.configure do |c|
