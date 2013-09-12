@@ -6,6 +6,12 @@ describe Rack::RedisAnalytics::Dashboard do
 
   context 'the pretty dashboard' do
 
+    before do
+      Rack::RedisAnalytics.configure do |c|
+        c.dashboard_endpoint = '/analytics/dashboard'
+      end
+    end
+
     it 'should be mapped to configured endpoint' do
       get Rack::RedisAnalytics.dashboard_endpoint
       last_response.ok?
@@ -19,7 +25,7 @@ describe Rack::RedisAnalytics::Dashboard do
     it 'should contain the word Visits' do
       get Rack::RedisAnalytics.dashboard_endpoint
       last_response.body.include? "Visits"
-    end  
+    end
 
   end
 
