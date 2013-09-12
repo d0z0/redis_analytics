@@ -8,6 +8,7 @@ Rack::RedisAnalytics.configure do |c|
   c.dashboard_endpoint = '/analytics/dashboard'
   c.api_endpoint = '/analytics/api'
 
+  c.add_path_filter(/^\/favicon.ico$/)
 end
 
 app = Rack::Builder.app do
