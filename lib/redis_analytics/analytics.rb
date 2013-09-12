@@ -29,7 +29,6 @@ module Rack
         return false unless @response.content_type =~ /^text\/html/
         RedisAnalytics.filters.each do |filter|
           return false if filter.matches?(@request.path)
-          end
         end
         return true
       end
