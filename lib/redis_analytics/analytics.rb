@@ -30,8 +30,8 @@ module Rack
         RedisAnalytics.path_filters.each do |filter|
           return false if filter.matches?(@request.path)
         end
-        RedisAnalytics.ip_filters.each do |filter|
-          return false if filter.matches?(@request.ip)
+        RedisAnalytics.filters.each do |filter|
+          return false if filter.matches?(@request, @response)
         end
         return true
       end
