@@ -86,18 +86,18 @@ end
 Rack::RedisAnalytics.configure do |configuration|
 
   # simple string path filter
-  c.add_path_filter('/robots.txt')
+  configuration.add_path_filter('/robots.txt')
 
   # regexp path filter
-  c.add_path_filter(/^\/favicon.ico$/)
+  configuration.add_path_filter(/^\/favicon.ico$/)
 
   # generic filters
-  c.add_filter do |request, response|
+  configuration.add_filter do |request, response|
     request.params['layout'] == 'print'
   end
 
   # generic filters
-  c.add_filter do |request, response|
+  configuration.add_filter do |request, response|
     request.ip =~ /^172.16/ or request.ip =~ /^192.168/
   end
 
