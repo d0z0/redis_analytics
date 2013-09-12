@@ -80,6 +80,31 @@ Rack::RedisAnalytics.configure do |configuration|
 end
 ```
 
+## How do I use filters?
+
+```ruby
+Rack::RedisAnalytics.configure do |configuration|
+
+  # simple string path filter
+  c.add_path_filter('/robots.txt')
+
+  # regexp path filter
+  c.add_path_filter(/^\/favicon.ico$/)
+
+  # generic filters
+  c.add_filter do |request, response|
+    request.params['layout'] == 'print'
+  end
+
+  # generic filters
+  c.add_filter do |request, response|
+    request.ip =~ /^172.16/ or request.ip =~ /^192.168/
+  end
+
+end
+```
+
+
 ## Why is the Geolocation tracking giving me wrong results?
 
 IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
