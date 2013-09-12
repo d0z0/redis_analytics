@@ -5,13 +5,17 @@ module Rack
     module Helpers
 
       FORMAT_SPECIFIER = [['%Y', 365], ['%m', 30], ['%d', 24], ['%H', 60], ['%M', 60]]
+
       GRANULARITY = ['yearly', 'monthly', 'dayly', 'hourly', 'minutely']
 
-      # all methods are private unless explicitly declared public
-      private
+      DATA_TYPES = ['new_visits', 'visits', 'page_views', 'second_page_views',
+                    'unique_visits', 'visit_time', 'ratio_recency',
+                    'ratio_browsers', 'ratio_platforms', 'ratio_devices',
+                    'ratio_country', 'ratio_referrers']
 
+      private
       def method_missing(meth, *args, &block)
-        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_(new_visits|visits|page_views|second_page_views|unique_visits|visit_time|ratio_recency|ratio_browsers|ratio_platforms|ratio_devices|ratio_country|ratio_referrers)$/
+        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_(#{DATA_TYPES.join('|')})$/
           granularity = ($1 == 'dai' ? 'day' : $1) + 'ly'
           type = $2
           data(granularity, type, *args)
@@ -23,20 +27,19 @@ module Rack
       def data(granularity, type, from_date, options = {})
         aggregate = options[:aggregate] || false
         x = granularity[0..-3]
-        # puts "DATA: #{x} (#{type})"
+
         to_date = (options[:to_date] || Time.now).send("end_of_#{x}")
         i = from_date.send("beginning_of_#{x}") #unless x == 'minute'
 
-        # puts "FROM: #{i} to #{to_date}"
         union = []
         time = []
         begin
           slice_key = i.strftime(FORMAT_SPECIFIER[0..GRANULARITY.index(granularity)].map{|x| x[0]}.join('_'))
           union << "#{RedisAnalytics.redis_namespace}:#{type}:#{slice_key}"
           time << slice_key.split('_')
-          i += 1.send(x) # FORMAT_SPECIFIER[GRANULARITY.index(granularity)..-1].map{|x| x[1]}.inject{|p,x| p*=x; p}
+          i += 1.send(x)
         end while i <= to_date
-        # puts "UNION #{union.inspect}"
+
         seq = get_next_seq
         if type =~ /unique/
           if aggregate
@@ -60,7 +63,7 @@ module Rack
           time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
         end
       end
-      
+
       def get_next_seq
         seq = RedisAnalytics.redis_connection.incr("#{RedisAnalytics.redis_namespace}:#SEQUENCER")
       end
@@ -73,7 +76,7 @@ module Rack
       def parse_float(float)
         float.nan? ? '0.0' : float
       end
-      
+
       def with_benchmarking
         @t0 = Time.now
         yield
