@@ -68,20 +68,6 @@ describe Rack::RedisAnalytics::Configuration do
     end
   end
 
-  context 'property dashboard_endpoint' do
-    subject(:endpoint) { Rack::RedisAnalytics.dashboard_endpoint }
-    it 'should not be nil' do 
-      endpoint.should_not be_nil
-    end
-    it 'should have an default value' do
-      endpoint.should be == "/dashboard"
-    end
-    it 'can be set to another value' do
-      endpoint = "/testboard"
-      endpoint.should be == "/testboard"
-    end
-  end
-
   context 'property visitor_recency_slices' do
     subject(:visitor_recency_slices) { Rack::RedisAnalytics.visitor_recency_slices }
     it 'should not be nil' do
