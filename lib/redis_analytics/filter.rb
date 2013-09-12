@@ -1,31 +1,32 @@
 module Rack
   module RedisAnalytics
     class Filter
-      attr_reader :filter_criteria
+      attr_reader :filter_proc
 
-      def initialize(filter_criteria)
-        @filter_criteria = filter_criteria
+      def initialize(filter_proc)
+        @filter_proc = filter_proc
       end
 
-      def matches?(request_criteria)
-        debug "CHECK #{filter_criteria.inspect} AGAINST #{request_criteria}"
-        if filter_criteria.is_a?(String)
-          request_criteria == filter_criteria
-        elsif filter_criteria.is_a?(Regexp)
-          request_criteria =~ filter_criteria
-        elsif filter_criteria.is_a?(Proc)
-          filter_criteria.call(request_criteria)
+      def matches?(request, response)
+        filter_proc.call(request, response)
+      end
+
+    end
+
+    class PathFilter
+      attr_reader :filter_path
+
+      def initialize(filter_path)
+        @filter_path = filter_path
+      end
+
+      def matches?(request_path)
+        if filter_path.is_a?(String)
+          request_path == filter_path
+        elsif filter_path.is_a?(Regexp)
+          request_path =~ filter_path
         end
       end
-
-    end
-
-    class PathFilter < Filter
-
-    end
-
-    class IpFilter < Filter
-
     end
 
   end
