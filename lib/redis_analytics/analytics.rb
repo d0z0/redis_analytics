@@ -27,8 +27,11 @@ module Rack
       def should_record?
         return false unless @response.ok?
         return false unless @response.content_type =~ /^text\/html/
-        RedisAnalytics.filters.each do |filter|
+        RedisAnalytics.path_filters.each do |filter|
           return false if filter.matches?(@request.path)
+        end
+        RedisAnalytics.ip_filters.each do |filter|
+          return false if filter.matches?(@request.ip)
         end
         return true
       end
