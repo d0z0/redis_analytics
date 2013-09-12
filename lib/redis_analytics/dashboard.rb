@@ -34,27 +34,27 @@ module Rack
         js_compression  :jsmin    # :jsmin | :yui | :closure | :uglify
         css_compression :simple   # :simple | :sass | :yui | :sqwish
       end
-      
+
       get '/' do
         redirect url('visits')
       end
 
-      get '/activity' do
+      get '/activity/?' do
         with_benchmarking do
           @data = {}
         end
         erb :activity
       end
 
-      get '/visits' do
+      get '/visits/?' do
         with_benchmarking do
           @range = time_range
           @data = {}
-          
+
           RedisAnalytics.time_range_formats.each do |range, unit, time_format|
             multiple = (1.send(range)/1.send(unit)).round
             time_range = @t0 - 1.send(range) + 1.send(unit)
-            
+
             @data[range] ||= {}
             @data[range][:visits] = self.send("#{unit}ly_visits".to_sym, time_range)
             @data[range][:total_visits] = @data[range][:visits].inject(0){|s, x| s += x[1].to_i; s}
@@ -78,7 +78,7 @@ module Rack
             @data[range][:unique_visits] = unique_visits[0..(multiple-1)].inject(Hash[unique_visits[multiple..(multiple*2-1)]]){|a, i| a[i[0]] = [i[1], a[i[0]]];a}.map{|k,v| {'unit'=> k, 'unique_visits_last' => v[0].to_i, 'unique_visits_this' => v[1].to_i}}
             second_page_views = self.send("#{unit}ly_second_page_views", time_range)
             @data[range][:total_second_page_views] = second_page_views.inject(0){|s, x| s += x[1].to_i; s}
-          
+
             visitor_recency = self.send("#{unit}ly_ratio_recency", time_range, :aggregate => true)
             @data[range][:visitor_recency_slices] = [0, RedisAnalytics.visitor_recency_slices, '*'].flatten.each_cons(2).inject([]) do |h, (x, y)|
               h << [[x, y], visitor_recency.select{|a, b| a.to_i >= x and (a.to_i < y  or y == '*') }.map{|p, q| q}.sum]
@@ -91,7 +91,7 @@ module Rack
         @data[:all_unique_visits] = daily_unique_visits(Time.now - 1.year).map{|x,y| [Time.mktime(*x).to_i * 1000, realistic(y)]}
         erb :visits
       end
-      
+
     end
   end
 end
