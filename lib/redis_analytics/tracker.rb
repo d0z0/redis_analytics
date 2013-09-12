@@ -8,12 +8,12 @@ module Rack
             run Analytics.new(app)
           end
 
-          if defined? Dashboard and RedisAnalytics.dashboard_endpoint
+          if defined?(Dashboard) and RedisAnalytics.dashboard_endpoint
             map RedisAnalytics.dashboard_endpoint do
               run Dashboard.new
             end
           end
-          if defined? Api and RedisAnalytics.api_endpoint
+          if defined?(Api) and RedisAnalytics.api_endpoint
             map RedisAnalytics.api_endpoint do
               run Api.new
             end
@@ -25,8 +25,7 @@ module Rack
       def call(env)
         @app.call(env)
       end
-      
+
     end
   end
 end
-
