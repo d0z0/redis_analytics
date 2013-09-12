@@ -24,7 +24,7 @@ module Rack
 
       attr_writer :path_filters
 
-      attr_writer :ip_filters
+      attr_writer :filters
 
       # Path to the Geo IP Database file
       attr_writer :geo_ip_data_path
@@ -49,28 +49,20 @@ module Rack
         @visit_cookie_name ||= '_vcn'
       end
 
+      def filters
+        @filters ||= []
+      end
+
       def path_filters
         @path_filters ||= []
       end
 
-      def ip_filters
-        @ip_filters ||= []
+      def add_filter(&proc)
+        filters << RedisAnalytics::Filter.new(proc)
       end
 
-      def add_path_filter(path = nil, &proc)
-        if path
-          path_filters << RedisAnalytics::PathFilter.new(path)
-        elsif proc
-          path_filters << RedisAnalytics::PathFilter.new(proc)
-        end
-      end
-
-      def add_ip_filter(path = nil, &proc)
-        if path
-          ip_filters << RedisAnalytics::IpFilter.new(path)
-        elsif proc
-          ip_filters << RedisAnalytics::IpFilter.new(proc)
-        end
+      def add_path_filter(path)
+        path_filters << RedisAnalytics::PathFilter.new(path)
       end
 
       def geo_ip_data_path
