@@ -3,7 +3,7 @@ module Rack
     module Configuration
       # Redis connection instance
       attr_accessor :redis_connection
-      
+
       # Redis namespace for keys
       attr_writer :redis_namespace
 
@@ -17,10 +17,14 @@ module Rack
       attr_writer :visit_timeout
 
       # Endpoint for dashboard
-      attr_writer :dashboard_endpoint
+      attr_accessor :dashboard_endpoint
 
       # Endpoint for api
-      attr_writer :api_endpoint
+      attr_accessor :api_endpoint
+
+      attr_writer :path_filters
+
+      attr_writer :ip_filters
 
       # Path to the Geo IP Database file
       attr_writer :geo_ip_data_path
@@ -35,14 +39,6 @@ module Rack
         @visit_timeout ||= 1 # minutes
       end
 
-      def dashboard_endpoint
-        @dashboard_endpoint ||= '/dashboard'
-      end
-
-      def api_endpoint
-        @api_endpoint ||= '/api'
-      end
-      
       # Name of the cookie which tracks returning visitors (known visitors)
       def returning_user_cookie_name
         @returning_user_cookie_name ||= '_rucn'
@@ -52,7 +48,31 @@ module Rack
       def visit_cookie_name
         @visit_cookie_name ||= '_vcn'
       end
-      
+
+      def path_filters
+        @path_filters ||= []
+      end
+
+      def ip_filters
+        @ip_filters ||= []
+      end
+
+      def add_path_filter(path = nil, &proc)
+        if path
+          path_filters << RedisAnalytics::PathFilter.new(path)
+        elsif proc
+          path_filters << RedisAnalytics::PathFilter.new(proc)
+        end
+      end
+
+      def add_ip_filter(path = nil, &proc)
+        if path
+          ip_filters << RedisAnalytics::IpFilter.new(path)
+        elsif proc
+          ip_filters << RedisAnalytics::IpFilter.new(proc)
+        end
+      end
+
       def geo_ip_data_path
         @geo_ip_data_path = ::File.expand_path(::File.join(::File.dirname(__FILE__),'..','..')) + "/bin/GeoIP.dat"
       end
@@ -72,11 +92,11 @@ module Rack
       def time_range_formats
         [[:year, :month, "%b"], [:week, :day, "%a"], [:day, :hour, "%l%P"]]
       end
-      
+
       def configure
         yield self
       end
-      
+
     end
   end
 end
