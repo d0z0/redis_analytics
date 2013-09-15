@@ -133,4 +133,26 @@ describe Rack::RedisAnalytics::Configuration do
     end
   end
 
+  context 'method add_filter' do
+    subject(:filters) { Rack::RedisAnalytics.filters }
+    it 'should add a new filter' do
+      proc = Proc.new {}
+      Rack::RedisAnalytics.configure do |c|
+        c.add_filter(&proc)
+      end
+      filters[0].should be_an_instance_of Rack::RedisAnalytics::Filter
+    end
+  end
+
+  context 'method add_path_filter' do
+    subject(:path_filters) { Rack::RedisAnalytics.path_filters }
+    it 'should add a new path filter' do
+      path = '/hello'
+      Rack::RedisAnalytics.configure do |c|
+        c.add_path_filter(path)
+      end
+      path_filters[0].should be_an_instance_of Rack::RedisAnalytics::PathFilter
+    end
+  end
+
 end

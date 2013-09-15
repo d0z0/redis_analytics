@@ -6,24 +6,24 @@ describe Rack::RedisAnalytics::Dashboard do
 
   context 'the pretty dashboard' do
 
-    before do
-      Rack::RedisAnalytics.configure do |c|
-        c.dashboard_endpoint = '/analytics/dashboard'
-      end
+    it 'should redirect to visits' do
+      get '/'
+      last_response.should be_redirect
+      # how do we check the redirect location?
     end
 
     it 'should be mapped to configured endpoint' do
-      get Rack::RedisAnalytics.dashboard_endpoint
+      get '/'
       last_response.ok?
     end
 
     it 'should be content-type html' do
-      get Rack::RedisAnalytics.dashboard_endpoint
+      get '/'
       last_response.headers['Content-Type'] == "text/html"
     end
 
     it 'should contain the word Visits' do
-      get Rack::RedisAnalytics.dashboard_endpoint
+      get '/'
       last_response.body.include? "Visits"
     end
 
