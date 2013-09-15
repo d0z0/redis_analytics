@@ -11,7 +11,9 @@ module Rack
       DATA_TYPES = ['new_visits', 'visits', 'page_views', 'second_page_views',
                     'unique_visits', 'visit_time', 'ratio_recency',
                     'ratio_browsers', 'ratio_platforms', 'ratio_devices',
-                    'ratio_country', 'ratio_referrers']
+                    'ratio_country', 'ratio_referrers', 'unqiue_mobile_browser_info',
+                    'unqiue_desktop_browser_info', 'total_mobile_browser_info', 
+                    'total_desktop_browser_info']
 
       private
       def method_missing(meth, *args, &block)
