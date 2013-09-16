@@ -8,9 +8,10 @@
 
 * refactor of the dashboard sinatra app
 * code revamp and cleanup
+* path filters and proc filters
 * JSON api for reports
-* dashboard and api endpoints not mandatory
-* bug fixes and tests
+* dashboard and api endpoints no longer mandatory
+* various bug fixes and tests
 
 ## 0.1.0
 
