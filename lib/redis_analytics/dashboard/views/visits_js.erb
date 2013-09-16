@@ -54,7 +54,7 @@ case '<%=range%>':
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[range.to_sym][:visits_new_visits_donut].to_json%>});
     mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
 
-    $("#compare_unit")[0].innerHTML = '<%=range%>';
+    // $("#compare_unit")[0].innerHTML = '<%=range%>'; no longer exists
 
     <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
     <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
