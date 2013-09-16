@@ -6,9 +6,11 @@
 
 ## 0.2.0
 
+* refactor of the dashboard sinatra app
+* code revamp and cleanup
 * JSON api for reports
 * dashboard and api endpoints not mandatory
-* bug fixes
+* bug fixes and tests
 
 ## 0.1.0
 
