@@ -7,8 +7,7 @@ module Rack
       helpers Rack::RedisAnalytics::Helpers
 
       get '/data/?' do
-        result = []
-        content_type :json
+
         begin
           to_date_time = Date.parse(params[:to_date_time]).to_time rescue Time.now
           unit = params[:unit] || 'day'
@@ -40,6 +39,7 @@ module Rack
 
             end
           end
+          content_type :json
           results.to_json
         rescue Exception => e
           halt 500, [500, [e.message, e.backtrace]].to_json
