@@ -5,11 +5,44 @@ function changeTimeFrame(range)
 var mapObject = $('#world-map').vectorMap('get', 'mapObject');
 switch(range)
 {
-<% Rack::RedisAnalytics.time_range_formats.map{|x| x[0].to_s}.each do |range| %>
+<% Rack::RedisAnalytics.time_range_formats.each do |range, unit, time_format| %>
 case '<%=range%>':
     setSessionCookie("_rarng", "<%=range%>");
-    visits_area.setData(<%=@data[range.to_sym][:visits_new_visits_plot].to_json%>);
-    unique_visits_line.setData(<%=@data[range.to_sym][:unique_visits].to_json%>);
+    $.ajax({
+	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=visits,new_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	dataType: "json",
+	success: function(data) {
+		 console.log(data);
+		 visits_area.setData(data);
+		 }
+	});
+
+    $.ajax({
+	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	dataType: "json",
+	success: function(data) {
+		 console.log(data);
+		 unique_visits_line.setData(data);
+		 }
+	});
+
+    $.ajax({
+	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=ratio_browsers&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	dataType: "json",
+	success: function(data) {
+		 console.log(data);
+		 browsers_donut = Morris.Donut({element: 'browsers_donut', data: data});
+		 }
+	});
+
+    $.ajax({
+	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=ratio_referrers&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	dataType: "json",
+	success: function(data) {
+		 console.log(data);
+		 referrers_donut = Morris.Donut({element: 'referrers_donut', data: data});
+		 }
+	});
 
     $("#total_visits")[0].innerHTML = '<%=@data[range.to_sym][:total_visits]%> <small class="muted">visits</small>';
     $("#total_page_views")[0].innerHTML = '<%=@data[range.to_sym][:total_page_views]%> <small class="muted">page views</small>';
@@ -19,11 +52,9 @@ case '<%=range%>':
     $("#new_visits")[0].innerHTML = '<%=parse_float(((@data[range.to_sym][:total_new_visits].to_f/@data[range.to_sym][:total_visits].to_f)*100).round(2))%>% <small class="muted">new visits</small></h4>';
 
     visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[range.to_sym][:visits_new_visits_donut].to_json%>});
-    browsers_donut = Morris.Donut({element: 'browsers_donut', data: <%=@data[range.to_sym][:browsers_donut].to_json%>});
-    referrers_donut = Morris.Donut({element: 'referrers_donut', data: <%=@data[range.to_sym][:referrers_donut].to_json%>});
     mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
 
-    $("#compare_unit")[0].innerHTML = '<%=range%>'; 
+    $("#compare_unit")[0].innerHTML = '<%=range%>';
 
     <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
     <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
@@ -36,6 +67,8 @@ case '<%=range%>':
 <% end %>
 }
 }
+
+
 
 function setSessionCookie(name,value) {
     document.cookie = name+"="+value+"; path=/";
@@ -59,6 +92,8 @@ function convertToCSV(objArray) {
   }
   return str;
 };
+
+
 
 </script>
 

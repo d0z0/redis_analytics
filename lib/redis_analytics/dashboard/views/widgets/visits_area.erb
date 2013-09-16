@@ -8,32 +8,23 @@
 </table>
 
 <script type="text/javascript">
-visits_area = Morris.Area({
-  element: 'visits_area',
-  xkey: 'date',
-  data: <%= @data[@range][:visits_new_visits_plot].to_json %>,
-  ykeys: ['new_visits', 'returning_visits'],
-  labels: ['New Visits', 'Returning Visits'],
-  ymax: 'auto',
-  //events: ['2013-03-02', '2013-03-03'],
-    grid: true,
-  eventStrokeWidth: 2,
-  eventLineColors: ['#ccc', '#eee'],
-  smooth: true,
-  hideHover: 'auto',
-  parseTime: false,
-  lineWidth: 1,
-  pointSize: 0,
-   //  xLabels: 'day',
-    xLabelFormat: function(x) {return '';},
-
-  // hoverCallback: function(index, series)
-  //   {
-  //  h = series.data[index];
-  //  d = Date(h.x);
-  //  return(d + '<br>' + h.new_visits);
-  //   },
-  pointFillColors: ['#fff'],
-  pointStrokeColors: ['#000'],
-});
+    visits_area = Morris.Area({
+	element: 'visits_area',
+	xkey: 'raw',
+	//data: data,
+	ykeys: ['new_visits', 'visits'],
+	labels: ['New Visits', 'Visits'],
+	ymax: 'auto',
+	grid: true,
+	eventStrokeWidth: 2,
+	eventLineColors: ['#ccc', '#eee'],
+	smooth: true,
+	hideHover: 'auto',
+	parseTime: false,
+	lineWidth: 1,
+	pointSize: 0,
+	xLabelFormat: function(x) {return x.getFullYear() + '-' + x.getMonth() + '-' + x.getDate();},
+	pointFillColors: ['#fff'],
+	pointStrokeColors: ['#000']
+    });    
 </script>

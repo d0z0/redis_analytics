@@ -2,38 +2,26 @@
   <tr>
     <td>
       <p class="text-center">
-        <b>Unique Visits - Current vs Previous <span id="compare_unit"><%=@range%></span></b><a href="#unique_visits_modal" data-toggle="modal"><i class="pull-right icon-search"></i></a></p>
+        <b>Unique Visits</b><a href="#unique_visits_modal" data-toggle="modal"><i class="pull-right icon-search"></i></a></p>
       <div id="unique_visits_line" style="width:100%;height:160px;"></div>
     </td>
   </tr>
 </table>
 
 <script type="text/javascript">
-  unique_visits_line = Morris.Line({
-    element: 'unique_visits_line',
-    xkey: 'unit',
-    data: <%=@data[@range][:unique_visits].to_json%>,
-    ykeys: ['unique_visits_this', 'unique_visits_last'],
-      labels: ['Current', 'Previous'],
-    ymax: 'auto',
-    hideHover: 'auto',
-    parseTime: false,
-    lineWidth: 1,
-    pointSize: 0,
-    grid: true,
-    pointFillColors: ['#fff'],
-    pointStrokeColors: ['#000'],
-    // hoverCallback: function(index, series)
-    //   {
-    //  h = series.data[index];
-    //  this_week_color = series.lineColors[0];
-    //  last_week_color = series.lineColors[1];
-    //  html = '';
-    //  html += '<font style="color:' + this_week_color + '">This ' + h.unit + ': ' + h.unique_visits_this + '</font>';
-    //  html += '<br/>';
-    //  html += '<font style="color:' + last_week_color + '">Last ' + h.unit + ': ' + h.unique_visits_last + '</font>';
-    //  return html;
-    //  },
-
-  });
+    unique_visits_line = Morris.Line({
+	element: 'unique_visits_line',
+	xkey: 'raw',
+	//data: <%=@data[@range][:unique_visits].to_json%>,
+	ykeys: ['unique_visits'],
+	labels: ['Current'],
+	ymax: 'auto',
+	hideHover: 'auto',
+	parseTime: false,
+	lineWidth: 1,
+	pointSize: 0,
+	grid: true,
+	pointFillColors: ['#fff'],
+	pointStrokeColors: ['#000'],
+    });
 </script>

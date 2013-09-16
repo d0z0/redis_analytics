@@ -74,7 +74,7 @@ module Rack
             @data[range][:referrers_donut] = self.send("#{unit}ly_ratio_referrers", time_range, :aggregate => true).map{|x| {'label' => x[0], 'value' => x[1].to_i}}
 
             @data[range][:total_mobile_browser_info] = self.send("#{unit}ly_total_mobile_browser_info".to_sym, time_range)
-            @data[range][:total_desktop_info] = self.send("#{unit}ly_total_desktop_info".to_sym, time_range)
+            @data[range][:total_desktop_info] = self.send("#{unit}ly_total_desktop_browser_info".to_sym, time_range)
 
             @data[range][:unqiue_mobile_browser] = self.send("#{unit}ly_unqiue_mobile_browser_info".to_sym, time_range)
             @data[range][:unqiue_desktop_browser] = self.send("#{unit}ly_unqiue_desktop_browser_info".to_sym, time_range)
