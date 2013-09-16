@@ -142,6 +142,7 @@ module Rack
 
         # User agent
         ua = Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
+        browser = "#{ua.name} #{ua.version}"
 
         for_each_time_range(t) do |ts, expire|
 
@@ -152,6 +153,15 @@ module Rack
           if rucn_seq
             unique = RedisAnalytics.redis_connection.sadd("#{@redis_key_prefix}unique_visits:#{ts}", rucn_seq)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unique_visits:#{ts}", expire) if expire
+
+            # Unique detailed desktop and mobile/tablet list.
+            if ua.mobile? || ua.tablet?
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}unqiue_mobile_browser_info:#{ts}", 1, browser)
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unqiue_mobile_browser_info:#{ts}", expire) if expire
+            else
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", 1, browser)
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", expire) if expire
+            end          
 
             # geo ip tracking
             if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
@@ -168,6 +178,15 @@ module Rack
             days_since_last_visit = ((t.to_i - last_visit_time)/(24*3600)).round
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_recency:#{ts}", 1, days_since_last_visit)
             RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_recency:#{ts}", expire) if expire
+          end
+
+          # Total detailed desktop and mobile/tablet list.
+          if ua.mobile? || ua.tablet?
+            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}total_mobile_browser_info:#{ts}", 1, browser)
+            RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}total_mobile_browser_info:#{ts}", expire) if expire
+          else
+            RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}total_desktop_browser_info:#{ts}", 1, browser)
+            RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}total_desktop_browser_info:#{ts}", expire) if expire
           end
 
           RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_browsers:#{ts}", 1,  ua.name)
