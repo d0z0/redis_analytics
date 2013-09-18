@@ -8,11 +8,11 @@ module Rack
 
       GRANULARITY = ['yearly', 'monthly', 'dayly', 'hourly', 'minutely']
 
-      DATA_TYPES = ['new_visits', 'visits', 'page_views', 'second_page_views',
+      DATA_TYPES = ['new_visits', 'returning_visits', 'visits', 'page_views', 'second_page_views',
                     'unique_visits', 'visit_time', 'ratio_recency',
                     'ratio_browsers', 'ratio_platforms', 'ratio_devices',
                     'ratio_country', 'ratio_referrers', 'unqiue_mobile_browser_info',
-                    'unqiue_desktop_browser_info', 'total_mobile_browser_info', 
+                    'unqiue_desktop_browser_info', 'total_mobile_browser_info',
                     'total_desktop_browser_info']
 
       private
@@ -41,7 +41,7 @@ module Rack
           time << slice_key.split('_')
           i += 1.send(x)
         end while i <= to_date
-
+        puts union.inspect
         seq = get_next_seq
         if type =~ /unique/
           if aggregate
@@ -57,12 +57,16 @@ module Rack
             union_key = "#{RedisAnalytics.redis_namespace}:#{seq}"
             RedisAnalytics.redis_connection.zunionstore(union_key, union)
             RedisAnalytics.redis_connection.expire(union_key, 100)
-            return RedisAnalytics.redis_connection.zrange(union_key, 0, -1, :with_scores => true)
+            return Hash[RedisAnalytics.redis_connection.zrange(union_key, 0, -1, :with_scores => true)]
           else
-            return time.zip(union.map{|x| RedisAnalytics.redis_connection.zrange(x,0,-1, :with_scores => true)})
+            return time.zip(union.map{|x| Hash[RedisAnalytics.redis_connection.zrange(x,0,-1, :with_scores => true)]})
           end
         else
-          time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
+          if aggregate
+            return RedisAnalytics.redis_connection.mget(*union).map(&:to_i).inject(:+)
+          else
+            return time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
+          end
         end
       end
 
