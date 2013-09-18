@@ -16,27 +16,23 @@ module Rack
           metrics = params[:metrics].split(',')
           from_date_time = to_date_time - units.send(unit)
           results = []
-          metrics.each do |metric|
-            result = self.send("#{unit}ly_#{metric}", from_date_time, :to_date => to_date_time, :aggregate => aggregate)
-            result.each_with_index do |r, i|
-              results[i] ||= {}
 
-              if !aggregate
-                # fetch the date and time
+          metrics.each_with_index do |metric, j|
+            result = self.send("#{unit}ly_#{metric}", from_date_time, :to_date => to_date_time, :aggregate => aggregate)
+            if result.is_a?(Array) # time range data (non-aggregate)
+              result.each_with_index do |r, i|
+                results[i] ||= {}
                 date_value = r[0][0..2]
                 time_value = r[0][3..-1]
                 date_time_value = []
                 date_time_value << date_value.join('-')
                 date_time_value << time_value.join(':') if time_value
-
                 results[i]['raw'] = date_time_value.join(' ')
                 results[i]['unix'] = Time.mktime(*r[0].map(&:to_i)).to_i
                 results[i][metric] = r[1]
-              else
-                results[i]['label'] = r[0]
-                results[i]['value'] = r[1]
               end
-
+            elsif result.is_a?(Hash) or result.is_a?(Fixnum) # aggregate data
+              results[j] = {metric => result}
             end
           end
           content_type :json
