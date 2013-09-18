@@ -82,6 +82,7 @@ module Rack
           vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
           rucn_seq, first_visit_time, last_visit_time = returning_visitor.split('.')
           visit(t, :last_visit_time => last_visit_time.to_i, :rucn_seq => rucn_seq)
+          returning_visit(t)
           page_view(t)
         elsif returning_visitor and recent_visitor
           rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
@@ -105,6 +106,13 @@ module Rack
         for_each_time_range(t) do |ts, expire|
           RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
           RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}new_visits:#{ts}",expire) if expire
+        end
+      end
+
+      def returning_visit(t)
+        for_each_time_range(t) do |ts, expire|
+          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}returning_visits:#{ts}")
+          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}returning_visits:#{ts}",expire) if expire
         end
       end
 

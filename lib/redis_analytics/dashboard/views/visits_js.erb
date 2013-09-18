@@ -1,73 +1,89 @@
 <script type="text/javascript" language="text/javascript">
-
 function changeTimeFrame(range)
 {
-var mapObject = $('#world-map').vectorMap('get', 'mapObject');
-switch(range)
-{
-<% Rack::RedisAnalytics.time_range_formats.each do |range, unit, time_format| %>
-case '<%=range%>':
-    setSessionCookie("_rarng", "<%=range%>");
-    $.ajax({
-	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=visits,new_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
-	dataType: "json",
-	success: function(data) {
-		 console.log(data);
-		 visits_area.setData(data);
-		 }
+    var mapObject = $('#world-map').vectorMap('get', 'mapObject');
+    switch(range)
+    {
+    <% Rack::RedisAnalytics.time_range_formats.each do |range, unit, time_format| %>
+    case '<%=range%>':
+	setSessionCookie("_rarng", "<%=range%>");
+	
+	// both time range graphs powered by time range data
+	$.ajax({
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits,new_visits,returning_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	    dataType: "json",
+	    success: function(data) {
+		visits_area.setData(data);
+		unique_visits_line.setData(data);
+	    }
 	});
 
-    $.ajax({
-	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
-	dataType: "json",
-	success: function(data) {
-		 console.log(data);
-		 unique_visits_line.setData(data);
-		 }
+	// aggregate data powers the 3 donuts
+	$.ajax({
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=new_visits,returning_visits,ratio_browsers,ratio_referrers,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    dataType: "json",
+	    success: function(data) {
+
+		// parse visits data from json
+		var visits_json_data = []
+		var new_visits = data[0].new_visits;
+		var returning_visits = data[1].returning_visits;
+		var total_visits = new_visits + returning_visits;
+		var page_views = data[4].page_views;
+		var second_page_views = data[5].second_page_views;
+		var page_depth = Math.round(page_views/total_visits);
+		var bounce_rate = Math.round(((total_visits - second_page_views)/total_visits) * 100);
+		var percent_new_visits = Math.round((new_visits / total_visits) * 100);
+		var total_visit_time = data[6].visit_time;
+		var avg_visit_time = Math.round((total_visit_time / <%= (1.send(range)/1.send(unit)).round %>));
+
+		visits_json_data.push({'label': 'new_visits', 'value': new_visits});
+		visits_json_data.push({'label': 'returning_visits', 'value': returning_visits});
+		browsers_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
+		$("#total_visits")[0].innerHTML = total_visits + ' <small class="muted">visits</small>';
+		$("#total_page_views")[0].innerHTML = page_views + ' <small class="muted">page views</small>';
+		$("#page_depth")[0].innerHTML = page_depth + ' <small class="muted">pages per visit</small>';		
+		$("#bounce_rate")[0].innerHTML = bounce_rate + '% <small class="muted">bounce rate</small>';
+		$("#visit_duration")[0].innerHTML = avg_visit_time + ' sec <small class="muted">avg time spent</small>';
+		$("#new_visits")[0].innerHTML = percent_new_visits + '% <small class="muted">new visits</small></h4>';
+
+		// parse browser data from json
+		var browsers_json_data = [];
+		for(var i in data[2].ratio_browsers)
+		{
+		    var browser_data = {}
+		    browser_data[i] = data[2].ratio_browsers[i];
+		    browser_data['label'] = i;
+		    browser_data['value'] = data[2].ratio_browsers[i];
+		    browsers_json_data.push(browser_data);
+		}
+		browsers_donut = Morris.Donut({element: 'browsers_donut', data: browsers_json_data});
+
+		// parse referrer data from json
+		var referrers_json_data = [];
+		for(var i in data[3].ratio_referrers)
+		{
+		    var referrer_data = {}
+		    referrer_data['label'] = i;
+		    referrer_data['value'] = data[3].ratio_referrers[i];
+		    referrers_json_data.push(referrer_data);
+		}
+		referrers_donut = Morris.Donut({element: 'referrers_donut', data: referrers_json_data});
+	    }
 	});
-
-    $.ajax({
-	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=ratio_browsers&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
-	dataType: "json",
-	success: function(data) {
-		 console.log(data);
-		 browsers_donut = Morris.Donut({element: 'browsers_donut', data: data});
-		 }
-	});
-
-    $.ajax({
-	url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=ratio_referrers&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
-	dataType: "json",
-	success: function(data) {
-		 console.log(data);
-		 referrers_donut = Morris.Donut({element: 'referrers_donut', data: data});
-		 }
-	});
-
-    $("#total_visits")[0].innerHTML = '<%=@data[range.to_sym][:total_visits]%> <small class="muted">visits</small>';
-    $("#total_page_views")[0].innerHTML = '<%=@data[range.to_sym][:total_page_views]%> <small class="muted">page views</small>';
-    $("#page_depth")[0].innerHTML = '<%=parse_float((@data[range.to_sym][:total_page_views].to_f/@data[range.to_sym][:total_visits].to_f).round(2))%> <small class="muted">pages per visit</small>';
-    $("#bounce_rate")[0].innerHTML = '<%=parse_float((((@data[range.to_sym][:total_visits].to_f-@data[range.to_sym][:total_second_page_views].to_f)/@data[range.to_sym][:total_visits].to_f)*100).round(2))%>% <small class="muted">bounce rate</small>';
-    $("#visit_duration")[0].innerHTML = '<%=Time.at(@data[range.to_sym][:avg_visit_time].round(2)).gmtime.strftime("%R:%S")%> <small class="muted">avg time spent</small>';
-    $("#new_visits")[0].innerHTML = '<%=parse_float(((@data[range.to_sym][:total_new_visits].to_f/@data[range.to_sym][:total_visits].to_f)*100).round(2))%>% <small class="muted">new visits</small></h4>';
-
-    visits_donut = Morris.Donut({element: 'visits_donut', data: <%=@data[range.to_sym][:visits_new_visits_donut].to_json%>});
-    mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
-
-    // $("#compare_unit")[0].innerHTML = '<%=range%>'; no longer exists
-
-    <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
-    <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
-    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
-    <%= "$('#recency_#{c}_num')[0].title = '#{i.to_i} visits';" %>
-    <%= "$('#recency_#{c}_cent')[0].innerHTML = '#{p}';" %>
-    <% end %>
-
-    break;
-<% end %>
+	mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
+	
+	    <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
+	    <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
+	    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
+	    <%= "$('#recency_#{c}_num')[0].title = '#{i.to_i} visits';" %>
+	    <%= "$('#recency_#{c}_cent')[0].innerHTML = '#{p}';" %>
+	    <% end %>
+	    
+	break;
+	    <% end %>
+    }
 }
-}
-
 
 
 function setSessionCookie(name,value) {

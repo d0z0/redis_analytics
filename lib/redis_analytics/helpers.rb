@@ -41,7 +41,6 @@ module Rack
           time << slice_key.split('_')
           i += 1.send(x)
         end while i <= to_date
-        puts union.inspect
         seq = get_next_seq
         if type =~ /unique/
           if aggregate
