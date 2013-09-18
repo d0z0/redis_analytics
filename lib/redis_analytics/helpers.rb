@@ -31,7 +31,7 @@ module Rack
         x = granularity[0..-3]
 
         to_date = (options[:to_date] || Time.now).send("end_of_#{x}")
-        i = from_date.send("beginning_of_#{x}") #unless x == 'minute'
+        i = from_date.send("beginning_of_#{x}")
 
         union = []
         time = []
