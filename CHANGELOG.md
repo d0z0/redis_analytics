@@ -1,9 +1,3 @@
-## TODO
-
-* move to bootstrap 3?
-* pixel tracker to track custom
-* dashboard to allow custom date range (instead of day/week/year) and units
-
 ## 0.2.0
 
 * refactor of the dashboard sinatra app
