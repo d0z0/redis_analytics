@@ -11,7 +11,8 @@ module Rack
       DATA_TYPES = ['new_visits', 'returning_visits', 'visits', 'page_views', 'second_page_views',
                     'unique_visits', 'visit_time', 'ratio_recency',
                     'ratio_browsers', 'ratio_platforms', 'ratio_devices',
-                    'ratio_country', 'ratio_referrers', 'unqiue_mobile_browser_info',
+                    'ratio_referrers', 'unqiue_mobile_browser_info',
+                    'ratio_session', 'ratio_country',
                     'unqiue_desktop_browser_info', 'total_mobile_browser_info',
                     'total_desktop_browser_info']
 

@@ -38,7 +38,7 @@ module Rack
 
       def for_each_time_range(t)
         RedisAnalytics.redis_key_timestamps.map{|x, y| [t.strftime(x), y]}.each do |ts, expire|
-          yield(ts, expire) # returns an array of the redis methods to call 
+          yield(ts, expire) # returns an array of the redis methods to call
           # r.each do |method, args|
           #   RedisAnalytics.redis_connection.send(method, *args)
           #   RedisAnalytics.redis_connection.expire(args[1]) if expire # assuming args[1] is always the key that is being operated on.. will this always work?
@@ -169,7 +169,7 @@ module Rack
             else
               RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", 1, browser)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", expire) if expire
-            end          
+            end
 
             # geo ip tracking
             if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
@@ -177,7 +177,17 @@ module Rack
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
             end
 
-            # referrer tracking 
+            # Session && user
+            if @request.session
+              session_id = @request.session.id
+              # Devise user
+              user_id = (defined?(Devise) && (warden = @env['warden']) && (user = warden.user)) ? user.id.to_s : ""
+
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_session:#{ts}", 1, "#{session_id}, #{user_id}")
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_session:#{ts}", expire) if expire
+            end
+
+            # referrer tracking
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, referrer)
           end
 
