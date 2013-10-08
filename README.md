@@ -36,7 +36,6 @@ check out the [Redis documentation](http://redis.io/documentation).
 # this is not required unless you use :require => false in your Gemfile
 require 'redis_analytics'
 
-# configure your redis connection (this is mandatory) and namespace (this is optional)
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'ra'
