@@ -17,11 +17,14 @@ Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for 
 
 ## OK, so how do I install it?
 
-`gem install redis_analytics`
+```
+gem install redis_analytics
+```
 
 or in your `Gemfile`
 
 ```ruby
+# Gemfile
 gem 'redis_analytics'
 ```
 
@@ -33,6 +36,7 @@ check out the [Redis documentation](http://redis.io/documentation).
 ### Step 1: Load the redis_analytics library and configure it
 
 ```ruby
+# config/initializers/redis_analytics.rb
 # this is not required unless you use :require => false in your Gemfile
 require 'redis_analytics'
 
@@ -55,6 +59,7 @@ For rails the middleware is added automatically, so you do not need to add it ma
 ### Option 1: Set a dashboard endpoint in your configuration
 
 ```ruby
+# config/initializers/redis_analytics.rb
 Rack::RedisAnalytics.configure do |configuration|
   configuration.dashboard_endpoint = '/dashboard'
 end
@@ -73,6 +78,7 @@ and navigate to [http://localhost:4567](http://localhost:4567)
 In the configuration, keep the value of redis_namespace the same across all your rails apps
 
 ```ruby
+# config/initializers/redis_analytics.rb
 Rack::RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'mywebsite.org'
@@ -82,6 +88,7 @@ end
 ## How do I use filters?
 
 ```ruby
+# config/initializers/redis_analytics.rb
 Rack::RedisAnalytics.configure do |configuration|
 
   # simple string path filter
@@ -105,16 +112,43 @@ end
 
 
 ## Why is the Geolocation tracking giving me wrong results?
+By default geolocation is disabled.
+You can use the GeoCoder or GeoIP.
 
-IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
+### Geocoder
+
+add in your `Gemfile`
+
+```ruby
+# Gemfile
+gem 'geocoder'
+```
+
+```ruby
+# config/initializers/redis_analytics.rb
+require 'geocoder' # this is not required for Rails
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.geo_engine = :geocoder
+end
+```
+
+
+### GeoIP
+IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version.
 Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
 You will then need to point to the GeoIP.dat file in your configuration.
 
 ```ruby
+# Gemfile
+gem 'geoip'
+```
+
+```ruby
+# config/initializers/redis_analytics.rb
+require 'geoip' # this is not required for Rails
 Rack::RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
-  configuration.redis_namespace = 'mywebsite.org'
-  configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
+  configuration.geo_engine = :geoip
+  configuration.geo_ip_data_path = '/path/to/GeoIP.dat' # optional, default: "bin/GeoIP.dat"
 end
 ```
 

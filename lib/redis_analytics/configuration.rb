@@ -26,6 +26,9 @@ module Rack
 
       attr_writer :filters
 
+      # GeoEngine
+      attr_writer :geo_engine
+
       # Path to the Geo IP Database file
       attr_writer :geo_ip_data_path
 
@@ -78,6 +81,12 @@ module Rack
 
       def add_path_filter(path)
         path_filters << RedisAnalytics::PathFilter.new(path)
+      end
+
+      # Geo tool
+      # :geocoder or :geoip (default is: false)
+      def geo_engine
+        @geo_engine ||= false
       end
 
       def geo_ip_data_path

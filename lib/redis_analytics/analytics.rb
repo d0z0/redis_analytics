@@ -119,18 +119,17 @@ module Rack
       def visit(t, options = {})
         last_visit_time = options[:last_visit_time] || nil
         rucn_seq = options[:rucn_seq] || nil
+        geo_data = nil
         geo_country_code = nil
         referrer = nil
         ua = nil
 
-        # Geo IP Country code fetch
-        if defined?(GeoIP)
-          begin
-            g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
-            geo_country_code = g.country(@request.ip).to_hash[:country_code2]
-          rescue Exception => e
-            puts "Warning: Unable to fetch country info #{e}"
-          end
+        # Geo data
+        geo_engine = RedisAnalytics::Geo.new
+        if geo_engine.defined?
+          # ENV["REMOTE_ADDR"] to possible test in development with vagrant
+          geo_data = geo_engine.get_data(ENV["REMOTE_ADDR"] || @request.ip)
+          geo_country_code = geo_data["country_code#{"2" if geo_engine == GeoIP}"]
         end
 
         # Referrer regex decode
@@ -171,7 +170,13 @@ module Rack
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", expire) if expire
             end
 
-            # geo ip tracking
+            # geo data
+            if geo_data
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}geo_data:#{ts}", 1, Marshal.dump(geo_data))
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}geo_data:#{ts}", expire) if expire
+            end
+
+            # geo data ip tracking
             if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
               RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
