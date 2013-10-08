@@ -129,7 +129,7 @@ module Rack
         if geo_engine.defined?
           # ENV["REMOTE_ADDR"] to possible test in development with vagrant
           geo_data = geo_engine.get_data(ENV["REMOTE_ADDR"] || @request.ip)
-          geo_country_code = geo_data["country_code#{"2" if geo_engine == GeoIP}"]
+          geo_country_code = geo_data["country_code#{"2" if defined?(GeoIP) && geo_engine == GeoIP}"]
         end
 
         # Referrer regex decode
