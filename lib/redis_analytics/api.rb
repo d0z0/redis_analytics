@@ -13,9 +13,14 @@ module Rack
           unit = params[:unit] || 'day'
           aggregate = (params[:aggregate] == 'yes')
           units = (params[:unit_count] || 1).to_i
-          metrics = params[:metrics].split(',')
           from_date_time = to_date_time - units.send(unit)
           results = []
+
+          metrics = case params[:metrics].class
+            when String then params[:metrics].split(',')
+            when Array  then params[:metrics]
+            else DATA_TYPES # Rack::RedisAnalytics::Helpers::DATA_TYPES
+          end
 
           metrics.each_with_index do |metric, j|
             result = self.send("#{unit}ly_#{metric}", from_date_time, :to_date => to_date_time, :aggregate => aggregate)

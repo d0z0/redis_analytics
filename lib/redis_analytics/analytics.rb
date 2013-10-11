@@ -38,7 +38,7 @@ module Rack
 
       def for_each_time_range(t)
         RedisAnalytics.redis_key_timestamps.map{|x, y| [t.strftime(x), y]}.each do |ts, expire|
-          yield(ts, expire) # returns an array of the redis methods to call 
+          yield(ts, expire) # returns an array of the redis methods to call
           # r.each do |method, args|
           #   RedisAnalytics.redis_connection.send(method, *args)
           #   RedisAnalytics.redis_connection.expire(args[1]) if expire # assuming args[1] is always the key that is being operated on.. will this always work?
@@ -119,18 +119,18 @@ module Rack
       def visit(t, options = {})
         last_visit_time = options[:last_visit_time] || nil
         rucn_seq = options[:rucn_seq] || nil
+        geo_data = nil
         geo_country_code = nil
         referrer = nil
         ua = nil
 
-        # Geo IP Country code fetch
-        if defined?(GeoIP)
-          begin
-            g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
-            geo_country_code = g.country(@request.ip).to_hash[:country_code2]
-          rescue Exception => e
-            puts "Warning: Unable to fetch country info #{e}"
-          end
+        # Geo data
+        geo_engine = RedisAnalytics::Geo.new
+        if geo_engine.defined?
+          # ENV["REMOTE_ADDR"] to possible test in development with vagrant
+          geo_data = geo_engine.get_data(ENV["REMOTE_ADDR"] || @request.ip)
+          Rails.logger.debug " #\n\n ====   geo_ip: #{ENV["REMOTE_ADDR"] || @request.ip}\n\n\n"
+          geo_country_code = geo_data["country_code#{"2" if defined?(GeoIP) && geo_engine == GeoIP}"] unless geo_data.empty?
         end
 
         # Referrer regex decode
@@ -169,15 +169,31 @@ module Rack
             else
               RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", 1, browser)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}unqiue_desktop_browser_info:#{ts}", expire) if expire
-            end          
+            end
 
-            # geo ip tracking
+            # geo data
+            if geo_data
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}geo_data:#{ts}", 1, Marshal.dump(geo_data))
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}geo_data:#{ts}", expire) if expire
+            end
+
+            # geo data ip tracking
             if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
               RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_country:#{ts}", 1, geo_country_code)
               RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_country:#{ts}", expire) if expire
             end
 
-            # referrer tracking 
+            # Session && user
+            if @request.session
+              session_id = @request.session.id
+              # Devise user
+              user_id = (defined?(Devise) && (warden = @env['warden']) && (user = warden.user)) ? user.id.to_s : ""
+
+              RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_session:#{ts}", 1, "#{session_id}, #{user_id}")
+              RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}ratio_session:#{ts}", expire) if expire
+            end
+
+            # referrer tracking
             RedisAnalytics.redis_connection.zincrby("#{@redis_key_prefix}ratio_referrers:#{ts}", 1, referrer)
           end
 
