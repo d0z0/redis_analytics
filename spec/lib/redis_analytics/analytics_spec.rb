@@ -22,16 +22,16 @@ describe Rack::RedisAnalytics::Analytics do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.visit_cookie_name}=1.1.#{t1.to_i}.#{t1.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.returning_user_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
       t2 = t1 + 5 # just adding 5 seconds
       Time.stubs(:now).returns(t2)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.visit_cookie_name}=1.1.#{t1.to_i}.#{t2.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.returning_user_cookie_name}=1.#{t1.to_i}.#{t2.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.#{t1.to_i}.#{t2.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t2.to_i}")
     end
   end
-  
+
   context "when a user makes 2 visits, but visit cookie and returning user cookie are both non-existent" do
     def cookie
       last_response.original_headers['Set-Cookie']
@@ -40,15 +40,15 @@ describe Rack::RedisAnalytics::Analytics do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.visit_cookie_name}=1.1.#{t1.to_i}.#{t1.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.returning_user_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
       clear_cookies
 
       t2 = t1 + 5 # just adding 5 seconds
       Time.stubs(:now).returns(t2)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.visit_cookie_name}=2.2.#{t2.to_i}.#{t2.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.returning_user_cookie_name}=2.#{t2.to_i}.#{t2.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=2.2.#{t2.to_i}.#{t2.to_i}")
+      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=2.#{t2.to_i}.#{t2.to_i}")
     end
   end
 

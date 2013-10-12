@@ -26,8 +26,8 @@ describe Rack::RedisAnalytics::Configuration do
     end
   end
 
-  context 'property returning_user_cookie_name' do 
-    subject(:return_cookie) { Rack::RedisAnalytics.returning_user_cookie_name }
+  context 'property first_visit_cookie_name' do 
+    subject(:return_cookie) { Rack::RedisAnalytics.first_visit_cookie_name }
     it 'should not be nil' do
       return_cookie.should_not be_nil
     end
@@ -40,17 +40,17 @@ describe Rack::RedisAnalytics::Configuration do
     end
   end
 
-  context 'property visit_cookie_name' do 
-    subject(:visit_cookie_name) { Rack::RedisAnalytics.visit_cookie_name }
+  context 'property current_visit_cookie_name' do 
+    subject(:current_visit_cookie_name) { Rack::RedisAnalytics.current_visit_cookie_name }
     it 'should not be nil' do 
-      visit_cookie_name.should_not be_nil
+      current_visit_cookie_name.should_not be_nil
     end
     it 'should have an default value' do 
-      visit_cookie_name.should be == "_vcn"
+      current_visit_cookie_name.should be == "_vcn"
     end
     it 'can be set to another value' do
-      visit_cookie_name = "test_vcn"
-      visit_cookie_name.should be == "test_vcn"
+      current_visit_cookie_name = "test_vcn"
+      current_visit_cookie_name.should be == "test_vcn"
     end
   end
 

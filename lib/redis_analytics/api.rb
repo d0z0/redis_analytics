@@ -27,7 +27,7 @@ module Rack
                 date_time_value = []
                 date_time_value << date_value.join('-')
                 date_time_value << time_value.join(':') if time_value
-                results[i]['raw'] = date_time_value.join(' ')
+                results[i]['raw'] = date_time_value.join(' ').strip
                 results[i]['unix'] = Time.mktime(*r[0].map(&:to_i)).to_i
                 results[i][metric] = r[1]
               end

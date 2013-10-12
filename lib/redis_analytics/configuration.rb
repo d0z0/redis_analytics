@@ -7,11 +7,11 @@ module Rack
       # Redis namespace for keys
       attr_writer :redis_namespace
 
-      # Name of the cookie which tracks returning visitors (known visitors)
-      attr_writer :returning_user_cookie_name
+      # Name of the cookie which tracks returning visitors
+      attr_writer :first_visit_cookie_name
 
-      # Name of the cookie which tracks visits
-      attr_writer :visit_cookie_name
+      # Name of the cookie which tracks current visits
+      attr_writer :current_visit_cookie_name
 
       # Minutes the visit should timeout after (if no hit is received)
       attr_writer :visit_timeout
@@ -40,13 +40,13 @@ module Rack
       end
 
       # Name of the cookie which tracks returning visitors (known visitors)
-      def returning_user_cookie_name
-        @returning_user_cookie_name ||= '_rucn'
+      def first_visit_cookie_name
+        @first_visit_cookie_name ||= '_rucn'
       end
 
       # Name of the cookie which tracks visits
-      def visit_cookie_name
-        @visit_cookie_name ||= '_vcn'
+      def current_visit_cookie_name
+        @current_visit_cookie_name ||= '_vcn'
       end
 
       def filters
@@ -78,7 +78,7 @@ module Rack
       end
 
       def redis_key_timestamps # [format, expire in seconds or nil]
-        ['%Y', '%Y_%m', '%Y_%m_%d', '%Y_%m_%d_%H', ['%Y_%m_%d_%H_%M', 1.day + 1.minute]]
+        ['%Y', '%Y_%m', '%Y_%m_%d', '%Y_%m_%d_%H', '%Y_%m_%d_%H_%M']
       end
 
       def time_range_formats

@@ -8,7 +8,6 @@ module Rack
 
       def initialize(app)
         @app = app
-        @redis_key_prefix = "#{RedisAnalytics.redis_namespace}:"
       end
 
       def call(env)
@@ -36,84 +35,11 @@ module Rack
         return true
       end
 
-      def for_each_time_range(t)
-        RedisAnalytics.redis_key_timestamps.map{|x, y| [t.strftime(x), y]}.each do |ts, expire|
-          yield(ts, expire) # returns an array of the redis methods to call 
-          # r.each do |method, args|
-          #   RedisAnalytics.redis_connection.send(method, *args)
-          #   RedisAnalytics.redis_connection.expire(args[1]) if expire # assuming args[1] is always the key that is being operated on.. will this always work?
-          # end
-        end
-      end
-
       def record
-        t = Time.now
-
-        # # Page Tracking
-        # path = @request.path
-        # params = @request.params
-        # if i = PAGEVIEWS.index{|x| x[0] == path}
-        #   page = PAGEVIEWS[i]
-        #   params.select{|x, y| page[1..-1].include?(x)}.each do |k, v|
-        #     for_each_time_range(t) do |ts, expire|
-        #       h = Digest::MD5.hexdigest(v)
-        #       RedisAnalytics.redis_connection.hset("#{@redis_key_prefix}page", h, v)
-        #       RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page", expire) if expire
-        #       RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}page_#{i}_#{page.index(k)}_#{h}:#{ts}")
-        #       RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}page_#{i}_#{page.index(k)}_#{h}:#{ts}", expire) if expire
-        #     end
-        #   end
-        # end
-
-        returning_visitor = @request.cookies[RedisAnalytics.returning_user_cookie_name]
-        recent_visitor = @request.cookies[RedisAnalytics.visit_cookie_name]
-
-        vcn_seq, rucn_seq = nil
-        visit_start_time =visit_end_time = first_visit_time = t.to_i
-
-        if not returning_visitor and not recent_visitor
-          rucn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}unique_visits")
-          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
-          visit(t, :rucn_seq => rucn_seq)
-          new_visit(t)
-          visit_time(t, t.to_i)
-          page_view(t)
-        elsif returning_visitor and not recent_visitor
-          vcn_seq = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}visits")
-          rucn_seq, first_visit_time, last_visit_time = returning_visitor.split('.')
-          visit(t, :last_visit_time => last_visit_time.to_i, :rucn_seq => rucn_seq)
-          returning_visit(t)
-          page_view(t)
-        elsif returning_visitor and recent_visitor
-          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
-          rucn_seq, first_visit_time = returning_visitor.split('.')
-          visit_time(t, visit_end_time.to_i)
-          page_view(t, visit_start_time.to_i == visit_end_time.to_i)
-        elsif not returning_visitor and recent_visitor
-          rucn_seq, vcn_seq, visit_start_time, visit_end_time = recent_visitor.split('.')
-          visit_time(t, visit_end_time.to_i)
-          page_view(t, visit_start_time.to_i == visit_end_time.to_i)
-        end
-
-        # create the recent visit cookie
-        @response.set_cookie(RedisAnalytics.visit_cookie_name, {:value => "#{rucn_seq}.#{vcn_seq}.#{visit_start_time}.#{t.to_i}", :expires => t + (RedisAnalytics.visit_timeout.to_i * 60 )})
-
-        # create the permanent cookie (2 years)
-        @response.set_cookie(RedisAnalytics.returning_user_cookie_name, {:value => "#{rucn_seq}.#{first_visit_time}.#{t.to_i}", :expires => t + (60 * 60 * 24 * 5)}) # 5 hours temp
-      end
-
-      def new_visit(t)
-        for_each_time_range(t) do |ts, expire|
-          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}new_visits:#{ts}")
-          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}new_visits:#{ts}",expire) if expire
-        end
-      end
-
-      def returning_visit(t)
-        for_each_time_range(t) do |ts, expire|
-          RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}returning_visits:#{ts}")
-          RedisAnalytics.redis_connection.expire("#{@redis_key_prefix}returning_visits:#{ts}",expire) if expire
-        end
+        v = Visit.new(@request, @response)
+        v.record
+        @response.set_cookie(RedisAnalytics.current_visit_cookie_name, v.updated_current_visit_info)
+        @response.set_cookie(RedisAnalytics.first_visit_cookie_name, v.updated_first_visit_info)
       end
 
       def visit(t, options = {})
