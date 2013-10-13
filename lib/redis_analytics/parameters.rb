@@ -7,12 +7,9 @@ module Rack
       attr_reader :track_unique_visits_types
       attr_reader :track_page_views_count, :track_second_page_views_count
 
-      # Developers can override the public methods here OR even introduce new
-      # Should the private methods be protected?
-      # Everything here will be tracked if you call the method called track
-      # Tracking differs based on return type of your meth
-      # String => ZINCRBY(meth, 1, return_value)
-      # Fixnum => INCRBY(meth, return_value)
+      # Developers can override or define new public methods here
+      # Methods should start with track and end with count or types
+      # Return types should be Fixnum or String resp.
       # If you return nil or an error nothing will be tracked
 
       def track_browser_types
@@ -45,13 +42,13 @@ module Rack
         end
       end
 
-      # def track_visit_time_count
-      #   return (@t.to_i - @last_visit_end_time.to_i)
-      # end
+      def track_device_types
+        return browser.mobile? ? 'M' : 'D'
+      end
 
       def track_referrer_types
         if @request.referrer
-          REFERRERS.each do |referrer|
+          ['google', 'bing', 'yahoo', 'cleartrip', 'github'].each do |referrer|
             # this will track x.google.mysite.com as google so its buggy, fix the regex
             if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
               "REFERRER => #{m.to_a[3]}"
