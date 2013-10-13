@@ -86,9 +86,9 @@ module Rack
       end
 
       def track(parameter_name, parameter_value)
-        key = "#{@redis_key_prefix}#{parameter_name}:#{ts}"
         RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#PARAMETERS", parameter_name, parameter_value.class)
         for_each_time_range(@t) do |ts|
+          key = "#{@redis_key_prefix}#{parameter_name}:#{ts}"
           if parameter_value.is_a?(Fixnum)
             RedisAnalytics.redis_connection.incrby(key, parameter_value)
           else
