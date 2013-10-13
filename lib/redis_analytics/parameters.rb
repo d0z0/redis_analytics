@@ -5,6 +5,7 @@ module Rack
       attr_reader :track_visit_time_count
       attr_reader :track_visits_count, :track_new_visits_count, :track_returning_visits_count
       attr_reader :track_unique_visits_types
+      attr_reader :track_page_views_count, :track_second_page_views_count
 
       # Developers can override the public methods here OR even introduce new
       # Should the private methods be protected?
@@ -13,14 +14,6 @@ module Rack
       # String => ZINCRBY(meth, 1, return_value)
       # Fixnum => INCRBY(meth, return_value)
       # If you return nil or an error nothing will be tracked
-
-      def track_page_views_count
-        return 1
-      end
-
-      def track_second_page_views_count
-        return 1 if @last_visit_start_time == @last_visit_end_time
-      end
 
       def track_browser_types
         browser.name.to_s

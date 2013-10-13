@@ -64,8 +64,8 @@ module Rack
             end
           end
         end
-        # track("page_views", 1)
-        # track("second_page_views", 1) if @last_visit_start_time == @last_visit_end_time
+        track("page_views", 1)
+        track("second_page_views", 1) if @last_visit_start_time == @last_visit_end_time
       end
 
       # helpers
