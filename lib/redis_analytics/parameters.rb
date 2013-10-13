@@ -2,26 +2,35 @@ module Rack
   module RedisAnalytics
     module Parameters
 
+      attr_reader :track_visit_time_count
+      attr_reader :track_visits_count, :track_new_visits_count, :track_returning_visits_count
+      attr_reader :track_unique_visits_types
+
       # Developers can override the public methods here OR even introduce new
       # Should the private methods be protected?
       # Everything here will be tracked if you call the method called track
-
       # Tracking differs based on return type of your meth
-      # nil => INCR(meth)
       # String => ZINCRBY(meth, 1, return_value)
       # Fixnum => INCRBY(meth, return_value)
+      # If you return nil or an error nothing will be tracked
 
-      # If you return an error nothing will be tracked
+      def track_page_views_count
+        return 1
+      end
 
-      def track_browser
+      def track_second_page_views_count
+        return 1 if @last_visit_start_time == @last_visit_end_time
+      end
+
+      def track_browser_types
         browser.name.to_s
       end
 
-      def track_platform
+      def track_platform_types
         browser.platform.to_s
       end
 
-      def track_country
+      def track_country_types
         if defined?(GeoIP)
           begin
             g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
@@ -35,19 +44,19 @@ module Rack
         end
       end
 
-      def track_recency
+      def track_recency_count
         # tracking for visitor recency
-        if @last_visit_time
-          days_since_last_visit = ((@t.to_i - @last_visit_time.to_i)/(24*3600)).round
+        if @last_visit_end_time
+          days_since_last_visit = ((@t.to_i - @last_visit_end_time.to_i)/(24*3600)).round
           return days_since_last_visit
         end
       end
 
-      def track_visit_time
-        return (@t.to_i - @last_visit_end_time.to_i)
-      end
+      # def track_visit_time_count
+      #   return (@t.to_i - @last_visit_end_time.to_i)
+      # end
 
-      def track_referrer
+      def track_referrer_types
         if @request.referrer
           REFERRERS.each do |referrer|
             # this will track x.google.mysite.com as google so its buggy, fix the regex

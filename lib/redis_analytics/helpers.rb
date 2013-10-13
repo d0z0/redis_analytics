@@ -46,11 +46,18 @@ module Rack
           else
             return time.zip(union.map{|x| Hash[RedisAnalytics.redis_connection.zrange(x, 0, -1, :with_scores => true)]})
           end
-        elsif parameter_type(parameter_name) == 'Fixnum' || parameter_type(parameter_name) == 'NilClass'
+        elsif parameter_type(parameter_name) == 'Fixnum'
           if aggregate
             return RedisAnalytics.redis_connection.mget(*union).map(&:to_i).inject(:+)
           else
             return time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
+          end
+        else
+          # recording of the parameter has not happened yet
+          if Parameters.public_instance_methods.include?("track_#{parameter_name}_types".to_sym)
+            aggregate ? {} : time.zip([{}] * time.length)
+          elsif Parameters.public_instance_methods.include?("track_#{parameter_name}_count".to_sym)
+            aggregate ? 0 : time.zip([0] * time.length)
           end
         end
       end

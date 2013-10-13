@@ -20,7 +20,7 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=new_visits,returning_visits,ratio_browsers,ratio_referrers,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=new_visits,returning_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 
@@ -49,36 +49,29 @@ function changeTimeFrame(range)
 
 		// parse browser data from json
 		var browsers_json_data = [];
-		for(var i in data[2].ratio_browsers)
+		for(var i in data[2].browser)
 		{
 		    var browser_data = {}
-		    browser_data[i] = data[2].ratio_browsers[i];
+		    browser_data[i] = data[2].browser[i];
 		    browser_data['label'] = i;
-		    browser_data['value'] = data[2].ratio_browsers[i];
+		    browser_data['value'] = data[2].browser[i];
 		    browsers_json_data.push(browser_data);
 		}
 		browsers_donut = Morris.Donut({element: 'browsers_donut', data: browsers_json_data});
 
 		// parse referrer data from json
 		var referrers_json_data = [];
-		for(var i in data[3].ratio_referrers)
+		for(var i in data[3].referrer)
 		{
 		    var referrer_data = {}
 		    referrer_data['label'] = i;
-		    referrer_data['value'] = data[3].ratio_referrers[i];
+		    referrer_data['value'] = data[3].referrer[i];
 		    referrers_json_data.push(referrer_data);
 		}
 		referrers_donut = Morris.Donut({element: 'referrers_donut', data: referrers_json_data});
 	    }
 	});
-	mapObject.series.regions[0].setValues(<%=@data[range.to_sym][:country_map].to_json%>);
 	
-	    <% @data[range.to_sym][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
-	    <% p = ((i.to_f/@data[range.to_sym][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
-	    <%= "$('#recency_#{c}')[0].style.width = '#{p}%';" %>
-	    <%= "$('#recency_#{c}_num')[0].title = '#{i.to_i} visits';" %>
-	    <%= "$('#recency_#{c}_cent')[0].innerHTML = '#{p}';" %>
-	    <% end %>
 	    
 	break;
 	    <% end %>
@@ -88,11 +81,6 @@ function changeTimeFrame(range)
 
 function setSessionCookie(name,value) {
     document.cookie = name+"="+value+"; path=/";
-}
-
-function onDownload() {
-  data =   encodeURIComponent(convertToCSV(<%=@data[@range][:visits_new_visits_plot].to_json%>));
-  document.location = 'data:Application/octet-stream,' + data
 }
 
 function convertToCSV(objArray) {

@@ -9,7 +9,7 @@
 
 <script type="text/javascript">
   // Map Overlay
-  var geoLocationData = <%=@data[@range][:country_map].to_json%>;
+  var geoLocationData = {}; 
   $(function(){
     $('#world-map').vectorMap({
       map: 'world_mill_en',
