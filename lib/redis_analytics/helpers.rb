@@ -8,7 +8,7 @@ module Rack
 
       private
       def method_missing(meth, *args, &block)
-        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_([a-z_]+)$/
+        if meth.to_s =~ /^(minute|hour|dai|day|month|year)ly_([a-z_0-9]+)$/
           granularity = ($1 == 'dai' ? 'day' : $1) + 'ly'
           parameter_name = $2
           data(granularity, parameter_name, *args)
@@ -53,7 +53,6 @@ module Rack
             return time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
           end
         else
-          # recording of the parameter has not happened yet
           if Parameters.public_instance_methods.include?("track_#{parameter_name}_types".to_sym)
             aggregate ? {} : time.zip([{}] * time.length)
           elsif Parameters.public_instance_methods.include?("track_#{parameter_name}_count".to_sym)
@@ -66,25 +65,7 @@ module Rack
         seq = RedisAnalytics.redis_connection.incr("#{RedisAnalytics.redis_namespace}:#SEQUENCER")
       end
 
-      def realistic(n, r = 1000)
-        return n
-        n + r + rand(r)
-      end
-
-      def parse_float(float)
-        float.nan? ? '0.0' : float
-      end
-
-      def with_benchmarking
-        @t0 = Time.now
-        yield
-        @t1 = Time.now
-        @t = @t1 - @t0
-        puts "Time Taken: #{@t} seconds"
-      end
-
       def time_range
-        # should first try to fetch from cookie what the default range is
         (request.cookies["_rarng"] || RedisAnalytics.default_range).to_sym
       end
     end
