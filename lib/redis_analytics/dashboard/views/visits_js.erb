@@ -35,7 +35,7 @@ function changeTimeFrame(range)
 		var bounce_rate = Math.round(((total_visits - second_page_views)/total_visits) * 100);
 		var percent_new_visits = Math.round((new_visits / total_visits) * 100);
 		var total_visit_time = data[6].visit_time;
-		var avg_visit_time = Math.round((total_visit_time / <%= (1.send(range)/1.send(unit)).round %>));
+		var avg_visit_time = Math.round((total_visit_time / total_visits));
 
 		visits_json_data.push({'label': 'new_visits', 'value': new_visits});
 		visits_json_data.push({'label': 'returning_visits', 'value': returning_visits});
