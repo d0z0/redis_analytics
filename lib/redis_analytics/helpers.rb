@@ -55,7 +55,7 @@ module Rack
         else
           if Parameters.public_instance_methods.any?{|m| m.to_s =~ /^#{parameter_name}_datum_per_(hit|visit)$/}
             aggregate ? {} : time.zip([{}] * time.length)
-          elsif Parameters.public_instance_methods.any{|m| m.to_s =~ /^#{parameter_name}_count_per_(hit|visit)$/}
+          elsif Parameters.public_instance_methods.any?{|m| m.to_s =~ /^#{parameter_name}_count_per_(hit|visit)$/}
             aggregate ? 0 : time.zip([0] * time.length)
           end
         end

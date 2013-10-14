@@ -2,25 +2,25 @@ module Rack
   module RedisAnalytics
     module Parameters
 
-      attr_reader :track_visit_time_count
-      attr_reader :track_visits_count, :track_first_visits_count, :track_repeat_visits_count
-      attr_reader :track_unique_visits_types
-      attr_reader :track_page_views_count, :track_second_page_views_count
+      attr_reader :visit_time_count_per_visit
+      attr_reader :visits_count_per_visit, :first_visits_count_per_visit, :repeat_visits_count_per_visit
+      attr_reader :unique_visits_datum_per_visit
+      attr_reader :page_views_count_per_hit, :second_page_views_count_per_hit
 
       # Developers can override or define new public methods here
       # Methods should start with track and end with count or types
       # Return types should be Fixnum or String resp.
       # If you return nil or an error nothing will be tracked
 
-      def track_browser_types
+      def browser_datum_per_visit
         user_agent.name.to_s
       end
 
-      def track_platform_types
+      def platform_datum_per_visit
         user_agent.platform.to_s
       end
 
-      def track_country_types
+      def country_datum_per_visit
         if defined?(GeoIP)
           begin
             g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
@@ -34,7 +34,7 @@ module Rack
         end
       end
 
-      def track_recency_count
+      def recency_count_per_visit
         # tracking for visitor recency
         if @last_visit_end_time
           days_since_last_visit = ((@t.to_i - @last_visit_end_time.to_i)/(24*3600)).round
@@ -42,11 +42,11 @@ module Rack
         end
       end
 
-      def track_device_types
+      def device_datum_per_visit
         return ((user_agent.mobile? or user_agent.tablet?) ? 'mobile' : 'desktop')
       end
 
-      def track_referrer_types
+      def referrer_datum_per_visit
         if @request.referrer
           ['google', 'bing', 'yahoo', 'cleartrip', 'github'].each do |referrer|
             # this will track x.google.mysite.com as google so its buggy, fix the regex
