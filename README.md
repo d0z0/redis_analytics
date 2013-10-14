@@ -80,7 +80,66 @@ Rack::RedisAnalytics.configure do |configuration|
 end
 ```
 
-## How do I use filters?
+## Why is the Geolocation tracking giving me wrong results?
+
+IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
+Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
+You will then need to point to the GeoIP.dat file in your configuration.
+
+```ruby
+Rack::RedisAnalytics.configure do |configuration|
+  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_namespace = 'mywebsite.org'
+  configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
+end
+```
+
+## Customizing & Extending
+
+### Tracking custom parameters
+
+You can define and track your own parameters by defining a function inside the `Parameters` module  
+
+All you need to is make sure the function name is of the following format
+
+`[abc]_[x]_per_[y]`
+
+where
+
+`abc` is the parameter name can be any alphanumeric (underscore allowed) characters  
+`x` can be any of `datum` or `count` and defines how this parameter will be tacked  
+`y` can be any of `hit` or `visit` and defines when this parameter will be tracked  
+
+You can access @request and @response in your methods  
+
+The return value of the function should be `Fixnum` for `count` and `String` for `datum`  
+
+If the return value is an `error` or `nil` the parameter won't be tracked
+
+```ruby
+module Rack::RedisAnalytics::Parameters
+
+  # for tracking a parameter named product_sale with values of different
+  # product_id for any hit on yoursite.com/checkout?sale=yes&product_id=XXX
+  def product_sale_datum_per_hit
+    if @request.path == '/checkout' && @request.params['sale'] == 'yes'
+      return @request.params['product_id']
+    end
+  end
+
+  # for tracking a parameter named product_sale with values of different
+  # product_id for any hit on yoursite.com/checkout?sale=yes&product_id=XXX
+  def product_sale_datum_per_hit
+    if @request.path == '/checkout' && @request.params['sale'] == 'yes'
+      return @request.params['product_id']
+    end
+  end
+
+
+end
+```
+
+### Using filters
 
 ```ruby
 Rack::RedisAnalytics.configure do |configuration|
@@ -101,21 +160,6 @@ Rack::RedisAnalytics.configure do |configuration|
     request.ip =~ /^172.16/ or request.ip =~ /^192.168/
   end
 
-end
-```
-
-
-## Why is the Geolocation tracking giving me wrong results?
-
-IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
-Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
-You will then need to point to the GeoIP.dat file in your configuration.
-
-```ruby
-Rack::RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
-  configuration.redis_namespace = 'mywebsite.org'
-  configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
 end
 ```
 
