@@ -53,9 +53,9 @@ module Rack
             return time.zip(RedisAnalytics.redis_connection.mget(*union).map(&:to_i))
           end
         else
-          if Parameters.public_instance_methods.include?("track_#{parameter_name}_types".to_sym)
+          if Parameters.public_instance_methods.any?{|m| m.to_s =~ /track_#{parameter_name}_datum/}
             aggregate ? {} : time.zip([{}] * time.length)
-          elsif Parameters.public_instance_methods.include?("track_#{parameter_name}_count".to_sym)
+          elsif Parameters.public_instance_methods.any{|m| m.to_s =~ /"track_#{parameter_name}_count/}
             aggregate ? 0 : time.zip([0] * time.length)
           end
         end

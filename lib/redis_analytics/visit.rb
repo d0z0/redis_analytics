@@ -55,17 +55,24 @@ module Rack
             track("first_visits", 1)
             track("unique_visits", @first_visit_seq)
           end
-          Parameters.public_instance_methods.grep(/^track_([a-z_]*)_(count|types)$/) do |meth|
+          exec_custom_methods('visit')
+        end
+        exec_custom_methods('hit')
+        track("page_views", 1)
+        track("second_page_views", 1) if @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
+      end
+
+      def exec_custom_methods(type)
+        Parameters.public_instance_methods.each do |meth|
+          if m = meth.to_s.match(/^([a-z_]*)_(count|datum)_per_#{type}$/)
             begin
               return_value = self.send(meth)
-              track(meth[6..-7], return_value) if return_value
+              track(m.to_a[1], return_value) if return_value
             rescue => e
-              warn "#{meth} resulted in an exception"
+              warn "#{meth} resulted in an exception #{e}"
             end
           end
         end
-        track("page_views", 1)
-        track("second_page_views", 1) if @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
       end
 
       # helpers
