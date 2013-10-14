@@ -3,7 +3,7 @@ module Rack
     module Parameters
 
       attr_reader :track_visit_time_count
-      attr_reader :track_visits_count, :track_new_visits_count, :track_returning_visits_count
+      attr_reader :track_visits_count, :track_first_visits_count, :track_repeat_visits_count
       attr_reader :track_unique_visits_types
       attr_reader :track_page_views_count, :track_second_page_views_count
 
@@ -13,11 +13,11 @@ module Rack
       # If you return nil or an error nothing will be tracked
 
       def track_browser_types
-        browser.name.to_s
+        user_agent.name.to_s
       end
 
       def track_platform_types
-        browser.platform.to_s
+        user_agent.platform.to_s
       end
 
       def track_country_types
@@ -43,7 +43,7 @@ module Rack
       end
 
       def track_device_types
-        return browser.mobile? ? 'M' : 'D'
+        return ((user_agent.mobile? or user_agent.tablet?) ? 'mobile' : 'desktop')
       end
 
       def track_referrer_types
@@ -64,7 +64,7 @@ module Rack
       end
 
       private
-      def browser
+      def user_agent
         Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
       end
 

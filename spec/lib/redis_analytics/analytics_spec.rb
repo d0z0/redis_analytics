@@ -14,7 +14,7 @@ describe Rack::RedisAnalytics::Analytics do
   end
 
   # Spec for Cookies
-  context "when a user makes 2 visits and the visit cookie and returning user cookie are not expired" do
+  context "when a user makes 2 visits and the current visit cookie and first visit cookie are not expired" do
     def cookie
       last_response.original_headers['Set-Cookie']
     end
@@ -32,7 +32,7 @@ describe Rack::RedisAnalytics::Analytics do
     end
   end
 
-  context "when a user makes 2 visits, but visit cookie and returning user cookie are both non-existent" do
+  context "when a user makes 2 visits, but current visit cookie and first visit cookie are both non-existent" do
     def cookie
       last_response.original_headers['Set-Cookie']
     end

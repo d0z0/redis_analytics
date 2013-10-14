@@ -10,7 +10,7 @@ function changeTimeFrame(range)
 	
 	// both time range graphs powered by time range data
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits,new_visits,returning_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits,first_visits,repeat_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
 	    dataType: "json",
 	    success: function(data) {
 		visits_area.setData(data);
@@ -20,32 +20,32 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=new_visits,returning_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 
 		// parse visits data from json
 		var visits_json_data = []
-		var new_visits = data[0].new_visits;
-		var returning_visits = data[1].returning_visits;
-		var total_visits = new_visits + returning_visits;
+		var first_visits = data[0].first_visits;
+		var repeat_visits = data[1].repeat_visits;
+		var total_visits = first_visits + repeat_visits;
 		var page_views = data[4].page_views;
 		var second_page_views = data[5].second_page_views;
 		var page_depth = Math.round(page_views/total_visits);
 		var bounce_rate = Math.round(((total_visits - second_page_views)/total_visits) * 100);
-		var percent_new_visits = Math.round((new_visits / total_visits) * 100);
+		var percent_first_visits = Math.round((first_visits / total_visits) * 100);
 		var total_visit_time = data[6].visit_time;
 		var avg_visit_time = Math.round((total_visit_time / total_visits));
 
-		visits_json_data.push({'label': 'new_visits', 'value': new_visits});
-		visits_json_data.push({'label': 'returning_visits', 'value': returning_visits});
+		visits_json_data.push({'label': 'first_visits', 'value': first_visits});
+		visits_json_data.push({'label': 'repeat_visits', 'value': repeat_visits});
 		browsers_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
 		$("#total_visits")[0].innerHTML = total_visits + ' <small class="muted">visits</small>';
 		$("#total_page_views")[0].innerHTML = page_views + ' <small class="muted">page views</small>';
 		$("#page_depth")[0].innerHTML = page_depth + ' <small class="muted">pages per visit</small>';		
 		$("#bounce_rate")[0].innerHTML = bounce_rate + '% <small class="muted">bounce rate</small>';
 		$("#visit_duration")[0].innerHTML = avg_visit_time + ' sec <small class="muted">avg time spent</small>';
-		$("#new_visits")[0].innerHTML = percent_new_visits + '% <small class="muted">new visits</small></h4>';
+		$("#first_visits")[0].innerHTML = percent_first_visits + '% <small class="muted">new visits</small></h4>';
 
 		// parse browser data from json
 		var browsers_json_data = [];

@@ -7,7 +7,7 @@ module Rack
       # Redis namespace for keys
       attr_writer :redis_namespace
 
-      # Name of the cookie which tracks returning visitors
+      # Name of the cookie which tracks first visitors
       attr_writer :first_visit_cookie_name
 
       # Name of the cookie which tracks current visits
@@ -39,7 +39,7 @@ module Rack
         @visit_timeout ||= 1 # minutes
       end
 
-      # Name of the cookie which tracks returning visitors (known visitors)
+      # Name of the cookie which tracks first visitors (unknown visitors)
       def first_visit_cookie_name
         @first_visit_cookie_name ||= '_rucn'
       end

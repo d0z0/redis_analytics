@@ -49,10 +49,10 @@ module Rack
           @current_visit_seq ||= counter("visits")
           track("visits", 1)
           if @first_visit_seq
-            track("returning_visits", 1)
+            track("repeat_visits", 1)
           else
             @first_visit_seq ||= counter("unique_visits")
-            track("new_visits", 1)
+            track("first_visits", 1)
             track("unique_visits", @first_visit_seq)
           end
           Parameters.public_instance_methods.grep(/^track_([a-z_]*)_(count|types)$/) do |meth|
