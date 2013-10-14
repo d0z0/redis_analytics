@@ -96,45 +96,47 @@ end
 
 ## Customizing & Extending
 
-### Tracking custom parameters
+### Tracking custom parameters (COMING SOON)
 
-You can define and track your own parameters by defining a function inside the `Parameters` module  
+You can define and track your own parameters by defining an instance method inside the `Parameters` module
 
-All you need to is make sure the function name is of the following format
+All you need to do, is make sure the method name conforms to the following format:
 
 `[abc]_[x]_per_[y]`
 
 where
 
-`abc` is the parameter name can be any alphanumeric (underscore allowed) characters  
-`x` can be any of `datum` or `count` and defines how this parameter will be tacked  
-`y` can be any of `hit` or `visit` and defines when this parameter will be tracked  
+`abc` is the parameter name and can be any alphanumeric (underscore allowed) characters  
+`x` can be any one of `datum` or `count` and defines how this parameter will be tracked  
+`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  
 
-You can access @request and @response in your methods  
+You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method
 
-The return value of the function should be `Fixnum` for `count` and `String` for `datum`  
+The return value of the method should be `Fixnum` for `count` and `String` for `datum`
 
 If the return value is an `error` or `nil` the parameter won't be tracked
 
 ```ruby
 module Rack::RedisAnalytics::Parameters
 
-  # for tracking a parameter named product_sale with values of different
-  # product_id for any hit on yoursite.com/checkout?sale=yes&product_id=XXX
-  def product_sale_datum_per_hit
-    if @request.path == '/checkout' && @request.params['sale'] == 'yes'
+  # whenever a product is sold, i want to track it per product_id
+  def product_sales_datum_per_hit
+    if @request.path == '/product/sale'
       return @request.params['product_id']
     end
   end
 
-  # for tracking a parameter named product_sale with values of different
-  # product_id for any hit on yoursite.com/checkout?sale=yes&product_id=XXX
-  def product_sale_datum_per_hit
-    if @request.path == '/checkout' && @request.params['sale'] == 'yes'
-      return @request.params['product_id']
+  # whenever a product is viewed by a user, i want to track it per product & user
+  def user_product_views_datum_per_hit
+    if @request.path == '/product/info'
+      return "#{@request.params['product_id']}_#{@request.params['user_id']}"
     end
   end
 
+  # track the first page the user hit to enter the site
+  def entry_page_datum_per_visit
+    return @request.path
+  end
 
 end
 ```
