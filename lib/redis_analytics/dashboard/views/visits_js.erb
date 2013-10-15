@@ -40,7 +40,7 @@ function changeTimeFrame(range)
 
 		visits_json_data.push({'label': 'first_visits', 'value': first_visits});
 		visits_json_data.push({'label': 'repeat_visits', 'value': repeat_visits});
-		//browsers_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
+		visits_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
 		$("#total_visits")[0].innerHTML = total_visits + ' <small class="muted">visits</small>';
 		$("#total_page_views")[0].innerHTML = page_views + ' <small class="muted">page views</small>';
 		$("#page_depth")[0].innerHTML = page_depth + ' <small class="muted">pages per visit</small>';		
