@@ -4,16 +4,34 @@
       <p class="text-center"><b>Visit Recency</b></p>
       <div style="height:160px;">
         <div style="margin:5px;">
-        <%p @data[@range][:visitor_recency_slices].inspect %>
-        <% @data[@range][:visitor_recency_slices].each_with_index do |((k, v), i), c| %>
-        <% p = ((i.to_f/@data[@range][:visitor_recency_slices].map{|x| x[1]}.sum) * 100).round rescue '0' %>
-        <div id="recency_<%=c%>_num" title="<%=i.to_i%> visits">
-          <small class="muted"><%=(k == 0 ? 'Less than' : "#{k}")%> <%=('-' unless k == 0 or v == '*')%> <%=(v == '*' ? ' or more' : "#{v}")%> days (<span id="recency_<%=c%>_cent"><%=p%></span>%)</small>
+        <div id="recency_d" title="0 visits">
+          <small class="muted">Less than 1 day (<span id="recency_d_cent">0</span>)</small>
           <div class="progress" style="height: 8px; margin-bottom:10px;">
-            <div id="recency_<%=c%>" class="bar" style="width: <%=p%>%;"></div>
+            <div id="recency_d_bar" class="bar" style="width: 0%;"></div>
           </div>
         </div>
-        <% end %>
+
+        <div id="recency_w" title="0 visits">
+          <small class="muted">1 to 7 days (<span id="recency_w_cent">0</span>)</small>
+          <div class="progress" style="height: 8px; margin-bottom:10px;">
+            <div id="recency_w_bar" class="bar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div id="recency_m" title="0 visits">
+          <small class="muted">7 to 30 days (<span id="recency_m_cent">0</span>)</small>
+          <div class="progress" style="height: 8px; margin-bottom:10px;">
+            <div id="recency_m_bar" class="bar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div id="recency_o" title="0 visits">
+          <small class="muted">More than 30 days (<span id="recency_o_cent">0</span>)</small>
+          <div class="progress" style="height: 8px; margin-bottom:10px;">
+            <div id="recency_o_bar" class="bar" style="width: 0%;"></div>
+          </div>
+        </div>
+
         </div>
       </div>
     </td>

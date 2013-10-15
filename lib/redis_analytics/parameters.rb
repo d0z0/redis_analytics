@@ -34,11 +34,19 @@ module Rack
         end
       end
 
-      def recency_count_per_visit
+      def recency_datum_per_visit
         # tracking for visitor recency
-        if @last_visit_end_time
-          days_since_last_visit = ((@t.to_i - @last_visit_end_time.to_i)/(24*3600)).round
-          return days_since_last_visit
+        if @last_visit_time # from first_visit_cookie
+          days_since_last_visit = ((@t.to_i - @last_visit_time.to_i)/(24*3600)).round
+          if days_since_last_visit <= 1
+            return 'd'
+          elsif days_since_last_visit <= 7
+            return 'w'
+          elsif days_since_last_visit <= 30
+            return 'm'
+          else
+            return 'o'
+          end
         end
       end
 

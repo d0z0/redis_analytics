@@ -20,7 +20,7 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time,recency&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 
@@ -36,10 +36,11 @@ function changeTimeFrame(range)
 		var percent_first_visits = Math.round((first_visits / total_visits) * 100);
 		var total_visit_time = data[6].visit_time;
 		var avg_visit_time = Math.round((total_visit_time / total_visits));
+		var total_recency = data[7].recency;
 
 		visits_json_data.push({'label': 'first_visits', 'value': first_visits});
 		visits_json_data.push({'label': 'repeat_visits', 'value': repeat_visits});
-		browsers_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
+		//browsers_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
 		$("#total_visits")[0].innerHTML = total_visits + ' <small class="muted">visits</small>';
 		$("#total_page_views")[0].innerHTML = page_views + ' <small class="muted">page views</small>';
 		$("#page_depth")[0].innerHTML = page_depth + ' <small class="muted">pages per visit</small>';		
@@ -69,6 +70,17 @@ function changeTimeFrame(range)
 		    referrers_json_data.push(referrer_data);
 		}
 		referrers_donut = Morris.Donut({element: 'referrers_donut', data: referrers_json_data});
+		var rec_day = !isNaN(total_recency['d']) ? total_recency['d'] : 0;
+		var rec_week = !isNaN(total_recency['w']) ? total_recency['w'] : 0;
+		var rec_month = !isNaN(total_recency['m']) ? total_recency['m'] : 0;
+		var rec_other = !isNaN(total_recency['o']) ? total_recency['o'] : 0;
+		var rec_total = rec_day + rec_week + rec_month + rec_other;
+
+		$("#recency_d_bar")[0].style.width = $("#recency_d_cent")[0].innerHTML = (rec_day/rec_total) * 100 + '%';
+		$("#recency_w_bar")[0].style.width = $("#recency_w_cent")[0].innerHTML = (rec_week/rec_total) * 100 + '%';
+		$("#recency_m_bar")[0].style.width = $("#recency_m_cent")[0].innerHTML = (rec_month/rec_total) * 100 + '%';
+		$("#recency_o_bar")[0].style.width = $("#recency_o_cent")[0].innerHTML = (rec_other/rec_total) * 100 + '%';
+
 	    }
 	});
 	
