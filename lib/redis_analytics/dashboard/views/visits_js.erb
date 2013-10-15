@@ -10,7 +10,7 @@ function changeTimeFrame(range)
 	
 	// both time range graphs powered by time range data
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=unique_visits,first_visits,repeat_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=unique_visits,first_visits,repeat_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
 	    dataType: "json",
 	    success: function(data) {
 		visits_area.setData(data);
@@ -20,7 +20,7 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?metrics=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 

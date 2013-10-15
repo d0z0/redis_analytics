@@ -13,12 +13,12 @@ module Rack
           unit = params[:unit] || 'day'
           aggregate = (params[:aggregate] == 'yes')
           units = (params[:unit_count] || 1).to_i
-          metrics = params[:metrics].split(',')
+          p = params[:p].split(',')
           from_date_time = to_date_time - units.send(unit)
           results = []
 
-          metrics.each_with_index do |metric, j|
-            result = self.send("#{unit}ly_#{metric}", from_date_time, :to_date => to_date_time, :aggregate => aggregate)
+          p.each_with_index do |q, j|
+            result = self.send("#{unit}ly_#{q}", from_date_time, :to_date => to_date_time, :aggregate => aggregate)
             if result.is_a?(Array) # time range data (non-aggregate)
               result.each_with_index do |r, i|
                 results[i] ||= {}
@@ -29,10 +29,10 @@ module Rack
                 date_time_value << time_value.join(':') if time_value
                 results[i]['raw'] = date_time_value.join(' ').strip
                 results[i]['unix'] = Time.mktime(*r[0].map(&:to_i)).to_i
-                results[i][metric] = r[1]
+                results[i][q] = r[1]
               end
             elsif result.is_a?(Hash) or result.is_a?(Fixnum) # aggregate data
-              results[j] = {metric => result}
+              results[j] = {q => result}
             end
           end
           content_type :json
