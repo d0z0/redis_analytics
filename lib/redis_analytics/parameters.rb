@@ -24,7 +24,7 @@ module Rack
         if defined?(GeoIP)
           begin
             g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
-            geo_country_code = g.country(@request.ip).to_hash[:country_code2]
+            geo_country_code = g.country(@rack_request.ip).to_hash[:country_code2]
             if geo_country_code and geo_country_code =~ /^[A-Z]{2}$/
               return geo_country_code
             end
@@ -55,10 +55,10 @@ module Rack
       end
 
       def referrer_ratio_per_visit
-        if @request.referrer
+        if @rack_request.referrer
           ['google', 'bing', 'yahoo', 'cleartrip', 'github'].each do |referrer|
             # this will track x.google.mysite.com as google so its buggy, fix the regex
-            if m = @request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
+            if m = @rack_request.referrer.match(/^(https?:\/\/)?([a-zA-Z0-9\.\-]+\.)?(#{referrer})\.([a-zA-Z\.]+)(:[0-9]+)?(\/.*)?$/)
               "REFERRER => #{m.to_a[3]}"
               referrer = m.to_a[3]
             else
@@ -73,7 +73,7 @@ module Rack
 
       private
       def user_agent
-        Browser.new(:ua => @request.user_agent, :accept_language => 'en-us')
+        Browser.new(:ua => @rack_request.user_agent, :accept_language => 'en-us')
       end
 
     end
