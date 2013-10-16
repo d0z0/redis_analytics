@@ -96,7 +96,7 @@ end
 
 ## Customizing & Extending
 
-### Tracking custom parameters (COMING SOON)
+### Tracking custom parameters
 
 You can define and track your own parameters by defining an instance method inside the `Parameters` module
 
@@ -106,14 +106,13 @@ All you need to do, is make sure the method name conforms to the following forma
 
 where
 
-`abc` is the parameter name and can be any alphanumeric (underscore allowed) characters  
-`x` can be any one of `ratio` or `count` and defines how this parameter will be stored (ratio or a simple counter)  
-`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)  
+* `abc` is a parameter name  
+* `x` can be any one of `ratio` or `count` and defines how to parameter is stored ([zset] or [string])
+* `y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)
 
+The return value of the method should be `Fixnum` for `count` and `String` for `ratio`
 You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method  
-
-The return value of the method should be `Fixnum` for `count` and `String` for `ratio`  
-
+You are free to define other methods that do not have the above format in the `Parameter` module as helper methods  
 If the return value is an `error` or `nil` the parameter won't be tracked
 
 ```ruby
