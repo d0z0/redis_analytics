@@ -35,7 +35,7 @@ module Rack
 
       def record
         v = Visit.new(@request, @response)
-        v.record
+        @response = v.record
         @response.set_cookie(RedisAnalytics.current_visit_cookie_name, v.updated_current_visit_info)
         @response.set_cookie(RedisAnalytics.first_visit_cookie_name, v.updated_first_visit_info)
       end

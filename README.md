@@ -106,14 +106,17 @@ All you need to do, is make sure the method name conforms to the following forma
 
 where
 
-* `abc` is a parameter name  
-* `x` can be any one of `ratio` or `count` and defines how to parameter is stored ([zset] or [string])
+* `abc` is a parameter name
+* `x` can be any one of `ratio` or `count` and defines how the parameter is stored (`zset` or `astring`)
 * `y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)
 
-The return value of the method should be `Fixnum` for `count` and `String` for `ratio`
-You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method  
+The return value of the method should be `Fixnum` for `count` and `String` for `ratio`  
+
+If the return value is an `error` or `nil` the parameter won't be tracked  
+
+You can access the `Rack::Request` object via `@rack_request` and the `Rack::Response` object via `@rack_response` in your method  
+
 You are free to define other methods that do not have the above format in the `Parameter` module as helper methods  
-If the return value is an `error` or `nil` the parameter won't be tracked
 
 ```ruby
 module Rack::RedisAnalytics::Parameters

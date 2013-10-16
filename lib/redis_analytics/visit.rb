@@ -16,12 +16,12 @@ module Rack
       end
 
       def first_visit_info
-        cookie = @request.cookies[RedisAnalytics.first_visit_cookie_name]
+        cookie = @rack_request.cookies[RedisAnalytics.first_visit_cookie_name]
         return cookie ? cookie.split('.') : []
       end
 
       def current_visit_info
-        cookie = @request.cookies[RedisAnalytics.current_visit_cookie_name]
+        cookie = @rack_request.cookies[RedisAnalytics.current_visit_cookie_name]
         return cookie ? cookie.split('.') : []
       end
 
@@ -29,8 +29,8 @@ module Rack
       def initialize(request, response)
         @t = Time.now
         @redis_key_prefix = "#{RedisAnalytics.redis_namespace}:"
-        @request = request
-        @response = response
+        @rack_request = request
+        @rack_response = response
         @first_visit_seq = first_visit_info[0] || current_visit_info[0]
         @current_visit_seq = current_visit_info[1]
 
@@ -60,6 +60,7 @@ module Rack
         exec_custom_methods('hit')
         track("page_views", 1)
         track("second_page_views", 1) if @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
+        @rack_response
       end
 
       def exec_custom_methods(type)
