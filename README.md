@@ -107,12 +107,12 @@ All you need to do, is make sure the method name conforms to the following forma
 where
 
 `abc` is the parameter name and can be any alphanumeric (underscore allowed) characters  
-`x` can be any one of `datum` or `count` and defines how this parameter will be tracked  
-`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  
+`x` can be any one of `ratio` or `count` and defines how this parameter will be stored (ratio or a simple counter)
+`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)
 
 You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method
 
-The return value of the method should be `Fixnum` for `count` and `String` for `datum`
+The return value of the method should be `Fixnum` for `count` and `String` for `ratio`
 
 If the return value is an `error` or `nil` the parameter won't be tracked
 
@@ -120,21 +120,21 @@ If the return value is an `error` or `nil` the parameter won't be tracked
 module Rack::RedisAnalytics::Parameters
 
   # whenever a product is sold, i want to track it per product_id
-  def product_sales_datum_per_hit
+  def product_sales_ratio_per_hit
     if @request.path == '/product/sale'
       return @request.params['product_id']
     end
   end
 
   # whenever a product is viewed by a user, i want to track it per product & user
-  def user_product_views_datum_per_hit
+  def user_product_views_ratio_per_hit
     if @request.path == '/product/info'
       return "#{@request.params['product_id']}_#{@request.params['user_id']}"
     end
   end
 
   # track the first page the user hit to enter the site
-  def entry_page_datum_per_visit
+  def entry_page_ratio_per_visit
     return @request.path
   end
   

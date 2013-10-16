@@ -4,7 +4,7 @@ module Rack
 
       attr_reader :visit_time_count_per_visit
       attr_reader :visits_count_per_visit, :first_visits_count_per_visit, :repeat_visits_count_per_visit
-      attr_reader :unique_visits_datum_per_visit
+      attr_reader :unique_visits_ratio_per_visit
       attr_reader :page_views_count_per_hit, :second_page_views_count_per_hit
 
       # Developers can override or define new public methods here
@@ -12,15 +12,15 @@ module Rack
       # Return types should be Fixnum or String resp.
       # If you return nil or an error nothing will be tracked
 
-      def browser_datum_per_visit
+      def browser_ratio_per_visit
         user_agent.name.to_s
       end
 
-      def platform_datum_per_visit
+      def platform_ratio_per_visit
         user_agent.platform.to_s
       end
 
-      def country_datum_per_visit
+      def country_ratio_per_visit
         if defined?(GeoIP)
           begin
             g = GeoIP.new(RedisAnalytics.geo_ip_data_path)
@@ -34,7 +34,7 @@ module Rack
         end
       end
 
-      def recency_datum_per_visit
+      def recency_ratio_per_visit
         # tracking for visitor recency
         if @last_visit_time # from first_visit_cookie
           days_since_last_visit = ((@t.to_i - @last_visit_time.to_i)/(24*3600)).round
@@ -50,11 +50,11 @@ module Rack
         end
       end
 
-      def device_datum_per_visit
+      def device_ratio_per_visit
         return ((user_agent.mobile? or user_agent.tablet?) ? 'mobile' : 'desktop')
       end
 
-      def referrer_datum_per_visit
+      def referrer_ratio_per_visit
         if @request.referrer
           ['google', 'bing', 'yahoo', 'cleartrip', 'github'].each do |referrer|
             # this will track x.google.mysite.com as google so its buggy, fix the regex

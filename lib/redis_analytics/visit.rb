@@ -64,7 +64,7 @@ module Rack
 
       def exec_custom_methods(type)
         Parameters.public_instance_methods.each do |meth|
-          if m = meth.to_s.match(/^([a-z_]*)_(count|datum)_per_#{type}$/)
+          if m = meth.to_s.match(/^([a-z_]*)_(count|ratio)_per_#{type}$/)
             begin
               return_value = self.send(meth)
               track(m.to_a[1], return_value) if return_value
