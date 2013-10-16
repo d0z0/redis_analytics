@@ -107,12 +107,12 @@ All you need to do, is make sure the method name conforms to the following forma
 where
 
 `abc` is the parameter name and can be any alphanumeric (underscore allowed) characters  
-`x` can be any one of `ratio` or `count` and defines how this parameter will be stored (ratio or a simple counter)
-`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)
+`x` can be any one of `ratio` or `count` and defines how this parameter will be stored (ratio or a simple counter)  
+`y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)  
 
-You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method
+You can access the `Rack::Request` object via `@request` and the `Rack::Response` object via `@response` in your method  
 
-The return value of the method should be `Fixnum` for `count` and `String` for `ratio`
+The return value of the method should be `Fixnum` for `count` and `String` for `ratio`  
 
 If the return value is an `error` or `nil` the parameter won't be tracked
 
