@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('json', '~> 1.8.0')
   spec.add_runtime_dependency('activesupport', '~> 3.2.0')
 
+  spec.add_development_dependency('fakeredis', '~> 0.4.3')
   spec.add_development_dependency('rake', '~> 10.0.3')
   spec.add_development_dependency('rspec', '~> 2.13.0')
   spec.add_development_dependency('guard-rspec', '~> 3.0.1')
