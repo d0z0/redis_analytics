@@ -38,5 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('simplecov', '~> 0.7.1')
   spec.add_development_dependency('coveralls', '~> 0.6.7')
 
-  spec.required_ruby_version = '~> 1.9.2'
+  spec.required_ruby_version = '>= 1.9.2'
 end
