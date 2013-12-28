@@ -27,8 +27,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('sinatra-assetpack', '~> 0.2.5')
   spec.add_runtime_dependency('geoip', '~> 1.2.1')
   spec.add_runtime_dependency('json', '~> 1.8.0')
-  spec.add_runtime_dependency('activesupport', '~> 3.2.0')
+  spec.add_runtime_dependency('activesupport', '~> 4.0.2')
 
+  spec.add_development_dependency('fakeredis', '~> 0.4.3')
   spec.add_development_dependency('rake', '~> 10.0.3')
   spec.add_development_dependency('rspec', '~> 2.13.0')
   spec.add_development_dependency('guard-rspec', '~> 3.0.1')
@@ -37,5 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('simplecov', '~> 0.7.1')
   spec.add_development_dependency('coveralls', '~> 0.6.7')
 
-  spec.required_ruby_version = '~> 1.9.2'
+  spec.required_ruby_version = '>= 1.9.2'
 end
