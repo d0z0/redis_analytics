@@ -6,6 +6,14 @@ module TimeExtensions
     end
   end
 
+  def end_of_hour
+    change(:min => 59, :sec => 59, :usec => 999999.999)
+  end
+
+  def beginning_of_hour(seconds = 60)
+    change(:min => 0, :sec => 0, :usec => 0)
+  end
+
   def end_of_minute
     change(:sec => 59, :usec => 999999.999)
   end
