@@ -6,8 +6,6 @@
       <li>
         <div class="btn-group" data-toggle="buttons-radio">
           <a href="visits" class="btn btn-small <%=' active' if request.path.end_with?('/visits') %>">Visits</a>
-          <a href="activity" class="btn btn-small <%=' active' if request.path.end_with?('/activity') %>">Activity</a>
-          <button type="button" class="btn btn-small" onclick='javascript:visits_area.grid=true'>Transactions</button>
         </div>
         <div class="btn-group" data-toggle="buttons-radio" id="timeRange">
         <% Rack::RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
