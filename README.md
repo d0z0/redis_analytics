@@ -176,11 +176,11 @@ end
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/wsd.png)
 
-## Copyright
-
-Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details. 
-
-## Attribution
+## License
 
 Since redis_analytics is licensed under MIT, you can use redis_analytics, provided you leave the attribution as is, in code as well as on the dashboard pages
+
+Copyright (c) 2012-2013 Schubert Cardozo. See [LICENSE!](LICENSE) for further details. 
+
+
 
