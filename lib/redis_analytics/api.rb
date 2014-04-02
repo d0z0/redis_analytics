@@ -28,8 +28,17 @@ module Rack
                 date_time_value = []
                 date_time_value << date_value.join('-')
                 date_time_value << time_value.join(':') if time_value
-                results[i]['raw'] = date_time_value.join(' ').strip
+                # results[i]['raw'] = date_time_value.join(' ').strip
                 results[i]['unix'] = Time.mktime(*r[0].map(&:to_i)).to_i
+                strf = case unit
+                       when 'day'
+                         '%a'
+                       when 'hour'
+                         '%a %H00hrs'
+                       when 'month'
+                         '%b'
+                       end
+                results[i]['raw'] = Time.at(results[i]['unix']).strftime(strf)
                 results[i][q] = r[1]
               end
             elsif result.is_a?(Hash) or result.is_a?(Fixnum) # aggregate data
