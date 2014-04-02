@@ -55,23 +55,19 @@ For rails the middleware is added automatically, so you do not need to add it ma
 
 Simply navigate to `/redis_analytics` in your rack app
 
+You can also run the standalone dashboard sinatra app like:
+
+`redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
+
 ### Where do I change the dashboard URL endpoint?
 
-#### Option 1: Set a dashboard endpoint in your configuration
+Set a dashboard endpoint in your configuration:
 
 ```ruby
 Rack::RedisAnalytics.configure do |configuration|
   configuration.dashboard_endpoint = '/dashboard'
 end
 ```
-
-and navigate to [http://localhost:3000/dashboard](http://localhost:3000/dashboard) assuming your rack-compliant app is hosted at [http://localhost:3000](http://localhost:3000)
-
-#### Option 2: Simply run the bundled Sinatra application binary
-
-`redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
-
-and navigate to [http://localhost:4567](http://localhost:4567)
 
 ### What if I have multiple rails apps that I want to track as one?
 
