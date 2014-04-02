@@ -1,9 +1,30 @@
+require  'date'
 module TimeExtensions
   %w[ round floor ceil ].each do |_method|
     define_method _method do |*args|
       seconds = args.first || 60
       Time.at((self.to_f / seconds).send(_method) * seconds)
     end
+  end
+
+  def end_of_month
+    Time.local(self.year, self.mon, 1, 23, 59, 59)
+  end
+
+  def beginning_of_month
+    Date.civil(self.year, self.mon, -1).to_time
+  end
+
+  def beginning_of_day
+    Time.local(self.year, self.mon, self.day, 0, 0, 0)
+  end
+
+  def end_of_day
+    Time.local(self.year, self.mon, self.day, 23, 59, 59)
+  end
+
+  def beginning_of_day
+    Time.local(self.year, self.mon, self.day, 0, 0, 0)
   end
 
   def end_of_hour
