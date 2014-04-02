@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%= css :application, :media => 'screen' %>
   <%= js  :app %>
-  <script src="http://code.highcharts.com/stock/highstock.js"></script>
-  <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 </head>
 <body onload="changeTimeFrame('<%=@range%>')">
   <%= erb(:header, :layout => false) %>
