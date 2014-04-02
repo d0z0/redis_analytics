@@ -3,7 +3,6 @@ require 'redis'
 require 'browser'
 require 'sinatra'
 require 'geoip'
-require 'active_support/core_ext'
 
 require 'redis_analytics'
 require 'redis_analytics/version'

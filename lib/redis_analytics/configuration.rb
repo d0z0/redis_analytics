@@ -17,10 +17,10 @@ module Rack
       attr_writer :visit_timeout
 
       # Endpoint for dashboard
-      attr_accessor :dashboard_endpoint
+      attr_writer :dashboard_endpoint
 
       # Endpoint for api
-      attr_accessor :api_endpoint
+      attr_writer :api_endpoint
 
       attr_writer :path_filters
 
@@ -87,6 +87,14 @@ module Rack
 
       def configure
         yield self
+      end
+
+      def api_endpoint
+        @api_endpoint || dashboard_endpoint + '/api'
+      end
+
+      def dashboard_endpoint
+        @dashboard_endpoint || '/redis_analytics'
       end
 
     end

@@ -51,7 +51,11 @@ use Rack::RedisAnalytics::Tracker
 
 For rails the middleware is added automatically, so you do not need to add it manually using `config.middleware.use`
 
-### Where do I view the dashboard?
+### Where can I see the dashboard?
+
+Simply navigate to `/redis_analytics` in your rack app
+
+### Where do I change the dashboard URL endpoint?
 
 #### Option 1: Set a dashboard endpoint in your configuration
 
