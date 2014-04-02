@@ -11,7 +11,7 @@ It gives you detailed analytics about visitors, unique visitors, browsers, OS, v
 
 ### Does it have a cool dashboard?
 
-Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for the main dashboard and [Highcharts](http://www.highcharts.com) for drawing the various detailed graphs
+Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for graphs/charts
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
 
@@ -178,4 +178,9 @@ end
 
 ## Copyright
 
-Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details.
+Copyright (c) 2012-2013 Schubert Cardozo. See LICENSE for further details. 
+
+## Attribution
+
+Since redis_analytics is licensed under MIT, you can use redis_analytics, provided you leave the attribution as is, in code as well as on the dashboard pages
+
