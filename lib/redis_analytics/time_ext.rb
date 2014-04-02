@@ -7,19 +7,19 @@ module TimeExtensions
   end
 
   def end_of_hour
-    change(:min => 59, :sec => 59, :usec => 999999.999)
+    Time.local(self.year, self.mon, self.day, self.hour, 59, 59)
   end
 
-  def beginning_of_hour(seconds = 60)
-    change(:min => 0, :sec => 0, :usec => 0)
+  def beginning_of_hour
+    Time.local(self.year, self.mon, self.day, self.hour, 0, 0)
   end
 
   def end_of_minute
-    change(:sec => 59, :usec => 999999.999)
+    Time.local(self.year, self.mon, self.day, self.hour, self.min, 59)
   end
 
   def beginning_of_minute
-    change(:sec => 0, :usec => 0)
+    Time.local(self.year, self.mon, self.day, self.hour, self.min, 0)
   end
 end
 
