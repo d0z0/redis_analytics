@@ -78,16 +78,18 @@ function changeTimeFrame(range)
 		var rec_other = !isNaN(total_recency['o']) ? total_recency['o'] : 0;
 		var rec_total = rec_day + rec_week + rec_month + rec_other;
 
+		if(rec_total > 0)
+		{
 		$("#recency_d_bar")[0].style.width = $("#recency_d_cent")[0].innerHTML = (rec_day/rec_total) * 100 + '%';
 		$("#recency_w_bar")[0].style.width = $("#recency_w_cent")[0].innerHTML = (rec_week/rec_total) * 100 + '%';
 		$("#recency_m_bar")[0].style.width = $("#recency_m_cent")[0].innerHTML = (rec_month/rec_total) * 100 + '%';
 		$("#recency_o_bar")[0].style.width = $("#recency_o_cent")[0].innerHTML = (rec_other/rec_total) * 100 + '%';
-
+		
 		$("#recency_d")[0].title = rec_day + ' visits';
 		$("#recency_w")[0].title = rec_week + ' visits';
 		$("#recency_m")[0].title = rec_month + ' visits';
 		$("#recency_o")[0].title = rec_other + ' visits';
-
+		}
 
 	    }
 	});
