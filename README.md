@@ -96,9 +96,9 @@ end
 
 ## Customizing & Extending
 
-### Tracking custom parameters
+### Tracking custom metrics
 
-You can define and track your own parameters by defining an instance method inside the `Parameters` module
+You can define and track your own metrics by defining an instance method inside the `Metrics` module
 
 All you need to do, is make sure the method name conforms to the following format:
 
@@ -106,20 +106,20 @@ All you need to do, is make sure the method name conforms to the following forma
 
 where
 
-* `abc` is a parameter name
-* `x` can be any one of `ratio` or `count` and defines how the parameter is stored (`zset` or `astring`)
-* `y` can be any one of `hit` or `visit` and defines when this parameter will be tracked  (once per hit or once per visit)
+* `abc` is a metric name
+* `x` can be any one of `ratio` or `count` and defines how the metric is stored (`zset` or `string` respectively)
+* `y` can be any one of `hit` or `visit` and defines how will be tracked  (once per hit or once per visit)
 
 The return value of the method should be `Fixnum` for `count` and `String` for `ratio`  
 
-If the return value is an `error` or `nil` the parameter won't be tracked  
+If the return value is an `error` or `nil` the metric won't be tracked  
 
 You can access the `Rack::Request` object via `@rack_request` and the `Rack::Response` object via `@rack_response` in your method  
 
-You are free to define other methods that do not have the above format in the `Parameter` module as helper methods  
+You are free to define other methods that do not have the above format in the `Metrics` module as helper methods  
 
 ```ruby
-module Rack::RedisAnalytics::Parameters
+module Rack::RedisAnalytics::Metrics
 
   # whenever a product is sold, i want to track it per product_id
   def product_sales_ratio_per_hit

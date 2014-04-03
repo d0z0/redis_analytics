@@ -1,7 +1,7 @@
 module Rack
   module RedisAnalytics
     class Visit
-      include Parameters
+      include Metrics
 
       # This class represents one unique visit
       # User may have never visited the site
@@ -48,7 +48,7 @@ module Rack
           track("visit_time", @t.to_i - @last_visit_end_time.to_i)
         else
           @current_visit_seq ||= counter("visits")
-          track("visits", 1) # track core 'visit' parameter
+          track("visits", 1) # track core 'visit' metric
           if @first_visit_seq
             track("repeat_visits", 1)
           else
@@ -59,13 +59,13 @@ module Rack
           exec_custom_methods('visit') # custom methods that are measured on a per-visit basis
         end
         exec_custom_methods('hit') # custom methods that are measured on a per-page-view (per-hit) basis
-        track("page_views", 1) # track core 'page_view' parameter
+        track("page_views", 1) # track core 'page_view' metric
         track("second_page_views", 1) if @page_view_seq_no.to_i == 1 # @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
         @rack_response
       end
 
       def exec_custom_methods(type)
-        Parameters.public_instance_methods.each do |meth|
+        Metrics.public_instance_methods.each do |meth|
           if m = meth.to_s.match(/^([a-z_]*)_(count|ratio)_per_#{type}$/)
             begin
               return_value = self.send(meth)
@@ -78,10 +78,10 @@ module Rack
       end
 
       # helpers
-      def counter(parameter_name)
-        n = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}#{parameter_name}")
+      def counter(metric_name)
+        n = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}#{metric_name}")
         # to debug, uncomment this line
-        # puts "COUNT #{parameter_name} -> #{n}"
+        # puts "COUNT #{metric_name} -> #{n}"
         return n
       end
 
@@ -101,19 +101,19 @@ module Rack
         {:value => value.join('.'), :expires => expires}
       end
 
-      def track(parameter_name, parameter_value)
+      def track(metric_name, metric_value)
         n = 0
-        RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#PARAMETERS", parameter_name, parameter_value.class)
+        RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#METRICS", metric_name, metric_value.class)
         for_each_time_range(@t) do |ts|
-          key = "#{@redis_key_prefix}#{parameter_name}:#{ts}"
-          if parameter_value.is_a?(Fixnum)
-            n = RedisAnalytics.redis_connection.incrby(key, parameter_value)
+          key = "#{@redis_key_prefix}#{metric_name}:#{ts}"
+          if metric_value.is_a?(Fixnum)
+            n = RedisAnalytics.redis_connection.incrby(key, metric_value)
           else
-            n = RedisAnalytics.redis_connection.zincrby(key, 1, parameter_value)
+            n = RedisAnalytics.redis_connection.zincrby(key, 1, metric_value)
           end
         end
         # to debug, uncomment this line
-        # puts "TRACK #{parameter_name} -> #{n}" 
+        # puts "TRACK #{metric_name} -> #{n}" 
         return n
       end
 

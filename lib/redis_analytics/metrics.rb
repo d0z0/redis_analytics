@@ -1,6 +1,6 @@
 module Rack
   module RedisAnalytics
-    module Parameters
+    module Metrics
 
       attr_reader :visit_time_count_per_visit
       attr_reader :visits_count_per_visit, :first_visits_count_per_visit, :repeat_visits_count_per_visit
