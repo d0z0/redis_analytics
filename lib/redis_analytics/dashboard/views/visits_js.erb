@@ -31,11 +31,11 @@ function changeTimeFrame(range)
 		var total_visits = first_visits + repeat_visits;
 		var page_views = data[4].page_views;
 		var second_page_views = data[5].second_page_views;
-		var page_depth = Math.round(page_views/total_visits);
-		var bounce_rate = Math.round(((total_visits - second_page_views)/total_visits) * 100);
-		var percent_first_visits = Math.round((first_visits / total_visits) * 100);
+		var page_depth = (page_views/total_visits).toFixed(2);
+		var bounce_rate = (((total_visits - second_page_views)/total_visits) * 100).toFixed(2);
+		var percent_first_visits = ((first_visits / total_visits) * 100).toFixed(2);
 		var total_visit_time = data[6].visit_time;
-		var avg_visit_time = Math.round((total_visit_time / total_visits));
+		var avg_visit_time = ((total_visit_time / total_visits)).toFixed(2);
 		var total_recency = data[7].recency;
 
 		visits_json_data.push({'label': 'first_visits', 'value': first_visits});
