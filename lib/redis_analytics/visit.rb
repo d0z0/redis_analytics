@@ -37,8 +37,9 @@ module Rack
         @first_visit_time = first_visit_info[1]
         @last_visit_time = first_visit_info[2]
 
-        @last_visit_start_time = current_visit_info[2]
-        @last_visit_end_time = current_visit_info[3]
+        @page_view_seq_no = current_visit_info[2] || 0
+        @last_visit_start_time = current_visit_info[3]
+        @last_visit_end_time = current_visit_info[4]
       end
 
       # called from analytics.rb
@@ -47,7 +48,7 @@ module Rack
           track("visit_time", @t.to_i - @last_visit_end_time.to_i)
         else
           @current_visit_seq ||= counter("visits")
-          track("visits", 1)
+          track("visits", 1) # track core 'visit' parameter
           if @first_visit_seq
             track("repeat_visits", 1)
           else
@@ -55,11 +56,11 @@ module Rack
             track("first_visits", 1)
             track("unique_visits", @first_visit_seq)
           end
-          exec_custom_methods('visit')
+          exec_custom_methods('visit') # custom methods that are measured on a per-visit basis
         end
-        exec_custom_methods('hit')
-        track("page_views", 1)
-        track("second_page_views", 1) if @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
+        exec_custom_methods('hit') # custom methods that are measured on a per-page-view (per-hit) basis
+        track("page_views", 1) # track core 'page_view' parameter
+        track("second_page_views", 1) if @page_view_seq_no.to_i == 1 # @last_visit_start_time and (@last_visit_start_time.to_i == @last_visit_end_time.to_i)
         @rack_response
       end
 
@@ -78,31 +79,42 @@ module Rack
 
       # helpers
       def counter(parameter_name)
-        RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}#{parameter_name}")
+        n = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}#{parameter_name}")
+        # to debug, uncomment this line
+        # puts "COUNT #{parameter_name} -> #{n}"
+        return n
       end
 
       def updated_current_visit_info
-        value = [@first_visit_seq, @current_visit_seq, (@last_visit_start_time || @t).to_i, @t.to_i]
+        value = [@first_visit_seq.to_i, @current_visit_seq.to_i, @page_view_seq_no.to_i + 1, (@last_visit_start_time || @t).to_i, @t.to_i]
+        # to debug, uncomment this line
+        # puts "UPDATING VCN COOKIE -> #{value}"
         expires = @t + (RedisAnalytics.visit_timeout.to_i * 60)
         {:value => value.join('.'), :expires => expires}
       end
 
       def updated_first_visit_info
-        value = [@first_visit_seq, (@first_visit_time || @t).to_i, @t.to_i]
+        value = [@first_visit_seq.to_i, (@first_visit_time || @t).to_i, @t.to_i]
+        # to debug, uncomment this line
+        # puts "UPDATING RUCN COOKIE -> #{value}"
         expires = @t + (60 * 60 * 24 * 5) # 5 hours
         {:value => value.join('.'), :expires => expires}
       end
 
       def track(parameter_name, parameter_value)
+        n = 0
         RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#PARAMETERS", parameter_name, parameter_value.class)
         for_each_time_range(@t) do |ts|
           key = "#{@redis_key_prefix}#{parameter_name}:#{ts}"
           if parameter_value.is_a?(Fixnum)
-            RedisAnalytics.redis_connection.incrby(key, parameter_value)
+            n = RedisAnalytics.redis_connection.incrby(key, parameter_value)
           else
-            RedisAnalytics.redis_connection.zincrby(key, 1, parameter_value)
+            n = RedisAnalytics.redis_connection.zincrby(key, 1, parameter_value)
           end
         end
+        # to debug, uncomment this line
+        # puts "TRACK #{parameter_name} -> #{n}" 
+        return n
       end
 
     end
