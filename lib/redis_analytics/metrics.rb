@@ -71,6 +71,21 @@ module Rack
         return referrer
       end
 
+      # track the ratio of URL's visits
+      def url_ratio_per_hit
+        return @rack_request.path
+      end
+      
+      # track the landing pages ratio
+      def landing_page_ratio_per_hit
+        return @rack_request.path if @page_view_seq_no.to_i == 0
+      end
+
+      # track the landing pages ratio
+      def http_response_ratio_per_hit
+        return @rack_response.status.to_s
+      end
+
       private
       def user_agent
         Browser.new(:ua => @rack_request.user_agent, :accept_language => 'en-us')

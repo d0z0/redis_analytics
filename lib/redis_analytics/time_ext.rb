@@ -7,6 +7,14 @@ module TimeExtensions
     end
   end
 
+  def end_of_year
+    Time.local(self.year, 12, 31, 23, 59, 59)
+  end
+
+  def beginning_of_year
+    Time.local(self.year, 1, 1, 0, 0, 0)
+  end
+
   def end_of_month
     Time.local(self.year, self.mon + 1, 1, 23, 59, 59) - 1.day
   end

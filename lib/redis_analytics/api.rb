@@ -31,12 +31,16 @@ module Rack
                 # results[i]['raw'] = date_time_value.join(' ').strip
                 results[i]['unix'] = Time.mktime(*r[0].map(&:to_i)).to_i
                 strf = case unit
-                       when 'day'
-                         '%a'
+                       when 'minute'
+                         '%H%Mhrs'
                        when 'hour'
                          '%a %H00hrs'
+                       when 'day'
+                         '%a'
                        when 'month'
                          '%b'
+                       when 'year'
+                         '%Y'
                        end
                 results[i]['raw'] = Time.at(results[i]['unix']).strftime(strf)
                 results[i][q] = r[1]

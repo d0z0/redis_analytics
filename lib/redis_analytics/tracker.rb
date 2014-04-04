@@ -4,15 +4,18 @@ module Rack
 
       def initialize(app)
         @app = Rack::Builder.new do
-          map '/' do
-            run Analytics.new(app)
-          end
 
           if defined?(Dashboard) and RedisAnalytics.dashboard_endpoint
+            puts("WARNING: RedisAnalytics.dashboard_endpoint is set as \"/\"") if RedisAnalytics.dashboard_endpoint == '/'
             map RedisAnalytics.dashboard_endpoint do
               run Dashboard.new
             end
           end
+
+          map '/' do
+            run Analytics.new(app)
+          end
+
           if defined?(Api) and RedisAnalytics.api_endpoint
             map RedisAnalytics.api_endpoint do
               run Api.new
