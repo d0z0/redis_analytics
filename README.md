@@ -134,11 +134,6 @@ module Rack::RedisAnalytics::Metrics
     end
   end
 
-  # track the first page the user hit to enter the site
-  def entry_page_ratio_per_visit
-    return @request.path
-  end
-  
   # how many times did a visitor reach the payment step
   def payment_step_count_per_hit
     return 1 if @request.path == '/payment'
