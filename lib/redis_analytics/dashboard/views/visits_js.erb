@@ -4,13 +4,13 @@ function changeTimeFrame(range)
     var mapObject = $('#world-map').vectorMap('get', 'mapObject');
     switch(range)
     {
-    <% Rack::RedisAnalytics.time_range_formats.each do |range, unit, time_format| %>
+    <% RedisAnalytics.time_range_formats.each do |range, unit, time_format| %>
     case '<%=range%>':
 	setSessionCookie("_rarng", "<%=range%>");
 	
 	// both time range graphs powered by time range data
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=unique_visits,first_visits,repeat_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
+	    url: '<%=RedisAnalytics.api_endpoint + "/data?p=unique_visits,first_visits,repeat_visits&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}"%>',
 	    dataType: "json",
 	    success: function(data) {
 		visits_area.setData(data);
@@ -20,7 +20,7 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%=Rack::RedisAnalytics.api_endpoint + "/data?p=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time,recency&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%=RedisAnalytics.api_endpoint + "/data?p=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time,recency&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 

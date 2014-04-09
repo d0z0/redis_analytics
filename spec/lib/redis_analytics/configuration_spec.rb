@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Rack::RedisAnalytics::Configuration do
+describe RedisAnalytics::Configuration do
 
   context 'property redis_connection' do
-    subject(:connection) { Rack::RedisAnalytics.redis_connection }
+    subject(:connection) { RedisAnalytics.redis_connection }
     it 'should not be nil' do
       connection.should_not be_nil
     end
@@ -13,7 +13,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property redis_namespace' do
-    subject(:namespace) { Rack::RedisAnalytics.redis_namespace }
+    subject(:namespace) { RedisAnalytics.redis_namespace }
     it 'should not be nil' do
       namespace.should_not be_nil
     end
@@ -27,7 +27,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property first_visit_cookie_name' do 
-    subject(:return_cookie) { Rack::RedisAnalytics.first_visit_cookie_name }
+    subject(:return_cookie) { RedisAnalytics.first_visit_cookie_name }
     it 'should not be nil' do
       return_cookie.should_not be_nil
     end
@@ -41,7 +41,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property current_visit_cookie_name' do 
-    subject(:current_visit_cookie_name) { Rack::RedisAnalytics.current_visit_cookie_name }
+    subject(:current_visit_cookie_name) { RedisAnalytics.current_visit_cookie_name }
     it 'should not be nil' do 
       current_visit_cookie_name.should_not be_nil
     end
@@ -55,7 +55,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property visit_timeout' do
-    subject(:visit_timeout) { Rack::RedisAnalytics.visit_timeout }
+    subject(:visit_timeout) { RedisAnalytics.visit_timeout }
     it 'should not be nil' do 
       visit_timeout.should_not be_nil
     end
@@ -69,7 +69,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property visitor_recency_slices' do
-    subject(:visitor_recency_slices) { Rack::RedisAnalytics.visitor_recency_slices }
+    subject(:visitor_recency_slices) { RedisAnalytics.visitor_recency_slices }
     it 'should not be nil' do
       visitor_recency_slices.should_not be_nil
     end
@@ -86,7 +86,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property default_range' do 
-    subject(:default_range) { Rack::RedisAnalytics.default_range }
+    subject(:default_range) { RedisAnalytics.default_range }
     it 'should not be nil' do
       default_range.should_not be_nil
     end
@@ -103,7 +103,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property redis_key_timestamps' do
-    subject(:redis_key_timestamps) { Rack::RedisAnalytics.redis_key_timestamps }
+    subject(:redis_key_timestamps) { RedisAnalytics.redis_key_timestamps }
     it 'should not be nil' do
       redis_key_timestamps.should_not be_nil
     end
@@ -117,7 +117,7 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'property time_range_formats' do
-    subject(:time_range_formats) { Rack::RedisAnalytics.time_range_formats }
+    subject(:time_range_formats) { RedisAnalytics.time_range_formats }
     it 'should not be nil' do
       time_range_formats.should_not be_nil
     end
@@ -134,24 +134,24 @@ describe Rack::RedisAnalytics::Configuration do
   end
 
   context 'method add_filter' do
-    subject(:filters) { Rack::RedisAnalytics.filters }
+    subject(:filters) { RedisAnalytics.filters }
     it 'should add a new filter' do
       proc = Proc.new {}
-      Rack::RedisAnalytics.configure do |c|
+      RedisAnalytics.configure do |c|
         c.add_filter(&proc)
       end
-      filters[0].should be_an_instance_of Rack::RedisAnalytics::Filter
+      filters[0].should be_an_instance_of RedisAnalytics::Filter
     end
   end
 
   context 'method add_path_filter' do
-    subject(:path_filters) { Rack::RedisAnalytics.path_filters }
+    subject(:path_filters) { RedisAnalytics.path_filters }
     it 'should add a new path filter' do
       path = '/hello'
-      Rack::RedisAnalytics.configure do |c|
+      RedisAnalytics.configure do |c|
         c.add_path_filter(path)
       end
-      path_filters[0].should be_an_instance_of Rack::RedisAnalytics::PathFilter
+      path_filters[0].should be_an_instance_of RedisAnalytics::PathFilter
     end
   end
 

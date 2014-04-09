@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Rack::RedisAnalytics::Tracker do
+describe RedisAnalytics::Tracker do
 
   subject(:app) {
     Rack::Builder.app do
-      use Rack::RedisAnalytics::Tracker
+      use RedisAnalytics::Tracker
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, "Hello!"] }
     end
   }

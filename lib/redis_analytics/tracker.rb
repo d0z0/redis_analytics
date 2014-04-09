@@ -1,16 +1,15 @@
-module Rack
   module RedisAnalytics
     class Tracker
 
       def initialize(app)
         @app = Rack::Builder.new do
 
-          if defined?(Dashboard) and RedisAnalytics.dashboard_endpoint
-            puts("WARNING: RedisAnalytics.dashboard_endpoint is set as \"/\"") if RedisAnalytics.dashboard_endpoint == '/'
-            map RedisAnalytics.dashboard_endpoint do
-              run Dashboard.new
-            end
-          end
+          # if defined?(Dashboard) and RedisAnalytics.dashboard_endpoint
+          #   puts("WARNING: RedisAnalytics.dashboard_endpoint is set as \"/\"") if RedisAnalytics.dashboard_endpoint == '/'
+          #   map RedisAnalytics.dashboard_endpoint do
+          #     run Dashboard.new
+          #   end
+          # end
 
           map '/' do
             run Analytics.new(app)
@@ -31,4 +30,4 @@ module Rack
 
     end
   end
-end
+

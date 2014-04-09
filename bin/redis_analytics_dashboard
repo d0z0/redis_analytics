@@ -6,12 +6,12 @@ $:.unshift(path) if File.directory?(path) && !$:.include?(path)
 require 'redis_analytics'
 args = Hash[*ARGV] rescue {}
 if args.key?('--redis-host') and args.key?('--redis-port')
-  Rack::RedisAnalytics.configure do |c|
+  RedisAnalytics.configure do |c|
     c.redis_connection = Redis.new(:host => args['--redis-host'], :port => args['--redis-port'], :db => args['--redis-db'])
     c.redis_namespace = args['--redis-namespace'] if args['--redis-namespace']
   end
-  Rack::RedisAnalytics::Dashboard.set(:port, args['-p']) if args['-p']
-  Rack::RedisAnalytics::Dashboard.run!
+  RedisAnalytics::Dashboard.set(:port, args['-p']) if args['-p']
+  RedisAnalytics::Dashboard.run!
 else
   puts "Usage: redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-db 0 --redis-namespace test_namespace"
 end

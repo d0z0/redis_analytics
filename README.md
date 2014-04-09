@@ -36,7 +36,7 @@ check out the [Redis documentation](http://redis.io/documentation).
 require 'redis_analytics'
 
 # configure your redis connection (this is mandatory) and namespace (this is optional)
-Rack::RedisAnalytics.configure do |configuration|
+RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'ra'
 end
@@ -45,7 +45,7 @@ end
 
 ```ruby
 # in Sinatra you would do...
-use Rack::RedisAnalytics::Tracker
+use RedisAnalytics::Tracker
 ```
 
 For rails the middleware is added automatically, so you do not need to add it manually using `config.middleware.use`
@@ -63,7 +63,7 @@ You can also run the standalone dashboard sinatra app like:
 Set a dashboard endpoint in your configuration:
 
 ```ruby
-Rack::RedisAnalytics.configure do |configuration|
+RedisAnalytics.configure do |configuration|
   configuration.dashboard_endpoint = '/dashboard'
 end
 ```
@@ -73,7 +73,7 @@ end
 In the configuration, keep the value of redis_namespace the same across all your rails apps
 
 ```ruby
-Rack::RedisAnalytics.configure do |configuration|
+RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'mywebsite.org'
 end
@@ -86,7 +86,7 @@ Also it is recommended to regularly get an updated binary of 'GeoLite Country' d
 You will then need to point to the GeoIP.dat file in your configuration.
 
 ```ruby
-Rack::RedisAnalytics.configure do |configuration|
+RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'mywebsite.org'
   configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
@@ -118,7 +118,7 @@ You can access the `Rack::Request` object via `@rack_request` and the `Rack::Res
 You are free to define other methods that do not have the above format in the `Metrics` module as helper methods  
 
 ```ruby
-module Rack::RedisAnalytics::Metrics
+module RedisAnalytics::Metrics
 
   # whenever a product is sold, i want to track it per product_id
   def product_sales_ratio_per_hit
@@ -145,7 +145,7 @@ end
 ### Using filters
 
 ```ruby
-Rack::RedisAnalytics.configure do |configuration|
+RedisAnalytics.configure do |configuration|
 
   # simple string path filter
   configuration.add_path_filter('/robots.txt')

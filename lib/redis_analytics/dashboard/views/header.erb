@@ -8,7 +8,7 @@
           <a href="visits" class="btn btn-small <%=' active' if request.path.end_with?('/visits') %>">Visits</a>
         </div>
         <div class="btn-group" data-toggle="buttons-radio" id="timeRange">
-        <% Rack::RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
+        <% RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
 	  <button type="button" class="btn btn-small <%="active" if @range == range%>" onclick='changeTimeFrame("<%=range.to_s%>")'><%=range.to_s%></button>
         <% end %>
         </div>

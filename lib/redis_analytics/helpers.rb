@@ -1,4 +1,3 @@
-module Rack
   module RedisAnalytics
     module Helpers
 
@@ -72,4 +71,4 @@ module Rack
       end
     end
   end
-end
+

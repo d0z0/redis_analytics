@@ -23,14 +23,14 @@ RSpec.configure do |config|
   config.color_enabled = true
 
   config.before(:all) do
-    Rack::RedisAnalytics.configure do |configuration|
+    RedisAnalytics.configure do |configuration|
       configuration.redis_connection = Redis.new(:db => 15, :host => '127.0.0.1')
       configuration.redis_namespace = '_ra_test_namespace'
     end
   end
 
   config.before(:each) do
-    Rack::RedisAnalytics.redis_connection.flushdb
+    RedisAnalytics.redis_connection.flushdb
   end
 
   # Run specs in random order to surface order dependencies. If you find an

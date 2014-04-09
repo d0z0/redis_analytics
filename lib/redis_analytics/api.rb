@@ -1,11 +1,9 @@
-require 'sinatra/base'
 require 'json'
 
-module Rack
   module RedisAnalytics
 
     class Api < Sinatra::Base
-      helpers Rack::RedisAnalytics::Helpers
+      helpers RedisAnalytics::Helpers
 
       get '/data/?' do
 
@@ -57,4 +55,4 @@ module Rack
       end
     end
   end
-end
+

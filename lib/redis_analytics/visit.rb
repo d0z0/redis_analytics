@@ -1,4 +1,3 @@
-module Rack
   module RedisAnalytics
     class Visit
       include Metrics
@@ -119,4 +118,4 @@ module Rack
 
     end
   end
-end
+

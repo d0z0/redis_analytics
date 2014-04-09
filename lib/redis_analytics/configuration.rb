@@ -1,4 +1,3 @@
-module Rack
   module RedisAnalytics
     module Configuration
       # Redis connection instance
@@ -99,4 +98,4 @@ module Rack
 
     end
   end
-end
+

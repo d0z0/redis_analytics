@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Rack::RedisAnalytics::Analytics do
+describe RedisAnalytics::Analytics do
 
   subject(:app) {
     Rack::Builder.app do
-      use Rack::RedisAnalytics::Analytics
+      use RedisAnalytics::Analytics
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, "Hello!"] }
     end
   }
@@ -22,13 +22,13 @@ describe Rack::RedisAnalytics::Analytics do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.1.#{t1.to_i}.#{t1.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{RedisAnalytics.current_visit_cookie_name}=1.1.1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
       t2 = t1 + 5 # just adding 5 seconds
       Time.stubs(:now).returns(t2)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.2.#{t1.to_i}.#{t2.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t2.to_i}")
+      cookie.should match("#{RedisAnalytics.current_visit_cookie_name}=1.1.2.#{t1.to_i}.#{t2.to_i}")
+      cookie.should match("#{RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t2.to_i}")
     end
   end
 
@@ -40,15 +40,15 @@ describe Rack::RedisAnalytics::Analytics do
       t1 = Time.now
       Time.stubs(:now).returns(t1)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=1.1.1.#{t1.to_i}.#{t1.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{RedisAnalytics.current_visit_cookie_name}=1.1.1.#{t1.to_i}.#{t1.to_i}")
+      cookie.should match("#{RedisAnalytics.first_visit_cookie_name}=1.#{t1.to_i}.#{t1.to_i}")
       clear_cookies
 
       t2 = t1 + 5 # just adding 5 seconds
       Time.stubs(:now).returns(t2)
       get '/'
-      cookie.should match("#{Rack::RedisAnalytics.current_visit_cookie_name}=2.2.1.#{t2.to_i}.#{t2.to_i}")
-      cookie.should match("#{Rack::RedisAnalytics.first_visit_cookie_name}=2.#{t2.to_i}.#{t2.to_i}")
+      cookie.should match("#{RedisAnalytics.current_visit_cookie_name}=2.2.1.#{t2.to_i}.#{t2.to_i}")
+      cookie.should match("#{RedisAnalytics.first_visit_cookie_name}=2.#{t2.to_i}.#{t2.to_i}")
     end
   end
 

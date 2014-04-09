@@ -1,4 +1,3 @@
-module Rack
   module RedisAnalytics
     class Filter
       attr_reader :filter_proc
@@ -30,4 +29,4 @@ module Rack
     end
 
   end
-end
+

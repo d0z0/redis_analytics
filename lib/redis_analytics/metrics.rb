@@ -1,4 +1,3 @@
-module Rack
   module RedisAnalytics
     module Metrics
 
@@ -93,4 +92,4 @@ module Rack
 
     end
   end
-end
+
