@@ -1,0 +1,50 @@
+<table class="table table-bordered">
+  <tr>
+    <td>
+      <p class="text-center"><b>Visitor Map</b></p>
+      <div id="world-map" class="info" style="width: 100%px; height: 160px"></div>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  // Map Overlay
+  var geoLocationData = {}; 
+  $(function(){
+    $('#world-map').vectorMap({
+      map: 'world_mill_en',
+      min: 0,
+      backgroundColor: '#fff',
+      regionStyle: {
+        initial: {
+          fill: '#ddd',
+          "fill-opacity": 1,
+          stroke: 'none',
+          "stroke-width": 0,
+          "stroke-opacity": 1
+        },
+        hover: {
+          fill: '#bbb',
+          "fill-opacity": 0.8
+        },
+        selected: {
+          fill: 'yellow'
+        },
+        selectedHover: {
+        }
+      },
+      series: {
+        regions: [{
+          scale: ['#C8EEFF', '#0071A4'],
+          values: geoLocationData,
+          normalizeFunction: 'polynomial'
+        }]
+      },
+      onRegionLabelShow: function(e, el, code){
+	  c = geoLocationData[code];
+	  if(c != undefined)
+	  el.html(el.html()+' ('+c+')');
+      }
+    });
+  });
+</script>

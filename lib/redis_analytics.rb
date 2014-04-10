@@ -1,6 +1,5 @@
 require 'redis'
 require 'browser'
-require 'rails'
 require 'sinatra'
 require 'geoip'
 

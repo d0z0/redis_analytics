@@ -1,0 +1,71 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span6">
+      <%= erb :'widgets/visits_area' %>
+    </div>
+    <div class="span2">
+      <%= erb :'widgets/visits_donut' %>
+    </div>
+    <div class="span2">
+      <%= erb :'widgets/referers_donut' %>
+    </div>
+    <div class="span2">
+      <%= erb :'widgets/browsers_donut' %>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <%= erb :'widgets/unique_visits_line' %>
+    </div>
+    <div class="span4">
+      <%= erb :'widgets/world_map' %>
+    </div>
+
+    <div class="span2">
+      <%= erb :'widgets/visitor_recency_slices' %>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <table class="table table-bordered table-hover">
+        <colgroup>
+          <col style="width: 33%"></col>
+          <col style="width: 33%"></col>
+          <col style="width: 33%"></col>
+        </colgroup>
+        <tr>
+          <td><%= erb :'widgets/total_visits' %></td>
+          <td><%= erb :'widgets/total_page_views' %></td>
+          <td><%= erb :'widgets/page_depth' %></td>
+        </tr>
+        <!--
+        <tr colspan="3">
+          <td>
+            <%# erb :'widgets/visit_spark' %>
+          </td>
+        </tr>
+        -->
+      </table>
+    </div>
+    <div class="span6">
+      <table class="table table-bordered table-hover">
+        <colgroup>
+          <col style="width: 33%"></col>
+          <col style="width: 33%"></col>
+          <col style="width: 33%"></col>
+        </colgroup>
+        <tr>
+          <td><%= erb :'widgets/bounce_rate' %></td>
+          <td><%= erb :'widgets/visit_duration' %></td>
+          <td><%= erb :'widgets/first_visits' %></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%# erb :'dialogs/visits' %>
+<%# erb :'dialogs/unique_visits' %>
+<%= erb :visits_js %>

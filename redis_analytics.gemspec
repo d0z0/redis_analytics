@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   spec.require_paths  = ["lib"]
 
   spec.add_runtime_dependency 'rails', '~> 3.2.0'
+  spec.add_runtime_dependency 'jquery-rails'
+  #spec.add_runtime_dependency 'twitter-bootstrap-rails'
   spec.add_runtime_dependency 'sqlite3'
   spec.add_runtime_dependency 'redis'
   spec.add_runtime_dependency 'browser'

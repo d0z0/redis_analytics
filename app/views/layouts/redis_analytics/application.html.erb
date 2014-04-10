@@ -6,9 +6,12 @@
   <%= javascript_include_tag "redis_analytics/application" %>
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body onload="changeTimeFrame('<%=@range%>')">
+<%= render partial: 'header', layout: false %>
 
 <%= yield %>
 
+<%= render partial: 'footer', layout: false %>
+<%= javascript_include_tag "redis_analytics/bootstrap.min.js" %>
 </body>
 </html>

@@ -1,9 +1,9 @@
 module RedisAnalytics
   class VisitsController < ApplicationController
-    
+
     def index
-      "Hello World"
+      @range = time_range
     end
-    
+
   end
 end
