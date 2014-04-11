@@ -174,7 +174,7 @@ end
 
 Since redis_analytics is licensed under MIT, you can use redis_analytics, provided you leave the attribution as is, in code as well as on the dashboard pages
 
-Copyright (c) 2012-2013 Schubert Cardozo. See [LICENSE!](LICENSE) for further details. 
+Copyright (c) 2012-2013 Schubert Cardozo. See [MIT-LICENSE!](MIT-LICENSE) for further details. 
 
 
 
