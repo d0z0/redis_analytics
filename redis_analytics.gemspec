@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'geoip'
   spec.add_runtime_dependency 'json'
 
-  spec.add_development_dependency 'fakeredis'
+  # spec.add_development_dependency 'fakeredis'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'guard-rspec'
