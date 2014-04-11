@@ -6,12 +6,6 @@ describe RedisAnalytics::Dashboard do
 
   context 'the pretty dashboard' do
 
-    it 'should redirect to visits' do
-      get '/'
-      last_response.should be_redirect
-      # how do we check the redirect location?
-    end
-
     it 'should be mapped to configured endpoint' do
       get '/'
       last_response.ok?

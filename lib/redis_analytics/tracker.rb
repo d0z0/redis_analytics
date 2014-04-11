@@ -21,7 +21,7 @@ module RedisAnalytics
     end
 
     def should_record?
-      return false if Rails.application.routes.named_routes[:redis_analytics].path =~ @request.path
+      return false if Rails.application and Rails.application.routes.named_routes[:redis_analytics].path =~ @request.path
       return false unless @response.ok?
       return false unless @response.content_type =~ /^text\/html/
       RedisAnalytics.path_filters.each do |filter|

@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   # spec.default_executable = 'redis_analytics_dashboard'
   spec.require_paths  = ["lib"]
 
-  spec.add_runtime_dependency 'railties', '>= 3.2.0', '< 5'
+  spec.add_runtime_dependency 'rails', '>= 3.2.0', '< 5'
   spec.add_runtime_dependency 'jquery-rails'
   spec.add_runtime_dependency 'sqlite3'
   spec.add_runtime_dependency 'redis'
