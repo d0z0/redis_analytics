@@ -20,7 +20,7 @@ function changeTimeFrame(range)
 
 	// aggregate data powers the 3 donuts
 	$.ajax({
-	    url: '<%= root_path + "api/visits?metrics=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time,recency&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
+	    url: '<%= root_path + "api/visits?metrics=first_visits,repeat_visits,browser,referrer,page_views,second_page_views,visit_time,recency,country&unit_count=#{(1.send(range)/1.send(unit)).round}&unit=#{unit}&aggregate=yes"%>',
 	    dataType: "json",
 	    success: function(data) {
 
@@ -37,6 +37,7 @@ function changeTimeFrame(range)
 		var total_visit_time = data[6].visit_time;
 		var avg_visit_time = ((total_visit_time / total_visits)).toFixed(2);
 		var total_recency = data[7].recency;
+                var country_info = data[8].country;
 
 		if(total_visits != 0)
 		  visits_json_data.push({'label': 'First Visits', 'value': first_visits});
@@ -49,6 +50,8 @@ function changeTimeFrame(range)
 		$("#bounce_rate")[0].innerHTML = (isNaN(bounce_rate) ? '?' : bounce_rate + '%') + ' <small class="muted">bounce rate</small>';
 		$("#visit_duration")[0].innerHTML = (isNaN(avg_visit_time) ? '?' : avg_visit_time + ' sec') + ' <small class="muted">avg time spent</small>';
 		$("#first_visits")[0].innerHTML = (isNaN(percent_first_visits) ? '?' : percent_first_visits + '%') + ' <small class="muted">new visits</small></h4>';
+
+                mapObject.series.regions[0].setValues(country_info);
 
 		// parse browser data from json
 		var browsers_json_data = [];
