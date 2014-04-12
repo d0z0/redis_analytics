@@ -60,11 +60,11 @@ describe RedisAnalytics::Configuration do
       visit_timeout.should_not be_nil
     end
     it 'should have an default value' do 
-      visit_timeout.should be == 1
+      visit_timeout.should be == 30
     end
     it 'can be set to another value' do 
-      visit_timeout = 5
-      visit_timeout.should be == 5
+      visit_timeout = 10
+      visit_timeout.should be == 10
     end
   end
 

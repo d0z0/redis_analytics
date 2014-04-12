@@ -35,7 +35,7 @@
 
       # Minutes the visit should timeout after (if no hit is received)
       def visit_timeout
-        @visit_timeout ||= 5 # minutes
+        @visit_timeout ||= 30 # minutes
       end
 
       # Name of the cookie which tracks first visitors (unknown visitors)
