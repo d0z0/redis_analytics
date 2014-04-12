@@ -53,7 +53,7 @@
           else
             @first_visit_seq ||= counter("unique_visits")
             track("first_visits", 1)
-            track("unique_visits", @first_visit_seq)
+            track("unique_visits", 1)
           end
           exec_custom_methods('visit') # custom methods that are measured on a per-visit basis
         end
