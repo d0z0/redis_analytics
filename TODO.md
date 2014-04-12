@@ -1,5 +1,6 @@
 ## TODO
 
+* traffic sources (split up and bugfixes)
 * cleanup and refactor analytics.rb
 * cleanup and refactor dashboard.rb
 * dashboard to have custom date selectors

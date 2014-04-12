@@ -40,9 +40,9 @@ function changeTimeFrame(range)
                 var country_info = data[8].country;
 
 		if(total_visits != 0)
-		  visits_json_data.push({'label': 'First Visits', 'value': first_visits});
+		  visits_json_data.push({'label': 'New', 'value': first_visits});
 		if(total_visits != 0)
-		  visits_json_data.push({'label': 'Repeat Visits', 'value': repeat_visits});
+		  visits_json_data.push({'label': 'Returning', 'value': repeat_visits});
 		visits_donut = Morris.Donut({element: 'visits_donut', data: visits_json_data});
 		$("#total_visits")[0].innerHTML = total_visits + ' <small class="muted">visits</small>';
 		$("#total_page_views")[0].innerHTML = page_views + ' <small class="muted">page views</small>';
@@ -83,10 +83,10 @@ function changeTimeFrame(range)
 
 		if(rec_total > 0)
 		{
-		$("#recency_d_bar")[0].style.width = $("#recency_d_cent")[0].innerHTML = (rec_day/rec_total) * 100 + '%';
-		$("#recency_w_bar")[0].style.width = $("#recency_w_cent")[0].innerHTML = (rec_week/rec_total) * 100 + '%';
-		$("#recency_m_bar")[0].style.width = $("#recency_m_cent")[0].innerHTML = (rec_month/rec_total) * 100 + '%';
-		$("#recency_o_bar")[0].style.width = $("#recency_o_cent")[0].innerHTML = (rec_other/rec_total) * 100 + '%';
+		$("#recency_d_bar")[0].style.width = $("#recency_d_cent")[0].innerHTML = ((rec_day/rec_total) * 100).toFixed(2) + '%';
+		$("#recency_w_bar")[0].style.width = $("#recency_w_cent")[0].innerHTML = ((rec_week/rec_total) * 100).toFixed(2) + '%';
+		$("#recency_m_bar")[0].style.width = $("#recency_m_cent")[0].innerHTML = ((rec_month/rec_total) * 100).toFixed(2) + '%';
+		$("#recency_o_bar")[0].style.width = $("#recency_o_cent")[0].innerHTML = ((rec_other/rec_total) * 100).toFixed(2) + '%';
 		
 		$("#recency_d")[0].title = rec_day + ' visits';
 		$("#recency_w")[0].title = rec_week + ' visits';

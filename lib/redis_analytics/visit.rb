@@ -88,7 +88,7 @@
         value = [@first_visit_seq.to_i, @current_visit_seq.to_i, @page_view_seq_no.to_i + 1, (@last_visit_start_time || @t).to_i, @t.to_i]
         # to debug, uncomment this line
         # puts "UPDATING VCN COOKIE -> #{value}"
-        expires = @t + (RedisAnalytics.visit_timeout.to_i * 60)
+        expires = @t + RedisAnalytics.visit_timeout.to_i.minutes
         {:value => value.join('.'), :expires => expires}
       end
 
@@ -96,7 +96,7 @@
         value = [@first_visit_seq.to_i, (@first_visit_time || @t).to_i, @t.to_i]
         # to debug, uncomment this line
         # puts "UPDATING RUCN COOKIE -> #{value}"
-        expires = @t + (60 * 60 * 24 * 5) # 5 hours
+        expires = @t + 1.year
         {:value => value.join('.'), :expires => expires}
       end
 
