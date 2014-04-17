@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe RedisAnalytics::Dashboard do
+describe RedisAnalytics::Dashboard::Engine do
 
-  subject(:app) { RedisAnalytics::Dashboard }
+  subject(:app) { RedisAnalytics::Dashboard::Engine }
 
   context 'the pretty dashboard' do
 

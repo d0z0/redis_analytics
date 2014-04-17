@@ -12,7 +12,7 @@ require 'redis_analytics/metrics'
 require 'redis_analytics/visit'
 require 'redis_analytics/helpers'
 require 'redis_analytics/tracker'
-require 'redis_analytics/dashboard'
+require 'redis_analytics/engine'
 
 module RedisAnalytics
   extend Configuration

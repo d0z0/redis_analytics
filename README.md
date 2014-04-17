@@ -2,11 +2,11 @@
 
 ### What is redis_analytics?
 
-A gem that provides a Redis based web analytics solution for your rack-compliant apps
+A ruby gem that uses redis to track web analytics for your rails apps
 
 ### Why should I use it?
 
-It gives you detailed analytics about visitors, unique visitors, browsers, OS, visitor recency, traffic sources and more
+It gives you detailed analytics about visitors, unique visitors, browsers, OS, visitor recency, traffic sources, etc
 
 ### Does it have a cool dashboard?
 
@@ -14,11 +14,9 @@ Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for 
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
 
-### OK, so how do I install it?
+### Cool! So how do I install it?
 
-`gem install redis_analytics`
-
-or in your `Gemfile`
+In your `Gemfile`
 
 ```ruby
 gem 'redis_analytics'
@@ -27,50 +25,33 @@ gem 'redis_analytics'
 Make sure your redis server is running! Redis configuration is outside the scope of this README, but
 check out the [Redis documentation](http://redis.io/documentation).
 
-### How do I enable tracking in my rack-compliant app?
-
-#### Step 1: Load the redis_analytics library and configure it
+### How do I enable tracking in my rails apps?
 
 ```ruby
-# this is not required unless you use :require => false in your Gemfile
 require 'redis_analytics'
 
-# configure your redis connection (this is mandatory) and namespace (this is optional)
+# configure your redis_connection (mandatory) and redis_namespace (optional)
 RedisAnalytics.configure do |configuration|
   configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
   configuration.redis_namespace = 'ra'
 end
 ```
-#### Step 2: Use the Tracker rack middleware (NOT REQUIRED FOR RAILS)
-
-```ruby
-# in Sinatra you would do...
-use RedisAnalytics::Tracker
-```
-
-For rails the middleware is added automatically, so you do not need to add it manually using `config.middleware.use`
 
 ### Where can I see the dashboard?
 
-Simply navigate to `/redis_analytics` in your rack app
-
-You can also run the standalone dashboard sinatra app like:
-
-`redis_analytics_dashboard --redis-host 127.0.0.1 --redis-port 6379 --redis-namespace ra`
-
-### Where do I change the dashboard URL endpoint?
-
-Set a dashboard endpoint in your configuration:
+The Dashboard is a `Rails::Engine`. Just mount it into your `routes.rb` file at your favorite endpoint
 
 ```ruby
-RedisAnalytics.configure do |configuration|
-  configuration.dashboard_endpoint = '/dashboard'
+Rails.application.routes.draw do
+  mount RedisAnalytics::Dashboard::Engine => "/dashboard"
 end
 ```
 
-### What if I have multiple rails apps that I want to track as one?
+and navigate to `/dashboard` in your app
 
-In the configuration, keep the value of redis_namespace the same across all your rails apps
+### What if I have multiple rails apps that I want to track as one single website?
+
+Just make sure you use the same `redis_connection` and `redis_namespace` in the configuration for all your rails apps
 
 ```ruby
 RedisAnalytics.configure do |configuration|
@@ -97,50 +78,66 @@ end
 
 ### Tracking custom metrics
 
-You can define and track your own metrics by defining an instance method inside the `Metrics` module
+You can define how to track custom metrics by creating an instance method inside the `RedisAnalytics::Metrics` module
 
-All you need to do, is make sure the method name conforms to the following format:
+```ruby
+module RedisAnalytics::Metrics
+
+  # methods to track custom metrics  
+
+end
+```
+
+RedisAnalytics only looks for method names which conform to the following format:
 
 `[abc]_[x]_per_[y]`
 
 where
 
 * `abc` is a metric name
-* `x` can be any one of `ratio` or `count` and defines how the metric is stored (`zset` or `string` respectively)
-* `y` can be any one of `hit` or `visit` and defines how will be tracked  (once per hit or once per visit)
+* `x` can be any one of `ratio` or `count` and defines the type of the metric
+* `y` can be any one of `hit` or `visit` and defines how the metric will be tracked (once per hit or once per visit)
 
-The return value of the method should be `Fixnum` for `count` and `String` for `ratio`  
+The return value of the method is important and should be `Fixnum` for `count` and `String` for `ratio` failing which, your metric might not work!
 
-If the return value is an `error` or `nil` the metric won't be tracked  
+If the return value is an `error` or `nil` the metric won't be tracked at all
 
-You can access the `Rack::Request` object via `@rack_request` and the `Rack::Response` object via `@rack_response` in your method  
+You can access the `Rack::Request` object via `@rack_request` and the `Rack::Response` object via `@rack_response` in your methods
 
-You are free to define other methods that do not have the above format in the `Metrics` module as helper methods  
+You are free to define other methods that do not have the above format in the `Metrics` module as helper methods
 
 ```ruby
 module RedisAnalytics::Metrics
 
-  # whenever a product is sold, i want to track it per product_id
-  def product_sales_ratio_per_hit
-    if @request.path == '/product/sale'
-      return @request.params['product_id']
-    end
-  end
+  # TRACKING RATIOS
 
-  # whenever a product is viewed by a user, i want to track it per product & user
+  # i want to track ratio of product views per product_id & user_id using query params
   def user_product_views_ratio_per_hit
-    if @request.path == '/product/info'
-      return "#{@request.params['product_id']}_#{@request.params['user_id']}"
+    if @rack_request.path == '/product/info'
+      return "#{@rack_request.params['product_id']}_#{@rack_request.params['user_id']}"
     end
   end
 
-  # how many times did a visitor reach the payment step
+  # i want to track ratio of sold products by product_id using the URL `/products/:id/sale`
+  def product_sales_ratio_per_hit
+    if @rack_request.path =~ Regexp.new("\/product\/([0-9]+)\/sale")
+      return $1
+    end
+  end
+
+  # TRACKING COUNTS
+
+  # i want to track how many times a visitor reached the payment step
   def payment_step_count_per_hit
-    return 1 if @request.path == '/payment'
+    return 1 if @rack_request.path == '/payment'
   end
 
 end
 ```
+
+### Customizing the dashboard
+
+Coming soon
 
 ### Using filters
 
@@ -166,15 +163,8 @@ RedisAnalytics.configure do |configuration|
 end
 ```
 
-## How does it work?
-
-![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/wsd.png)
-
 ## License
 
-Since redis_analytics is licensed under MIT, you can use redis_analytics, provided you leave the attribution as is, in code as well as on the dashboard pages
+Since redis_analytics is licensed under MIT, you can use redis_analytics for free, provided you leave the attribution as is, in code as well as on the dashboard pages
 
-Copyright (c) 2012-2013 Schubert Cardozo. See [MIT-LICENSE!](MIT-LICENSE) for further details. 
-
-
-
+Copyright (c) 2012-2014 Schubert Cardozo. See [MIT-LICENSE!](MIT-LICENSE) for further details.
