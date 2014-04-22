@@ -4,6 +4,7 @@ require 'redis_analytics/version'
 
 Gem::Specification.new do |spec|
   spec.name        = "redis_analytics"
+  spec.license	   = 'MIT'
   spec.version     = RedisAnalytics::VERSION
   spec.date        = Time.now.strftime('%Y-%m-%d')
   spec.authors     = ["Schubert Cardozo"]
