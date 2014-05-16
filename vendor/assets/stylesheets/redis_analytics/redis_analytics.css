@@ -8,5 +8,7 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
- *= require_tree .
+ *= require redis_analytics/jquery-jvectormap-1.2.2
+ *= require redis_analytics/morris
+ *= require redis_analytics/bootstrap.min
  */

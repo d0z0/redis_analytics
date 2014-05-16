@@ -1,5 +1,5 @@
-require 'rails'
 require 'jquery-rails'
+require 'rails'
 
 module RedisAnalytics
   module Dashboard
@@ -12,6 +12,13 @@ module RedisAnalytics
       
       initializer "redis_analytics.view_helpers" do |app|
         ActionController::Base.send :include, RedisAnalytics::Helpers
+      end
+      
+      initializer "redis_analytics.precompile.hook", group: :all do |app|
+        app.config.assets.precompile += %w[
+        redis_analytics/redis_analytics.js
+        redis_analytics/redis_analytics.css
+      ]
       end
     end
   end
