@@ -1,5 +1,5 @@
-require 'jquery-rails'
 require 'rails'
+require 'jquery-rails'
 
 module RedisAnalytics
   module Dashboard
