@@ -13,21 +13,21 @@ describe RedisAnalytics::Filter do
         req.ip == @mock_request.ip and res.content_type == @mock_response.content_type
       end
       filter = RedisAnalytics::Filter.new(proc)
-      filter.matches?(@mock_request, @mock_response).should be_true
+      expect(filter.matches?(@mock_request, @mock_response)).to be_true
     end
   end
 
   context "when a string PathFilter matches" do
     it "should return true" do
       filter = RedisAnalytics::PathFilter.new(@mock_request.path)
-      filter.matches?(@mock_request.path).should be_true
+      expect(filter.matches?(@mock_request.path)).to be_true
     end
   end
 
   context "when a regexp PathFilter matches" do
     it "should return true" do
       filter = RedisAnalytics::PathFilter.new(/#{@mock_request.path}/)
-      filter.matches?(@mock_request.path).should be_true
+      expect(filter.matches?(@mock_request.path)).to be_true
     end
   end
 
