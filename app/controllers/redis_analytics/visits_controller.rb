@@ -1,5 +1,5 @@
 module RedisAnalytics
-  class VisitsController < ApplicationController
+  class VisitsController < RedisAnalytics::ApplicationController
 
     def index
       @range = time_range
