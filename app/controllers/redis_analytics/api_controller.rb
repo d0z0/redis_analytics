@@ -1,5 +1,5 @@
 module RedisAnalytics
-  class ApiController < ApplicationController
+  class ApiController < RedisAnalytics::ApplicationController
 
     def visits
       to_date_time = Date.parse(params[:to_date_time]).to_time rescue Time.now
