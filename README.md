@@ -10,7 +10,7 @@ It gives you detailed analytics about visitors, unique visitors, browsers, OS, v
 
 ### Does it have a cool dashboard?
 
-Yes, It uses the excellent [Morris.js](http://www.oesmith.co.uk/morris.js/) for graphs/charts
+Yes, It uses the excellent [Morris.js](http://morrisjs.github.io/morris.js/) for graphs/charts
 
 ![Screenshot](https://github.com/saturnine/redis_analytics/raw/master/screenshot.png)
 
