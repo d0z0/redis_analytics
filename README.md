@@ -1,7 +1,5 @@
 ## redis_analytics [![Build Status](https://travis-ci.org/saturnine/redis_analytics.png?branch=master)](https://travis-ci.org/saturnine/redis_analytics) [![Coverage Status](https://coveralls.io/repos/saturnine/redis_analytics/badge.png?branch=master)](https://coveralls.io/r/saturnine/redis_analytics) [![Gem Version](https://badge.fury.io/rb/redis_analytics.png)](http://badge.fury.io/rb/redis_analytics)
 
-### What is redis_analytics?
-
 A ruby gem that uses redis to track web analytics for your rails apps
 
 ### Why should I use it?
@@ -162,6 +160,10 @@ RedisAnalytics.configure do |configuration|
 
 end
 ```
+
+## Contributors Wanted
+
+I may not be able to devote much time to this gem, but you are welcome to send me pull requests. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started
 
 ## License
 
