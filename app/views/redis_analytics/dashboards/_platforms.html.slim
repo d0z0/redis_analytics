@@ -1,0 +1,3 @@
+p.text-center
+  b Platform
+= pie_chart(api_events_aggregate_path(metric: 'platform', per: @range, count: @range_count), height: "200px")

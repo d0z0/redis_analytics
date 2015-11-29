@@ -1,6 +1,5 @@
 RedisAnalytics::Dashboard::Engine.routes.draw do
-  root :to => 'visits#index'
-  get '/visits', to: 'visits#index'
-  get '/api/visits', to: 'api#visits'
-  # get '/api/events', to: 'api#events'
+  root :to => 'dashboards#index'
+  get '/api/events/series', to: 'events#series'
+  get '/api/events/aggregate', to: 'events#aggregate'
 end

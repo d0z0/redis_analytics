@@ -1,0 +1,8 @@
+.navbar
+  .navbar-inner
+    a.brand href="http://www.github.com/saturnine/redis_analytics" Redis Analytics
+    ul.nav.nav-pills.pull-right
+      li
+        .btn-group data-toggle="buttons-radio"
+          - RedisAnalytics.time_range_formats.each do |range|
+            = link_to range, root_path(range: range, range_count: 10), 'class' => "btn #{'active' if range == @range}"

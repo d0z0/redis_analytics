@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title RedisAnalytics
+    = stylesheet_link_tag 'redis_analytics/redis_analytics', :media => 'all'
+    = javascript_include_tag 'redis_analytics/redis_analytics'
+    = javascript_include_tag "//code.highcharts.com/highcharts.js", "chartkick"
+    / = javascript_include_tag "//www.google.com/jsapi", "chartkick"
+    = csrf_meta_tags
+  body
+    = render partial: 'header'
+    = yield
+    = render partial: 'footer'
+javascript:
+  $(function() {
+    changeTimeFrame('#{@range}')
+  })
+
+  Highcharts.setOptions({
+        global: {
+            useUTC: false
+        }
+    });

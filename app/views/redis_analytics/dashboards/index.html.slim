@@ -1,0 +1,50 @@
+.container-fluid
+  .row-fluid
+    .span6
+      = render partial: 'visits'
+    .span2
+      = render partial: 'browsers'
+    .span2
+      = render partial: 'platforms'
+    .span2
+      = render partial: 'referrers'
+
+  .row-fluid
+    .span2
+      = render partial: 'visitor_recency_slices'
+    .span4
+      = render partial: 'world_map'
+    .span2
+      = render partial: 'landing_pages'
+    .span2
+      = render partial: 'urls'
+    .span2
+      = render partial: 'devices'
+
+  .row-fluid
+    .span6
+      table.table.table-bordered.table-hover
+        colgroup
+          col style="width: 33%"
+          col style="width: 33%"
+          col style="width: 33%"
+        tr
+          td
+            = render partial: 'total_visits'
+          td
+            = render partial: 'total_page_views'
+          td
+            = render partial: 'page_depth'
+    .span6
+      table.table.table-bordered.table-hover
+        colgroup
+          col style="width: 33%"
+          col style="width: 33%"
+          col style="width: 33%"
+        tr
+          td
+            = render partial: 'bounce_rate'
+          td
+            = render partial: 'visit_duration'
+          td
+            = render partial: 'first_visits'

@@ -3,9 +3,6 @@ module RedisAnalytics
     # Redis connection instance
     attr_accessor :redis_connection
 
-    # Redis namespace for keys
-    attr_writer :redis_namespace
-
     # Name of the cookie which tracks first visitors
     attr_writer :first_visit_cookie_name
 
@@ -27,11 +24,6 @@ module RedisAnalytics
 
     # Path to the Geo IP Database file
     attr_writer :geo_ip_data_path
-
-    # Redis namespace for keys
-    def redis_namespace
-      @redis_namespace ||= 'ra'
-    end
 
     # Minutes the visit should timeout after (if no hit is received)
     def visit_timeout
@@ -81,7 +73,7 @@ module RedisAnalytics
     end
 
     def time_range_formats
-      [[:year, :month, "%b"], [:week, :day, "%a"], [:day, :hour, "%l%P"]]
+      ['year', 'month', 'day', 'hour', 'minute']
     end
 
     def configure

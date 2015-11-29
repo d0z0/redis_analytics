@@ -1,6 +1,7 @@
 require 'redis'
 require 'browser'
 require 'geoip'
+require 'chartkick'
 
 require 'redis_analytics'
 

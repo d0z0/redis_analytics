@@ -1,0 +1,3 @@
+p.text-center
+  b Device
+= pie_chart(api_events_aggregate_path(metric: 'device', per: @range, count: @range_count), height: "200px")

@@ -27,7 +27,6 @@ module RedisAnalytics
     # method used in analytics.rb to initialize visit
     def initialize(request, response)
       @t = Time.now
-      @redis_key_prefix = "#{RedisAnalytics.redis_namespace}:"
       @rack_request = request
       @rack_response = response
       @first_visit_seq = first_visit_info[0] || current_visit_info[0]
@@ -68,6 +67,7 @@ module RedisAnalytics
         if m = meth.to_s.match(/^([a-z_]*)_(count|ratio)_per_#{type}$/)
           begin
             return_value = self.send(meth)
+            return_value.downcase! if return_value.is_a?(String)
             track(m.to_a[1], return_value) if return_value
           rescue => e
             warn "#{meth} resulted in an exception #{e}"
@@ -78,7 +78,7 @@ module RedisAnalytics
 
     # helpers
     def counter(metric_name)
-      n = RedisAnalytics.redis_connection.incr("#{@redis_key_prefix}#{metric_name}")
+      n = RedisAnalytics.redis_connection.incr(metric_name)
       # to debug, uncomment this line
       # puts "COUNT #{metric_name} -> #{n}"
       return n
@@ -102,9 +102,9 @@ module RedisAnalytics
 
     def track(metric_name, metric_value)
       n = 0
-      RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#METRICS", metric_name, metric_value.class)
+      RedisAnalytics.redis_connection.hmset("#METRICS", metric_name, metric_value.class)
       for_each_time_range(@t) do |ts|
-        key = "#{@redis_key_prefix}#{metric_name}:#{ts}"
+        key = "#{metric_name}:#{ts}"
         if metric_value.is_a?(Fixnum)
           n = RedisAnalytics.redis_connection.incrby(key, metric_value)
         else
@@ -112,7 +112,7 @@ module RedisAnalytics
         end
       end
       # to debug, uncomment this line
-      # puts "TRACK #{metric_name} -> #{n}" 
+      # puts "TRACK #{metric_name} -> #{n}"
       return n
     end
 

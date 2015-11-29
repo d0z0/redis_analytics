@@ -8,7 +8,7 @@ module RedisAnalytics
 
     # Developers can override or define new public methods here
     # Methods should start with track and end with count or types
-    # Return types should be Fixnum or String resp.
+    # Return types should be Fixnum or String resp
     # If you return nil or an error nothing will be tracked
 
     def browser_ratio_per_visit
@@ -74,7 +74,7 @@ module RedisAnalytics
     def url_ratio_per_hit
       return @rack_request.path
     end
-    
+
     # track the landing pages ratio
     def landing_page_ratio_per_hit
       return @rack_request.path if @page_view_seq_no.to_i == 0
