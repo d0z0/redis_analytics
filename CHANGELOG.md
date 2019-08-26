@@ -1,3 +1,11 @@
+## 1.1.0
+
+* Fixed to work with rails 5 and ruby 2.0
+
+## 1.0.1
+
+* Rspec fixes, removed sqlite3 dependency and a few other minor fixes
+
 ## 0.2.0
 
 * refactor of the dashboard sinatra app
