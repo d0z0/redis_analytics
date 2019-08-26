@@ -73,10 +73,10 @@ describe RedisAnalytics::Configuration do
     it 'should not be nil' do
       visitor_recency_slices.should_not be_nil
     end
-    it 'should be an Array of Fixnum' do 
+    it 'should be an Array of Integer' do 
       visitor_recency_slices.instance_of? Array
       visitor_recency_slices.each do |value|
-        value.instance_of? Fixnum
+        value.instance_of? Integer
       end
     end
     it 'can be set to another value' do 
