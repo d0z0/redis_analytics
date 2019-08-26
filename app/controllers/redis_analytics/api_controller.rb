@@ -37,7 +37,7 @@ module RedisAnalytics
             results[i]['raw'] = Time.at(results[i]['unix']).strftime(strf)
             results[i][q] = r[1]
           end
-        elsif result.is_a?(Hash) or result.is_a?(Fixnum) # aggregate data
+        elsif result.is_a?(Hash) or result.is_a?(Integer) # aggregate data
           results[j] = {q => result}
         end
       end

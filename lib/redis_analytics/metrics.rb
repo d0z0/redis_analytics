@@ -8,7 +8,7 @@ module RedisAnalytics
 
     # Developers can override or define new public methods here
     # Methods should start with track and end with count or types
-    # Return types should be Fixnum or String resp.
+    # Return types should be Integer or String resp.
     # If you return nil or an error nothing will be tracked
 
     def browser_ratio_per_visit

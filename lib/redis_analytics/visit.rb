@@ -105,7 +105,7 @@ module RedisAnalytics
       RedisAnalytics.redis_connection.hmset("#{@redis_key_prefix}#METRICS", metric_name, metric_value.class)
       for_each_time_range(@t) do |ts|
         key = "#{@redis_key_prefix}#{metric_name}:#{ts}"
-        if metric_value.is_a?(Fixnum)
+        if metric_value.is_a?(Integer)
           n = RedisAnalytics.redis_connection.incrby(key, metric_value)
         else
           n = RedisAnalytics.redis_connection.zincrby(key, 1, metric_value)

@@ -45,7 +45,7 @@ module RedisAnalytics
         else
           return time.zip(union.map{|x| Hash[RedisAnalytics.redis_connection.zrange(x, 0, -1, :with_scores => true)]})
         end
-      elsif metric_type(metric_name) == 'Fixnum'
+      elsif metric_type(metric_name) == 'Integer'
         if aggregate
           return RedisAnalytics.redis_connection.mget(*union).map(&:to_i).inject(:+)
         else
