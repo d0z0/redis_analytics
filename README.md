@@ -30,7 +30,7 @@ require 'redis_analytics'
 
 # configure your redis_connection (mandatory) and redis_namespace (optional)
 RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_connection = Redis.new(url: 'redis://localhost:6379')
   configuration.redis_namespace = 'ra'
 end
 ```
@@ -53,20 +53,20 @@ Just make sure you use the same `redis_connection` and `redis_namespace` in the 
 
 ```ruby
 RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_connection = Redis.new(url: 'redis://localhost:6379')
   configuration.redis_namespace = 'mywebsite.org'
 end
 ```
 
 ### Why is the Geolocation tracking giving me wrong results?
 
-IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version. 
+IP based Geolocation works using [MaxMind's](http://www.maxmind.com) GeoLite database. The free version is not as accurate as their commercial version.
 Also it is recommended to regularly get an updated binary of 'GeoLite Country' database from [here](http://dev.maxmind.com/geoip/geolite) and extract the GeoIP.dat file into a local directory.
 You will then need to point to the GeoIP.dat file in your configuration.
 
 ```ruby
 RedisAnalytics.configure do |configuration|
-  configuration.redis_connection = Redis.new(:host => 'localhost', :port => '6379')
+  configuration.redis_connection = Redis.new(url: 'redis://localhost:6379')
   configuration.redis_namespace = 'mywebsite.org'
   configuration.geo_ip_data_path = '/path/to/GeoIP.dat'
 end
