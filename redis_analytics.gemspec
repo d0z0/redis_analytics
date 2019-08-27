@@ -17,12 +17,11 @@ Gem::Specification.new do |spec|
 
   spec.files          = Dir.glob("**/*")
 
-  # spec.executables = ['redis_analytics_dashboard']
-  # spec.default_executable = 'redis_analytics_dashboard'
   spec.require_paths  = ["lib"]
 
   spec.required_ruby_version = ">= 2.3.0"
 
+  spec.add_dependency 'rack', '>= 1.2.0'
   spec.add_dependency 'redis', ["< 5", ">= 2.2"]
   spec.add_dependency 'jquery-rails', '~> 4.3'
   spec.add_dependency 'browser', '~> 2.6'
