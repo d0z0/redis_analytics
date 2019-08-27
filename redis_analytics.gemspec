@@ -21,12 +21,12 @@ Gem::Specification.new do |spec|
   # spec.default_executable = 'redis_analytics_dashboard'
   spec.require_paths  = ["lib"]
 
-  spec.add_runtime_dependency 'rails', '>= 3.2.0', '< 7'
-  spec.add_runtime_dependency 'jquery-rails'
-  spec.add_runtime_dependency 'redis'
-  spec.add_runtime_dependency 'browser'
-  spec.add_runtime_dependency 'geoip'
-  spec.add_runtime_dependency 'json'
+  spec.required_ruby_version = ">= 2.3.0"
+
+  spec.add_dependency 'redis', ["< 5", ">= 2.2"]
+  spec.add_dependency 'jquery-rails', '~> 4.3'
+  spec.add_dependency 'browser', '~> 2.6'
+  spec.add_dependency 'geoip', '~> 1.6'
 
   spec.add_development_dependency 'fakeredis'
   spec.add_development_dependency 'rake'
@@ -37,5 +37,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'coveralls'
 
-  spec.required_ruby_version = '>= 1.9.2'
 end
