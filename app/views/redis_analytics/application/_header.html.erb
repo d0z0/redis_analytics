@@ -5,7 +5,7 @@
     <ul class="nav nav-pills pull-right">
       <li>
         <div class="btn-group" data-toggle="buttons-radio">
-          <a href="visits" class="btn btn-small <%=' active' if request.path.end_with?('/visits') %>">Visits</a>
+          <a href="<%= visits_path %>" class="btn btn-small <%=' active' if request.path.end_with?('/visits') %>">Visits</a>
         </div>
         <div class="btn-group" data-toggle="buttons-radio" id="timeRange">
         <% RedisAnalytics.time_range_formats.map{|x| x[0]}.each do |range| %>
