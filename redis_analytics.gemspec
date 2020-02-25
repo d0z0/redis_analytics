@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rack', '>= 1.2.0'
   spec.add_dependency 'redis', ["< 5", ">= 2.2"]
   spec.add_dependency 'jquery-rails', '~> 4.3'
-  spec.add_dependency 'browser', '~> 2.6'
+  spec.add_dependency 'browser', '>= 2.6', '< 5.0'
   spec.add_dependency 'geoip', '~> 1.6'
 
   spec.add_development_dependency 'fakeredis'
